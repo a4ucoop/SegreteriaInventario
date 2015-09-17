@@ -1,0 +1,8 @@
+tmp/
+.metatada/
+.settings/
+*.pyc
+*.mo
+.*.swp
+*.db
+*.log
