@@ -6,3 +6,4 @@ tmp/
 .*.swp
 *.db
 *.log
+settings.py
