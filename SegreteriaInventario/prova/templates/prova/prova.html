@@ -1,6 +1,28 @@
-    <ul>
-    {% for row in rows %}
-        <li>{{ row }}</li>
-    {% endfor %}
-    </ul>
+{% extends "base.html" %}
+{% block body %}
+<table data-toggle="table" data-cache="false">
+    <thead>
+        <tr>
+            <th data-halign="center">ID</th>
+            <th data-halign="center">Descrizione</th>
+            <th data-halign="center">Data Acquisto</th>
+            <th data-halign="center">Valore</th>
+            <th data-halign="center">Ubicazione</th>
+            <th data-halign="center">Data Inizio Ammortamento</th>
+        </tr>
+    </thead>
+    <tbody>
+	{% for row in rows %}
+		<tr>
+			<td>{{ row.ID_INVENTARIO_BENI }}</td>
+			<td>{{ row.DS_BENE }}</td>
+			<td>{{ row.DT_REGISTRAZIONE_BUONO }}</td>
+			<td>{{ row.VALORE_CONVENZIONALE }}</td>
+			<td>{{ row.DS_SPAZIO }}</td>
+			<td>{{ row.DT_INI_AMMORTAMENTO }}</td>
+		</tr>
+	{% endfor %}
+    </tbody>
+</table>
 
+{% endblock %}

@@ -7,3 +7,5 @@ tmp/
 *.db
 *.log
 settings.py
+.Trash-1000/
+static/
