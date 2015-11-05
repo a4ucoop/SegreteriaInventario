@@ -26,7 +26,7 @@ def prova(request):
     		ON MOV.ID_INVENTARIO_BENI = INV.ID_INVENTARIO_BENI) INNER JOIN\
     		V_IE_AC_SPAZI SPA ON INV.CD_UBICAZIONE = SPA.CD_SPAZIO)\
     	WHERE\
-    		rownum < 10\
+    		rownum < 20\
     	ORDER BY\
     		INV.VALORE_CONVENZIONALE DESC"
     	)
