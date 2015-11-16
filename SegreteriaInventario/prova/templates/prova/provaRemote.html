@@ -1,27 +1,90 @@
 {% extends "base.html" %}
 {% block body %}
-<table data-toggle="table" data-cache="false">
+<a href="#add" class="btn btn-info add-row">Add New Row</a>
+Search: <input id="filter" type="text"/>
+Page Size:
+<select id="change-page-size">
+    <option value="2">2</option>
+    <option value="3">3</option>
+    <option value="5">5</option>
+    <option value="10">10</option>
+</select>
+Navigation Size:
+<select id="change-nav-size">
+    <option value="0">None</option>
+    <option value="2">2</option>
+    <option value="3">3</option>
+    <option value="4">4</option>
+</select>
+<table class="table demo table-bordered" data-page-size="2">
     <thead>
-        <tr>
-            <th data-halign="center">ID</th>
-            <th data-halign="center">Descrizione</th>
-            <th data-halign="center">Data Acquisto</th>
-            <th data-halign="center">Valore</th>
-            <th data-halign="center">Ubicazione</th>
-            <th data-halign="center">Data Inizio Ammortamento</th>
-        </tr>
+    <tr>
+        <th data-halign="center">ID</th>
+        <th data-halign="center">Descrizione</th>
+        <th data-halign="center">Data Acquisto</th>
+        <th data-halign="center">Valore</th>
+        <th data-halign="center">Ubicazione</th>
+        <th data-halign="center">Data Inizio Ammortamento</th>
+    </tr>
     </thead>
     <tbody>
-	{% for row in rows %}
-		<tr>
-			<td>{{ row.ID_INVENTARIO_BENI }}</td>
-			<td>{{ row.DS_BENE }}</td>
-			<td>{{ row.DT_REGISTRAZIONE_BUONO }}</td>
-			<td>{{ row.VALORE_CONVENZIONALE }}</td>
-			<td>{{ row.DS_SPAZIO }}</td>
-			<td>{{ row.DT_INI_AMMORTAMENTO }}</td>
-		</tr>
-	{% endfor %}
+    {% for row in rows %}
+    <tr>
+        <td><a data-id="{{ row.ID_INVENTARIO_BENI }}" onclick="openDialog($(this));  return false;">{{ row.ID_INVENTARIO_BENI }}</a></td>
+        <td>{{ row.DS_BENE }}</td>
+        <td>{{ row.DT_REGISTRAZIONE_BUONO }}</td>
+        <td>{{ row.VALORE_CONVENZIONALE }}</td>
+        <td>{{ row.DS_SPAZIO }}</td>
+        <td>{{ row.DT_INI_AMMORTAMENTO }}</td>
+    </tr>
+    {% endfor %}
     </tbody>
+    <tfoot class="hide-if-no-paging">
+    <tr>
+        <td colspan="6">
+            <div class="pagination pagination-centered"></div>
+        </td>
+    </tr>
+    </tfoot>
 </table>
+
+<div id="dialog-modal" title="QR CODE" class="foo">
+    <div id="qrcode">
+
+    </div>
+</div>
+<script type="text/javascript">
+
+    function openDialog(id_qr) {
+        var text = id_qr.data('id').toString();
+        $("#dialog-modal").dialog({
+
+            open: function (event, ui) {
+                $("#qrcode").qrcode({
+                    text: text,
+                    render : 'canvas',
+                    size : 200
+                });
+            }
+        });
+
+    }
+    $(function () {
+        $('table').footable();
+
+        $('#change-page-size').change(function (e) {
+            e.preventDefault();
+            var pageSize = $(this).val();
+            $('.footable').data('page-size', pageSize);
+            $('.footable').trigger('footable_initialized');
+        });
+
+        $('#change-nav-size').change(function (e) {
+            e.preventDefault();
+            var navSize = $(this).val();
+            $('.footable').data('limit-navigation', navSize);
+            $('.footable').trigger('footable_initialized');
+        });
+    });
+</script>
 {% endblock %}

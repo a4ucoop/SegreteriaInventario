@@ -8,4 +8,6 @@ tmp/
 *.log
 settings.py
 .Trash-1000/
-static/
+.DS_Store
+._*
+.idea/

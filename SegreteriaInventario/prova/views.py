@@ -4,8 +4,6 @@ from django.http import HttpResponse
 from django.db import connections
 from django.shortcuts import redirect
 from models import Item
-
-
 import datetime
 
 def index(request):
@@ -47,7 +45,7 @@ def showRemoteDB(request):
     rows = rows_to_dict_list(cursor)
 
     context = {'rows': rows}
-    
+
     return render (request,'prova/provaRemote.html',context)
 
 
