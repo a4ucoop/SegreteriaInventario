@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+{% block body %}
+<div class="btn-group" role="group" aria-label="...">
+  <button type="button" class="btn btn-success" onClick="location.href='{% url 'checkUpdate' %}'" data-toggle="tooltip" title="Aggiorna solo i dati nuovi (non modifica quelli già presenti)">Aggiornameto Parziale</button>
+</div>
+<div class="btn-group" role="group" aria-label="...">
+  <button type="button" class="btn btn-danger" onClick="location.href='{% url 'updateLocalDB' %}'" data-toggle="tooltip" title="Aggiorna tutti i dati (può richiedere del tempo)">Aggiornameto Completo</button>
+</div>
+<br><br>
+    {% if message %}<div class="alert alert-success" role="alert">{{ message }}</div>{% endif %}
+<table data-toggle="table" data-cache="false">
+    <thead>
+        <tr>
+            <th data-halign="center">ID</th>
+            <th data-halign="center">Item ID</th>
+            <th data-halign="center">Descrizione</th>
+            <th data-halign="center">Data Acquisto</th>
+            <th data-halign="center">Valore</th>
+            <th data-halign="center">Ubicazione</th>
+            <th data-halign="center">Data Inizio Ammortamento</th>
+        </tr>
+    </thead>
+    <tbody>
+	{% for row in rows %}
+		<tr>
+			<td>{{ row.id }}</td>
+            <td>{{ row.item_id }}</td>
+			<td>{{ row.description }}</td>
+			<td>{{ row.purchase_date }}</td>
+			<td>{{ row.price }}</td>
+			<td>{{ row.location }}</td>
+			<td>{{ row.depreciation_starting_date }}</td>
+		</tr>
+	{% endfor %}
+    </tbody>
+</table>
+{% endblock %}
+
+{% block javascripts %}
+<script>
+$(document).ready(function(){
+    $('[data-toggle="tooltip"]').tooltip();   
+});
+</script>
+{% endblock %}

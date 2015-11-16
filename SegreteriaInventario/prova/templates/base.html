@@ -14,7 +14,6 @@
     <title>Inventario Unicam</title>
     {% endblock %}
     
-    {% block stylesheets %}
     <!-- Bootstrap core CSS -->
     <link href="{% static 'css/bootstrap/bootstrap/bootstrap.min.css'%}" rel="stylesheet">
     <!-- Bootstrap table CSS -->
@@ -22,6 +21,7 @@
 
     <!-- Custom styles for this template -->
     <link href="{% static 'css/starter-template.css' %}" rel="stylesheet">
+    {% block stylesheets %}
     {% endblock %}
 
   </head>
@@ -41,7 +41,7 @@
         </div>
         <div id="navbar" class="collapse navbar-collapse">
           <ul class="nav navbar-nav">
-            <li class="active"><a href="#">Home</a></li>
+            <li class="active"><a href="{% url 'prova.views.index' %}">Home</a></li>
             <li><a href="#about">About</a></li>
             <li><a href="#contact">Contact</a></li>
           </ul>
@@ -58,7 +58,6 @@
 
     </div><!-- /.container -->
 
-    {% block javascripts %}
     <!-- Bootstrap core JavaScript
     ================================================== -->
     <!-- Placed at the end of the document so the pages load faster -->
@@ -67,6 +66,7 @@
     <script src="{% static 'js/bootstrap/bootstrap-table/bootstrap-table.js' %}"></script>
     <!-- put your locale files after bootstrap-table.js -->
     <script src="{% static 'locale/bootstrap/bootstrap-table/bootstrap-table-it-IT.js' %}"></script>
+    {% block javascripts %}
     {% endblock %}
   </body>
 </html>
