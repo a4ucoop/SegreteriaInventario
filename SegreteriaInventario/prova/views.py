@@ -2,6 +2,7 @@ from django.shortcuts import render
 from django.template import RequestContext, loader
 from django.http import HttpResponse
 from django.db import connection
+from django import template
 
 # prende il cursore che ha eseguito la query, estrae i risultati sotto
 # forma di dizionario che ha come chiave il nome del campo
@@ -36,3 +37,13 @@ def prova(request):
     context = {'rows': rows}
     
     return render (request,'prova/prova.html',context)
+
+register = template.Library()
+
+@register.filter
+def qr(value,size="150x150"):
+    """
+        Usage:
+        <img src="{{object.code|qr:"120x130"}}" />
+    """
+    return "http://chart.apis.google.com/chart?chs=%s&cht=qr&chl=%s&choe=UTF-8&chld=H|0" % (size, value)
