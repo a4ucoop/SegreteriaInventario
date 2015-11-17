@@ -25,6 +25,7 @@ Navigation Size:
         <th data-halign="center">Valore</th>
         <th data-halign="center">Ubicazione</th>
         <th data-halign="center">Data Inizio Ammortamento</th>
+        <th data-halign="center">Valore Residuo</th>
     </tr>
     </thead>
     <tbody>
@@ -36,6 +37,7 @@ Navigation Size:
         <td>{{ row.VALORE_CONVENZIONALE }}</td>
         <td>{{ row.DS_SPAZIO }}</td>
         <td>{{ row.DT_INI_AMMORTAMENTO }}</td>
+        <td>{{ row.VALORE_RESIDUO | floatformat:2 }}</td>
     </tr>
     {% endfor %}
     </tbody>
