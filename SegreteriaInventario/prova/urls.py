@@ -10,4 +10,6 @@ urlpatterns = [
     url(r'^update/complete', views.updateLocalDB, name='updateLocalDB'),
     url(r'^show/([0-9]+)/$', views.showSingleItem, name='showSingleItem'),
     url(r'^examples/bootstrap_table/data', views.getData, name='getData'),
+    url(r'^accounts/login/$', views.login, {'template_name': 'registration/login.html'}),
+    url(r'^accounts/registration/$', views.registration),
 ]

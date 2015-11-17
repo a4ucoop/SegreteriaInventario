@@ -4,12 +4,26 @@ from django.http import HttpResponse
 from django.db import connections
 from django.db.models import Q
 from django.shortcuts import redirect
+from django.contrib.auth.decorators import login_required
+from django.views.decorators.cache import never_cache
+from django.contrib.auth.views import login as django_auth_login
+
 from models import Item
+
 import datetime
 import json
 
 def index(request):
 	return render (request, 'prova/index.html')
+
+@never_cache
+def login(request, *args, **kw):
+    print request, args, kw
+    return django_auth_login(request, *args, **kw)
+
+def registration(request):
+    """TODO"""
+    return ""
 
 # prende il cursore che ha eseguito la query, estrae i risultati sotto
 # forma di dizionario che ha come chiave il nome del campo
@@ -18,7 +32,7 @@ def rows_to_dict_list(cursor):
     return [dict(zip(columns, row)) for row in cursor]
 
 
-
+@login_required
 def showRemoteDB(request):
 
     cursor = connections['cineca'].cursor()
@@ -54,6 +68,7 @@ def showRemoteDB(request):
 
 
 
+@login_required
 def showLocalDB(request):
     rows = Item.objects.using('default').all().order_by('-item_id')
     context ={'rows': rows}
@@ -61,6 +76,7 @@ def showLocalDB(request):
 
 
 
+@login_required
 def updateLocalDB(request):
     cursor = connections['cineca'].cursor()         # Cursor connessione Cineca
     cursorLocal = connections['default'].cursor()   # Cursor DB locale
@@ -116,6 +132,7 @@ def updateLocalDB(request):
 
 
 
+@login_required
 def checkUpdate(request):
     cursor = connections['cineca'].cursor()         # Cursor connessione Cineca
     cursorLocal = connections['default'].cursor()   # Cursor DB locale

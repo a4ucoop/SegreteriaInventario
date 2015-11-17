@@ -115,3 +115,10 @@ STATICFILES_DIRS = (
     os.path.join(BASE_DIR, "static"),
     #'/var/www/static/',
 )
+
+URL_PREFIX = "prova/"
+
+LOGIN_URL = "/%saccounts/login/" % URL_PREFIX
+LOGIN_REDIRECT_URL = "/%s" % URL_PREFIX
+LOGOUT_URL = "/%saccounts/logout/" % URL_PREFIX
+
