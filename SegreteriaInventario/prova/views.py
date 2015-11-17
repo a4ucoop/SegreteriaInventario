@@ -63,9 +63,7 @@ def updateLocalDB(request):
 
     # Seleziona tutti i dati necessari dal DB remoto
     cursor.execute(
-        "SELECT *\
-        FROM (\
-            SELECT \
+        "SELECT \
                 INV.ID_INVENTARIO_BENI,\
                 INV.DS_BENE,\
                 MOV.DT_REGISTRAZIONE_BUONO,\
@@ -77,10 +75,7 @@ def updateLocalDB(request):
                 ON MOV.ID_INVENTARIO_BENI = INV.ID_INVENTARIO_BENI) INNER JOIN\
                 V_IE_AC_SPAZI SPA ON INV.CD_UBICAZIONE = SPA.CD_SPAZIO)\
             ORDER BY\
-                MOV.ID_INVENTARIO_BENI DESC\
-            )\
-        WHERE\
-            rownum < 10"
+                MOV.ID_INVENTARIO_BENI DESC"
         )
     
     rows = rows_to_dict_list(cursor)
