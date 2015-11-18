@@ -1,24 +1,30 @@
 {% extends "base.html" %}
 {% block body %}
 <div class="btn-group" role="group" aria-label="...">
-  <button type="button" class="btn btn-success" onClick="location.href='{% url 'checkUpdate' %}'" data-toggle="tooltip" title="Aggiorna solo i dati nuovi (non modifica quelli già presenti)">Aggiornameto Parziale</button>
+    <button type="button" class="btn btn-success" onClick="location.href='{% url 'checkUpdate' %}'"
+            data-toggle="tooltip" title="Aggiorna solo i dati nuovi (non modifica quelli già presenti)">Aggiornameto
+        Parziale
+    </button>
 </div>
 <div class="btn-group" role="group" aria-label="...">
-  <button type="button" class="btn btn-danger" onClick="location.href='{% url 'updateLocalDB' %}'" data-toggle="tooltip" title="Aggiorna tutti i dati (può richiedere del tempo)">Aggiornameto Completo</button>
+    <button type="button" class="btn btn-danger" onClick="location.href='{% url 'updateLocalDB' %}'"
+            data-toggle="tooltip" title="Aggiorna tutti i dati (può richiedere del tempo)">Aggiornameto Completo
+    </button>
 </div>
 <br><br>
-    {% if message %}<div class="alert alert-success" role="alert">{{ message }}</div>{% endif %}
-<table data-toggle="table" data-cache="false">
+{% if message %}
+<div class="alert alert-success" role="alert">{{ message }}</div>{% endif %}
+<table id="tableID" data-toggle="table" data-cache="false">
     <thead>
-        <tr>
-            <th data-halign="center">ID</th>
-            <th data-halign="center">Item ID</th>
-            <th data-halign="center">Descrizione</th>
-            <th data-halign="center">Data Acquisto</th>
-            <th data-halign="center">Valore</th>
-            <th data-halign="center">Ubicazione</th>
-            <th data-halign="center">Data Inizio Ammortamento</th>
-        </tr>
+    <tr>
+        <th data-halign="center">ID</th>
+        <th data-halign="center">Item ID</th>
+        <th data-halign="center">Descrizione</th>
+        <th data-halign="center">Data Acquisto</th>
+        <th data-halign="center">Valore</th>
+        <th data-halign="center">Ubicazione</th>
+        <th data-halign="center">Data Inizio Ammortamento</th>
+    </tr>
     </thead>
     <tbody>
 	{% for row in rows %}
@@ -34,12 +40,95 @@
 	{% endfor %}
     </tbody>
 </table>
+
+<!-- Modal -->
+<div id="myModal" class="modal fade" role="dialog">
+    <div class="modal-dialog">
+
+        <!-- Modal content-->
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                <h4 class="modal-title">QR CODE</h4>
+            </div>
+            <div class="modal-body">
+                <div id="qrcode">
+
+                </div>
+                <button type="button" onclick="printDiv('qrcode');">Stampa QR Code</button>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+
+    </div>
+</div>
 {% endblock %}
 
 {% block javascripts %}
 <script>
-$(document).ready(function(){
-    $('[data-toggle="tooltip"]').tooltip();   
-});
+    var img;
+    $(document).ready(function () {
+        $('[data-toggle="tooltip"]').tooltip();
+        addRowHandlers();
+    });
+
+    function addRowHandlers() {
+        var table = document.getElementById("tableID");
+        var rows = table.getElementsByTagName("tr");
+        for (i = 0; i < rows.length; i++) {
+            var currentRow = table.rows[i];
+            var createClickHandler =
+                    function (row) {
+                        return function () {
+                            var cell = row.getElementsByTagName("td")[0];
+                            var id = cell.innerHTML;
+                            openDialog(id);
+                        };
+                    };
+
+            currentRow.onclick = createClickHandler(currentRow);
+        }
+    }
+
+    function openDialog(id_qr) {
+        var text = id_qr.toString();
+        $('#myModal').on('shown.bs.modal', function (e) {
+            idCode = text;
+            makeQR(text);
+        });
+        $('#myModal').on('hidden.bs.modal', function (e) {
+            $("#qrcode").empty();
+        });
+
+        $('#myModal').modal('show');
+
+    }
+
+    function makeQR(text) {
+        $("#qrcode").empty();
+        jQuery(function () {
+            $("#qrcode").qrcode({
+                text: text,
+                render: 'canvas',
+                size: 200
+            });
+            var canvas = $('#qrcode canvas');
+            console.log(canvas);
+            img = canvas.get(0).toDataURL("image/png");
+            //document.write('<img src="' + img + '"/>');
+        });
+    }
+
+    function printDiv(divName) {
+        var printContents = '<img src="' + img + '"/>';
+        var originalContents = document.body.innerHTML;
+
+        document.body.innerHTML = printContents;
+
+        window.print();
+        window.location.reload();
+    }
 </script>
 {% endblock %}
