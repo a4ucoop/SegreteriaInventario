@@ -180,3 +180,18 @@ def checkUpdate(request):
         # }
         # return render (request,'prova/provaLocal.html',context)
         return redirect('showLocalDB')
+
+
+def showSingleItem(request, local_id):
+    print local_id
+    item = Item.objects.get(id=local_id)
+    context ={
+        'id': item.id,
+        'item_id': item.item_id,
+        'description': item.description,
+        'purchase_date': item.purchase_date,
+        'price': item.price,
+        'location': item.location,
+        'depreciation_starting_date': item.depreciation_starting_date,
+    }
+    return render (request, 'prova/singleItem.html', context)
