@@ -9,4 +9,5 @@ urlpatterns = [
     url(r'^update/partial', views.checkUpdate, name='checkUpdate'),
     url(r'^update/complete', views.updateLocalDB, name='updateLocalDB'),
     url(r'^show/([0-9]+)/$', views.showSingleItem, name='showSingleItem'),
+    url(r'^examples/bootstrap_table/data(?P<order>\w{0,50})(?P<limit>\w{0,50})(?P<offset>\w{0,50})/$', views.getData, name='getData'),
 ]

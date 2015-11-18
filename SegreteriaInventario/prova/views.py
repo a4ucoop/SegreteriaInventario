@@ -53,7 +53,7 @@ def showRemoteDB(request):
 def showLocalDB(request):
     rows = Item.objects.using('default').all().order_by('-item_id')
     context ={'rows': rows}
-    return render (request,'prova/provaLocal.html',context)
+    return render (request,'prova/provaLocal2.html',context)
 
 
 
@@ -195,3 +195,8 @@ def showSingleItem(request, local_id):
         'depreciation_starting_date': item.depreciation_starting_date,
     }
     return render (request, 'prova/singleItem.html', context)
+
+
+def getData(request, order, limit, offset):
+    html = "prova"
+    return HttpResponse(html)
