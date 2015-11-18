@@ -39,9 +39,9 @@ def showRemoteDB(request):
 	    		MOV.ID_INVENTARIO_BENI DESC\
     		)\
         WHERE\
-            rownum < 10"
+            rownum < 100"
     	)
-    
+
     rows = rows_to_dict_list(cursor)
 
     context = {'rows': rows}
@@ -77,7 +77,7 @@ def updateLocalDB(request):
             ORDER BY\
                 MOV.ID_INVENTARIO_BENI DESC"
         )
-    
+
     rows = rows_to_dict_list(cursor)
 
     # Scorre tutti i dati riga per riga
@@ -155,7 +155,7 @@ def checkUpdate(request):
                 maxLocalID[0]
             ]
         )
-        
+
         rows = rows_to_dict_list(cursor)
 
         # i nuovi items vengono salvati in locale

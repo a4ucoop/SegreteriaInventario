@@ -23,6 +23,18 @@
     <link href="{% static 'css/starter-template.css' %}" rel="stylesheet">
     {% block stylesheets %}
     {% endblock %}
+
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
+    <script src="//code.jquery.com/ui/1.11.4/jquery-ui.js"></script>
+    <script src="{% static 'js/bootstrap/bootstrap/bootstrap.min.js' %}"></script>
+    <script src="{% static 'js/bootstrap/bootstrap-table/bootstrap-table.js' %}"></script>
+    <script src="{% static 'js/footable/footable.js' %}" type="text/javascript"></script>
+    <script src="{% static 'js/footable/footable.sort.js' %}" type="text/javascript"></script>
+    <script src="{% static 'js/footable/footable.filter.js' %}" type="text/javascript"></script>
+    <script src="{% static 'js/footable/footable.paginate.js' %}" type="text/javascript"></script>
+    <script type="text/javascript" src="{% static 'js/jquery.qrcode-0.12.0.min.js' %}"></script>
+    <!-- put your locale files after bootstrap-table.js -->
+    <script src="{% static 'locale/bootstrap/bootstrap-table/bootstrap-table-it-IT.js' %}"></script>
 </head>
 
 <body>
@@ -61,17 +73,7 @@
     <!-- Bootstrap core JavaScript
     ================================================== -->
     <!-- Placed at the end of the document so the pages load faster -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
-    <script src="//code.jquery.com/ui/1.11.4/jquery-ui.js"></script>
-    <script src="{% static 'js/bootstrap/bootstrap/bootstrap.min.js' %}"></script>
-    <script src="{% static 'js/bootstrap/bootstrap-table/bootstrap-table.js' %}"></script>
-    <script src="{% static 'js/footable/footable.js' %}" type="text/javascript"></script>
-    <script src="{% static 'js/footable/footable.sort.js' %}" type="text/javascript"></script>
-    <script src="{% static 'js/footable/footable.filter.js' %}" type="text/javascript"></script>
-    <script src="{% static 'js/footable/footable.paginate.js' %}" type="text/javascript"></script>
-    <script type="text/javascript" src="{% static 'js/jquery.qrcode-0.12.0.js' %}"></script>
-    <!-- put your locale files after bootstrap-table.js -->
-    <script src="{% static 'locale/bootstrap/bootstrap-table/bootstrap-table-it-IT.js' %}"></script>
+
 
 
     {% block javascripts %}

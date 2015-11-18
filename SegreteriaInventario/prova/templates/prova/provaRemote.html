@@ -48,14 +48,8 @@ Navigation Size:
     </tfoot>
 </table>
 
-<div id="dialog-modal" title="QR CODE" class="foo">
-    <div id="qrcode">
-
-    </div>
-</div>
 <script type="text/javascript">
-
-    function openDialog(id_qr) {
+        function openDialog(id_qr) {
         var text = id_qr.data('id').toString();
         $("#dialog-modal").dialog({
 
@@ -67,7 +61,6 @@ Navigation Size:
                 });
             }
         });
-
     }
     $(function () {
         $('table').footable();
