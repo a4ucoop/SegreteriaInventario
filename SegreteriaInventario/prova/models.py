@@ -7,3 +7,4 @@ class Item(models.Model):
 	price = models.DecimalField(max_digits=12, decimal_places=2)
 	location = models.CharField(max_length=2000)
 	depreciation_starting_date = models.DateTimeField('depreciation starting date')
+	residual_value = models.DecimalField(max_digits=12, decimal_places=2)

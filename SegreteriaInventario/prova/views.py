@@ -89,11 +89,13 @@ def updateLocalDB(request):
                 MOV.DT_REGISTRAZIONE_BUONO,\
                 INV.VALORE_CONVENZIONALE,\
                 SPA.DS_SPAZIO,\
-                INV.DT_INI_AMMORTAMENTO\
+                INV.DT_INI_AMMORTAMENTO,\
+			    INV.VALORE_CONVENZIONALE - (LEAST((extract(year from sysdate) - EXTRACT(year FROM INV.DT_INI_AMMORTAMENTO)),AMM.NUM_ANNUALITA) * (INV.VALORE_CONVENZIONALE / AMM.NUM_ANNUALITA)) AS VALORE_RESIDUO\
             FROM\
-                ((V_IE_CO_MOVIMENTI_BENE MOV INNER JOIN V_IE_CO_INVENTARIO_BENI INV\
+                (((V_IE_CO_MOVIMENTI_BENE MOV INNER JOIN V_IE_CO_INVENTARIO_BENI INV\
                 ON MOV.ID_INVENTARIO_BENI = INV.ID_INVENTARIO_BENI) INNER JOIN\
-                V_IE_AC_SPAZI SPA ON INV.CD_UBICAZIONE = SPA.CD_SPAZIO)\
+	    		V_IE_AC_SPAZI SPA ON INV.CD_UBICAZIONE = SPA.CD_SPAZIO) INNER JOIN\
+			    V_IE_CO_AS_TIP_AMM_CAT_GRP_INV AMM on INV.CD_CATEG_GRUPPO = AMM.CD_CATEG_GRUPPO )\
             ORDER BY\
                 MOV.ID_INVENTARIO_BENI DESC"
         )
@@ -113,6 +115,7 @@ def updateLocalDB(request):
             item.price = row['VALORE_CONVENZIONALE']
             item.location = row['DS_SPAZIO']
             item.depreciation_starting_date = row['DT_INI_AMMORTAMENTO']
+            item.residual_value = row['VALORE_RESIDUO']
 
             # item = Item(None,item_id,description,purchase_date,price,location,depreciation_starting_date)
             item.save()
@@ -124,8 +127,9 @@ def updateLocalDB(request):
             price = row['VALORE_CONVENZIONALE']
             location = row['DS_SPAZIO']
             depreciation_starting_date = row['DT_INI_AMMORTAMENTO']
+            residual_value = row['VALORE_RESIDUO']
 
-            item = Item(None,item_id,description,purchase_date,price,location,depreciation_starting_date)
+            item = Item(None,item_id,description,purchase_date,price,location,depreciation_starting_date,residual_value)
             item.save()
 
     return redirect ('showLocalDB')
@@ -163,11 +167,13 @@ def checkUpdate(request):
                     MOV.DT_REGISTRAZIONE_BUONO,\
                     INV.VALORE_CONVENZIONALE,\
                     SPA.DS_SPAZIO,\
-                    INV.DT_INI_AMMORTAMENTO\
+                    INV.DT_INI_AMMORTAMENTO,\
+			        INV.VALORE_CONVENZIONALE - (LEAST((extract(year from sysdate) - EXTRACT(year FROM INV.DT_INI_AMMORTAMENTO)),AMM.NUM_ANNUALITA) * (INV.VALORE_CONVENZIONALE / AMM.NUM_ANNUALITA)) AS VALORE_RESIDUO\
                 FROM\
-                    ((V_IE_CO_MOVIMENTI_BENE MOV INNER JOIN V_IE_CO_INVENTARIO_BENI INV\
+                    (((V_IE_CO_MOVIMENTI_BENE MOV INNER JOIN V_IE_CO_INVENTARIO_BENI INV\
                     ON MOV.ID_INVENTARIO_BENI = INV.ID_INVENTARIO_BENI) INNER JOIN\
-                    V_IE_AC_SPAZI SPA ON INV.CD_UBICAZIONE = SPA.CD_SPAZIO)\
+                    V_IE_AC_SPAZI SPA ON INV.CD_UBICAZIONE = SPA.CD_SPAZIO) INNER JOIN\
+                    V_IE_CO_AS_TIP_AMM_CAT_GRP_INV AMM on INV.CD_CATEG_GRUPPO = AMM.CD_CATEG_GRUPPO )\
                 WHERE\
                     INV.ID_INVENTARIO_BENI > %s\
                 ORDER BY\
@@ -187,8 +193,9 @@ def checkUpdate(request):
             price = row['VALORE_CONVENZIONALE']
             location = row['DS_SPAZIO']
             depreciation_starting_date = row['DT_INI_AMMORTAMENTO']
+            residual_value = row['RESIDUAL_VALUE']
 
-            item = Item(None,item_id,description,purchase_date,price,location,depreciation_starting_date)
+            item = Item(None,item_id,description,purchase_date,price,location,depreciation_starting_date,residual_value)
             item.save()
         return redirect('showLocalDB')
 
@@ -252,7 +259,8 @@ def getData(request):
             Q(purchase_date__icontains = search) | \
             Q(price__icontains = search) | \
             Q(location__icontains = search) | \
-            Q(depreciation_starting_date__icontains = search) \
+            Q(depreciation_starting_date__icontains = search) | \
+            Q(residual_value__icontains = search) \
             ).count()
 
         # retrieve the objects that match the query
@@ -263,7 +271,8 @@ def getData(request):
             Q(purchase_date__icontains = search) | \
             Q(price__icontains = search) | \
             Q(location__icontains = search) | \
-            Q(depreciation_starting_date__icontains = search) \
+            Q(depreciation_starting_date__icontains = search) | \
+            Q(residual_value__icontains = search) \
             ).order_by(order)[offset:offset + limit]
 
     else:
@@ -284,7 +293,8 @@ def getData(request):
         "purchase_date": ' + json.dumps(str(row.purchase_date.date())) + ', \
         "price": ' + json.dumps(str(row.price)) + ', \
         "location": ' + json.dumps(row.location) + ', \
-        "depreciation_starting_date": ' + json.dumps(str(row.depreciation_starting_date.date())) +  \
+        "depreciation_starting_date": ' + json.dumps(str(row.depreciation_starting_date.date())) + ', \
+        "residual_value": ' + json.dumps(str(row.residual_value)) +  \
         ' }, '
 
     # remove last "," character for the last item
