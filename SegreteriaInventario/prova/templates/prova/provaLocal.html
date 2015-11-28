@@ -27,17 +27,17 @@
     </tr>
     </thead>
     <tbody>
-    {% for row in rows %}
-    <tr>
-        <td>{{ row.id }}</td>
-        <td>{{ row.item_id }}</td>
-        <td>{{ row.description }}</td>
-        <td>{{ row.purchase_date }}</td>
-        <td>{{ row.price }}</td>
-        <td>{{ row.location }}</td>
-        <td>{{ row.depreciation_starting_date }}</td>
-    </tr>
-    {% endfor %}
+	{% for row in rows %}
+		<tr>
+			<td><a href="{% url 'prova.views.showSingleItem' row.id %}">{{ row.id }}</a></td>
+            <td>{{ row.item_id }}</td>
+			<td>{{ row.description }}</td>
+			<td>{{ row.purchase_date }}</td>
+			<td>{{ row.price }}</td>
+			<td>{{ row.location }}</td>
+			<td>{{ row.depreciation_starting_date }}</td>
+		</tr>
+	{% endfor %}
     </tbody>
 </table>
 

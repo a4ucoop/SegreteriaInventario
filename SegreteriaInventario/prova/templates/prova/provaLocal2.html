@@ -1,0 +1,347 @@
+{% load staticfiles %}
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Bootstrap Table Examples</title>
+    <link href="{% static 'css/bootstrap/bootstrap/bootstrap.min.css'%}" rel="stylesheet">
+    <link href="{% static 'css/bootstrap/bootstrap-table/bootstrap-table.css'%}" rel="stylesheet">
+    <link href="{% static 'css/starter-template.css' %}" rel="stylesheet">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+    <script src="{% static 'js/bootstrap/bootstrap/bootstrap.min.js' %}"></script>
+    <script type="text/javascript" src="{% static 'js/jquery.qrcode-0.12.0.min.js' %}"></script>
+</head>
+<body>
+<nav id="navbar1" class="navbar navbar-inverse navbar-fixed-top">
+    <div class="container">
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar"
+                    aria-expanded="false" aria-controls="navbar">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand" href="#">Inventario Unicam</a>
+        </div>
+        <div id="navbar" class="collapse navbar-collapse">
+            <ul class="nav navbar-nav">
+                <li class="active"><a href="{% url 'prova.views.index' %}">Home</a></li>
+                <li><a href="#about">About</a></li>
+                <li><a href="#contact">Contact</a></li>
+            </ul>
+        </div>
+    </div>
+</nav>
+<div class="container">
+    <div id="toolbar">
+        <button type="button" class="btn btn-success" onClick="location.href='{% url 'checkUpdate' %}'"
+                data-toggle="tooltip" data-placement="bottom"
+                title="Aggiorna solo i dati nuovi (non modifica quelli già presenti)">
+            Aggiornameto Parziale
+        </button>
+        <button type="button" class="btn btn-danger" onClick="location.href='{% url 'updateLocalDB' %}'"
+                data-toggle="tooltip" data-placement="bottom" title="Aggiorna tutti i dati (può richiedere del tempo)">
+            Aggiornameto Completo
+        </button>
+        <button type="button" class="btn btn-success" onclick="openDialog()"
+                data-toggle="tooltip" data-placement="bottom" title="Stampa i qr code degli oggetti selezionati">
+            Stampa QR code selezionati
+        </button>
+    </div>
+    <table id="table"
+           data-toolbar="#toolbar"
+           data-search="true"
+           data-show-refresh="true"
+           data-show-toggle="true"
+           data-show-columns="true"
+           data-detail-view="true"
+           data-detail-formatter="detailFormatter"
+           data-minimum-count-columns="2"
+           data-show-pagination-switch="true"
+           data-pagination="true"
+           data-id-field="id"
+           data-page-list="[1, 10, 25, 50, 100, ALL]"
+           data-show-footer="false"
+           data-side-pagination="server"
+           data-url="/prova/examples/bootstrap_table/data"
+           data-response-handler="responseHandler">
+    </table>
+
+    <!-- Modal -->
+    <div id="myModal" class="modal fade" role="dialog">
+        <div class="modal-dialog">
+
+            <!-- Modal content-->
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    <h4 class="modal-title">QR CODE</h4>
+                </div>
+                <div class="modal-body">
+                    <div id="qrcode">
+
+                    </div>
+                    <button type="button" onclick="printDiv(getIdSelections());">Stampa QR Code</button>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+</div>
+
+<script>
+    var $table = $('#table'),
+            selections = [];
+
+    function initTable() {
+        $table.bootstrapTable({
+            height: getHeight(),
+            columns: [
+                [
+                    {
+                        field: 'state',
+                        checkbox: true,
+                        align: 'center',
+                        valign: 'middle'
+                    }, {
+                    field: 'id',
+                    title: 'Local ID',
+                    formatter: 'showSingleItem',
+                    sortable: true,
+                    editable: true,
+                    align: 'center'
+                }, {
+                    field: 'item_id',
+                    title: 'Remote ID',
+                    sortable: true,
+                    editable: true,
+                    align: 'center'
+                }, {
+                    field: 'description',
+                    title: 'Description',
+                    sortable: true,
+                    editable: true,
+                    align: 'center'
+                }, {
+                    field: 'purchase_date',
+                    title: 'Purchase Date',
+                    sortable: true,
+                    editable: true,
+                    align: 'center'
+                }, {
+                    field: 'price',
+                    title: 'Price',
+                    sortable: true,
+                    editable: true,
+                    align: 'center'
+                }, {
+                    field: 'location',
+                    title: 'Location',
+                    sortable: true,
+                    editable: true,
+                    align: 'center'
+                }, {
+                    field: 'depreciation_starting_date',
+                    title: 'Depreciation Starting Date',
+                    sortable: true,
+                    editable: true,
+                    align: 'center'
+                }, {
+                    field: 'residual_value',
+                    title: 'Residual Value',
+                    sortable: true,
+                    editable: true,
+                    align: 'center'
+                },
+                ]
+            ]
+        });
+
+        // sometimes footer render error.
+        setTimeout(function () {
+            $table.bootstrapTable('resetView');
+        }, 200);
+
+        // handler check, unckeck
+        $table.on('check.bs.table uncheck.bs.table ' +
+                'check-all.bs.table uncheck-all.bs.table', function () {
+
+            // save your data, here just save the current page
+            selections = getIdSelections();
+            // push or splice the selections if you want to save all data selections
+        });
+        $table.on('all.bs.table', function (e, name, args) {
+            console.log(name, args);
+        });
+
+        // resize handler
+        $(window).resize(function () {
+            $table.bootstrapTable('resetView', {
+                height: getHeight()
+            });
+        });
+    }
+
+    // which rows are selected
+    function getIdSelections() {
+        return $.map($table.bootstrapTable('getSelections'), function (row) {
+            return row.id
+        });
+    }
+
+    // put the data in the table
+    function responseHandler(res) {
+        $.each(res.rows, function (i, row) {
+            row.state = $.inArray(row.id, selections) !== -1;
+        });
+        return res;
+    }
+
+    // handles the text formattation when the row is open
+    function detailFormatter(index, row) {
+        var html = [];
+        $.each(row, function (key, value) {
+            html.push('<p><b>' + key + ':</b> ' + value + '</p>');
+        });
+        return html.join('');
+    }
+
+    function getHeight() {
+        return $(window).height() - $('#navbar1').outerHeight(true);
+    }
+
+    function showSingleItem(value, row) {
+        return "<a href='/prova/show/" + row.id + "'>" + value + "</a>";
+    }
+
+    $(function () {
+        var scripts = [
+                    location.search.substring(1) || "{% static 'js/bootstrap/bootstrap-table/bootstrap-table.js' %}"
+                ],
+                eachSeries = function (arr, iterator, callback) {
+                    callback = callback || function () {
+                            };
+                    if (!arr.length) {
+                        return callback();
+                    }
+                    var completed = 0;
+                    var iterate = function () {
+                        iterator(arr[completed], function (err) {
+                            if (err) {
+                                callback(err);
+                                callback = function () {
+                                };
+                            }
+                            else {
+                                completed += 1;
+                                if (completed >= arr.length) {
+                                    callback(null);
+                                }
+                                else {
+                                    iterate();
+                                }
+                            }
+                        });
+                    };
+                    iterate();
+                };
+
+        eachSeries(scripts, getScript, initTable);
+    });
+
+    function getScript(url, callback) {
+        var head = document.getElementsByTagName('head')[0];
+        var script = document.createElement('script');
+        script.src = url;
+
+        var done = false;
+        // Attach handlers for all browsers
+        script.onload = script.onreadystatechange = function () {
+            if (!done && (!this.readyState ||
+                    this.readyState == 'loaded' || this.readyState == 'complete')) {
+                done = true;
+                if (callback)
+                    callback();
+
+                // Handle memory leak in IE
+                script.onload = script.onreadystatechange = null;
+            }
+        };
+
+        head.appendChild(script);
+
+        // We handle everything using the script element injection
+        return undefined;
+    }
+
+    var selected = [];
+    var immagine = [];
+    function openDialog() {
+        $('#myModal').on('shown.bs.modal', function (e) {
+            selected = getIdSelections();
+            console.log(selected.toString());
+            makeQR(selected);
+        });
+        $('#myModal').on('hidden.bs.modal', function (e) {
+            $("#qrcode").empty();
+        });
+
+        $('#myModal').modal('show');
+
+    }
+    function printDiv(text) {
+        var printContents = "" ;
+        for(var i=0;i<immagine.length; i++)
+        {
+            printContents += immagine[i];
+            i++;
+            printContents += '</br>';
+            printContents += immagine[i];
+            printContents += '</br>';
+        }
+        console.log(printContents);
+        document.body.innerHTML = printContents;
+
+        window.print();
+        window.location.reload();
+    }
+
+    function makeQR(text) {
+        $("#qrcode").empty();
+        immagine = [];
+        img = [];
+        for (var i = 0; i < text.length; i++) {
+            var text1 = text[i];
+            var url = document.location.origin + '/prova/show/'+ text1 +'/';
+            console.log(url);
+            jQuery(function () {
+                        $("#qrcode").qrcode({
+                            text: url,
+                            render: 'canvas',
+                            size: 200
+                        });
+                        var canvas = $('#qrcode canvas');
+                        console.log(canvas);
+                        var img1 = canvas.get(i).toDataURL('image/png');
+                        immagine.push(text1);
+                        immagine.push('<img src="' + img1 + '"/>');
+                        console.log(immagine[i]);
+                        //document.write('<img src="' + img + '"/>');
+                    }
+            );
+        }
+    }
+
+</script>
+<script>
+    $(document).ready(function () {
+        $('[data-toggle="tooltip"]').tooltip();
+
+    });
+</script>
+</body>
+</html>

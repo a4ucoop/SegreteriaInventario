@@ -1,0 +1,10 @@
+{% extends "base.html" %}
+{% block body %}
+<p class="text-left"><b>ID Locale: </b>{{ id }}</p>
+<p class="text-left"><b>ID Remoto: </b>{{ item_id }}</p>
+<p class="text-left"><b>Descrizione: </b>{{ description }}</p>
+<p class="text-left"><b>Data Acquisto: </b>{{ purchase_date }}</p>
+<p class="text-left"><b>Prezzo: </b>{{ price }}</p>
+<p class="text-left"><b>Ubicazione: </b>{{ location }}</p>
+<p class="text-left"><b>Data inizio ammortamento: </b>{{ depreciation_starting_date }}</p>
+{% endblock %}

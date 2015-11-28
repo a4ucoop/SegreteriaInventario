@@ -20,6 +20,8 @@ from django.contrib import admin
 from prova import urls as prova_urls
 
 urlpatterns = [
+    url(r'^$', 'prova.views.index'),
     url(r'^admin/', include(admin.site.urls)),
     url(r'^prova/', include(prova_urls)),
+    url(r'^%saccounts/logout/$' % settings.URL_PREFIX, 'django.contrib.auth.views.logout_then_login', name='logout'),
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
