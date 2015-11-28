@@ -11,4 +11,4 @@ settings.py
 .DS_Store
 ._*
 .idea/
-static/
+/static/
