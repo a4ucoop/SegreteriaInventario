@@ -102,6 +102,8 @@ def updateLocalDB(request):
                 ON MOV.ID_INVENTARIO_BENI = INV.ID_INVENTARIO_BENI) INNER JOIN\
 	    		V_IE_AC_SPAZI SPA ON INV.CD_UBICAZIONE = SPA.CD_SPAZIO) INNER JOIN\
 			    V_IE_CO_AS_TIP_AMM_CAT_GRP_INV AMM on INV.CD_CATEG_GRUPPO = AMM.CD_CATEG_GRUPPO )\
+            WHERE\
+                (AMM.ESERCIZIO - EXTRACT(year FROM INV.DT_INI_AMMORTAMENTO)) = 0\
             ORDER BY\
                 MOV.ID_INVENTARIO_BENI DESC"
         )
@@ -112,7 +114,7 @@ def updateLocalDB(request):
     for row in rows:
         # Per ogni riga vede se l'oggetto esiste gia' nel database
         try:
-            print "obj ",row['ID_INVENTARIO_BENI'],"val res: ",row['VALORE_RESIDUO']
+            #print "obj ",row['ID_INVENTARIO_BENI'],"val res: ",row['VALORE_RESIDUO']
             item = Item.objects.get(item_id=row['ID_INVENTARIO_BENI'])
 
             # Se l'oggetto esiste i dati vengono aggiornati
