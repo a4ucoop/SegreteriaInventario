@@ -9,6 +9,8 @@ from django.views.decorators.cache import never_cache
 from django.contrib.auth.views import login as django_auth_login
 
 from models import Item
+from forms import PictureForm
+
 
 import datetime
 import json
@@ -72,8 +74,10 @@ def showRemoteDB(request):
 
 @login_required
 def showLocalDB(request):
+
+    form = PictureForm()  # costruisce una form per l'upload dell'immagine
     rows = Item.objects.using('default').all().order_by('-item_id')
-    context ={'rows': rows}
+    context ={'rows': rows, 'form': form}
     return render (request,'prova/provaLocal2.html',context)
 
 
@@ -227,6 +231,7 @@ def showSingleItem(request, local_id):
         'price': item.price,
         'location': item.location,
         'depreciation_starting_date': item.depreciation_starting_date,
+        'picture': item.picture,
     }
     return render (request, 'prova/singleItem.html', context)
 
@@ -300,7 +305,8 @@ def getData(request):
         "price": ' + json.dumps(str(row.price)) + ', \
         "location": ' + json.dumps(row.location) + ', \
         "depreciation_starting_date": ' + json.dumps(str(row.depreciation_starting_date.date())) + ', \
-        "residual_value": ' + json.dumps(str(row.residual_value)) +  \
+        "residual_value": ' + json.dumps(str(row.residual_value)) + ', \
+        "picture": ' + json.dumps(str(row.picture)) + \
         ' }, '
 
     # remove last "," character for the last item
@@ -308,3 +314,20 @@ def getData(request):
         html = html[0:len(html)-2]
     html = html + ' ] }'
     return HttpResponse(html)
+
+def uploadPicture(request):
+    # Handle file upload
+    if request.method == 'POST':
+        form = PictureForm(request.POST, request.FILES)
+        if form.is_valid():
+            id = int(form.cleaned_data['id'])
+            try:
+                item = Item.objects.get(id=id)          # ricava l'item di cui fare l'upload della foto dall'ID
+                print request.FILES['picture']
+                item.picture = request.FILES['picture'] # valorizza l'immagine con il path dove è contenuta
+                item.save()
+            except Item.DoesNotExist:
+                print "Item DoesNotExist"
+
+    # Redirect to the document list after POST
+    return redirect ('showLocalDB')

@@ -1,4 +1,6 @@
 from django.conf.urls import url
+from django.conf.urls.static import static
+from django.conf import settings
 
 from . import views
 
@@ -12,4 +14,5 @@ urlpatterns = [
     url(r'^examples/bootstrap_table/data', views.getData, name='getData'),
     url(r'^accounts/login/$', views.login, {'template_name': 'registration/login.html'}),
     url(r'^accounts/registration/$', views.registration),
-]
+	url(r'^upload/$', views.uploadPicture),
+] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

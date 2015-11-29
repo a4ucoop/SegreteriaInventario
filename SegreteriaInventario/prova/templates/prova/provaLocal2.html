@@ -6,6 +6,8 @@
     <link href="{% static 'css/bootstrap/bootstrap/bootstrap.min.css'%}" rel="stylesheet">
     <link href="{% static 'css/bootstrap/bootstrap-table/bootstrap-table.css'%}" rel="stylesheet">
     <link href="{% static 'css/starter-template.css' %}" rel="stylesheet">
+    <link href="{% static 'prova/showLocalDBTableColumns.css'%}" rel="stylesheet">
+
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
     <script src="{% static 'js/bootstrap/bootstrap/bootstrap.min.js' %}"></script>
     <script type="text/javascript" src="{% static 'js/jquery.qrcode-0.12.0.min.js' %}"></script>
@@ -34,20 +36,39 @@
 </nav>
 <div class="container">
     <div id="toolbar">
-        <button type="button" class="btn btn-success" onClick="location.href='{% url 'checkUpdate' %}'"
-                data-toggle="tooltip" data-placement="bottom"
-                title="Aggiorna solo i dati nuovi (non modifica quelli già presenti)">
-            Aggiornameto Parziale
-        </button>
-        <button type="button" class="btn btn-danger" onClick="location.href='{% url 'updateLocalDB' %}'"
-                data-toggle="tooltip" data-placement="bottom" title="Aggiorna tutti i dati (può richiedere del tempo)">
-            Aggiornameto Completo
-        </button>
-        <button type="button" class="btn btn-success" onclick="openDialog()"
-                data-toggle="tooltip" data-placement="bottom" title="Stampa i qr code degli oggetti selezionati">
-            Stampa QR code selezionati
-        </button>
+        <div class="btn-group" role="group">
+          <button type="button"
+                  class="btn btn-default"
+                  onClick="location.href='{% url 'checkUpdate' %}'"
+                  data-toggle="tooltip"
+                  data-placement="bottom"
+                  title="Aggiornamento Parziale"
+                  >
+            <span class="glyphicon glyphicon-repeat" aria-hidden="true"></span>
+          </button>
+          <button type="button"
+                  class="btn btn-default"
+                  onClick="location.href='{% url 'updateLocalDB' %}'"
+                  data-toggle="tooltip"
+                  data-placement="bottom"
+                  title="Aggiornamento Completo"
+                  >
+            <span class="glyphicon glyphicon-refresh" aria-hidden="true"></span>
+          </button>
+        </div>
+        <div class="btn-group" role="group">
+          <button type="button"
+                  class="btn btn-default"
+                  onClick="openDialog()"
+                  data-toggle="tooltip"
+                  data-placement="bottom"
+                  title="Stampa codici QR selezionati"
+                  >
+            <span class="glyphicon glyphicon-qrcode" aria-hidden="true"></span>
+          </button>
+        </div>
     </div>
+
     <table id="table"
            data-toolbar="#toolbar"
            data-search="true"
@@ -91,6 +112,40 @@
         </div>
     </div>
 
+    <!-- Upload picture -->
+    <div id="uploadPictureModal" class="modal fade" role="dialog">
+        <div class="modal-dialog">
+
+            <!-- Modal content-->
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    <h4 class="modal-title">Upload Picture</h4>
+                </div>
+                <div class="modal-body">
+                    <!-- Upload form. Note enctype attribute! -->
+                    <form action="{% url "prova.views.uploadPicture" %}" method="post" enctype="multipart/form-data">
+                        {% csrf_token %}
+                        <p>{{ form.non_field_errors }}</p>
+                        <p>{{ form.picture.label_tag }} {{ form.picture.help_text }}</p>
+                        <p>
+                            {{ form.picture.errors }}
+                            <span class="btn btn-primary btn-file">
+                                Scegli un Immagine... {{ form.picture }}
+                            </span>
+                            {{ form.id }}
+                        </p>
+                        <button type="submit" class="btn btn-default">Invia</button>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
 </div>
 
 <script>
@@ -107,54 +162,63 @@
                         checkbox: true,
                         align: 'center',
                         valign: 'middle'
-                    }, {
+                    },
+                {
+                        field: 'operate',
+                        // title: 'Actions',
+                        class: 'actions',
+                        align: 'center',
+                        events: operateEvents,
+                        formatter: operateFormatter
+                    }, 
+                {
                     field: 'id',
-                    title: 'Local ID',
+                    title: 'ID Local',
+                    class: 'id',
                     formatter: 'showSingleItem',
                     sortable: true,
-                    editable: true,
                     align: 'center'
                 }, {
                     field: 'item_id',
-                    title: 'Remote ID',
+                    title: 'ID Remote',
+                    class: 'item_id',
                     sortable: true,
-                    editable: true,
                     align: 'center'
                 }, {
                     field: 'description',
                     title: 'Description',
+                    class: 'description',
                     sortable: true,
-                    editable: true,
                     align: 'center'
                 }, {
                     field: 'purchase_date',
                     title: 'Purchase Date',
+                    class: 'purchase_date',
                     sortable: true,
-                    editable: true,
                     align: 'center'
                 }, {
                     field: 'price',
                     title: 'Price',
+                    class: 'price',
                     sortable: true,
-                    editable: true,
                     align: 'center'
                 }, {
                     field: 'location',
                     title: 'Location',
+                    class: 'location',
                     sortable: true,
-                    editable: true,
                     align: 'center'
                 }, {
                     field: 'depreciation_starting_date',
                     title: 'Depreciation Starting Date',
+                    class: 'depreciation_starting_date',
                     sortable: true,
-                    editable: true,
                     align: 'center'
                 }, {
                     field: 'residual_value',
                     title: 'Residual Value',
+                    class: 'residual_value',
                     sortable: true,
-                    editable: true,
                     align: 'center'
                 },
                 ]
@@ -205,10 +269,41 @@
     function detailFormatter(index, row) {
         var html = [];
         $.each(row, function (key, value) {
-            html.push('<p><b>' + key + ':</b> ' + value + '</p>');
+            if(key == 'picture')
+                if ( value != "")
+                    html.push('<p><b>' + key + ':</b></p><p><img style="max-width:100px;max-height:100px" src="/prova/media/' + value + '"></p>');
+                else
+                    html.push('<p><b>' + key + ': </b><b class="text-left text-danger">Foto non disponibile</b></p>');
+            if(key != 'picture' && key != 'state')
+                html.push('<p><b>' + key + ':</b> ' + value + '</p>');
         });
         return html.join('');
     }
+
+
+    function operateFormatter(value, row, index) {
+        return [
+            '<a class="Picture" href="javascript:void(0)" title="upload a picture">',
+            '<i class="glyphicon glyphicon-picture"></i>',
+            '</a>  ',
+
+            '<a class="QRcode" href="javascript:void(0)" title="Remove">',
+            '<i class="glyphicon glyphicon-qrcode"></i>',
+            '</a>'
+        ].join('');
+    }
+
+    window.operateEvents = {
+        'click .Picture': function (e, value, row, index) {
+            $('#id_id').val(row.id);
+            $('#uploadPictureModal').modal();
+        },
+        'click .QRcode': function (e, value, row, index) {
+            // alert('You click like action, row: ' + JSON.stringify(row));
+            // makeQR(row.id);
+            alert("makeQR " + row.id);
+        }
+    };
 
     function getHeight() {
         return $(window).height() - $('#navbar1').outerHeight(true);
@@ -293,6 +388,17 @@
         $('#myModal').modal('show');
 
     }
+    // function openOneDialog() {
+    //     $('#myModal').on('shown.bs.modal', function (e) {
+    //         makeQR(selected);
+    //     });
+    //     $('#myModal').on('hidden.bs.modal', function (e) {
+    //         $("#qrcode").empty();
+    //     });
+
+    //     $('#myModal').modal('show');
+
+    // }
     function printDiv(text) {
         var printContents = "" ;
         for(var i=0;i<immagine.length; i++)
