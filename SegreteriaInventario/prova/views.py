@@ -98,8 +98,8 @@ def updateLocalDB(request):
                 INV.DT_INI_AMMORTAMENTO,\
 			    INV.VALORE_CONVENZIONALE - (LEAST((extract(year from sysdate) - EXTRACT(year FROM INV.DT_INI_AMMORTAMENTO)),AMM.NUM_ANNUALITA) * (INV.VALORE_CONVENZIONALE / AMM.NUM_ANNUALITA)) AS VALORE_RESIDUO\
             FROM\
-                (((V_IE_CO_MOVIMENTI_BENE MOV INNER JOIN V_IE_CO_INVENTARIO_BENI INV\
-                ON MOV.ID_INVENTARIO_BENI = INV.ID_INVENTARIO_BENI) INNER JOIN\
+                (((V_IE_CO_MOVIMENTI_BENE MOV RIGHT JOIN V_IE_CO_INVENTARIO_BENI INV\
+                ON MOV.ID_INVENTARIO_BENI = INV.ID_INVENTARIO_BENI) LEFT JOIN\
 	    		V_IE_AC_SPAZI SPA ON INV.CD_UBICAZIONE = SPA.CD_SPAZIO) INNER JOIN\
 			    V_IE_CO_AS_TIP_AMM_CAT_GRP_INV AMM on INV.CD_CATEG_GRUPPO = AMM.CD_CATEG_GRUPPO )\
             WHERE\
@@ -120,14 +120,11 @@ def updateLocalDB(request):
             # Se l'oggetto esiste i dati vengono aggiornati
             item.item_id = row['ID_INVENTARIO_BENI']
             item.description = row['DS_BENE']
-            item.purchase_date = row['DT_REGISTRAZIONE_BUONO']
+            item.purchase_date = row['DT_REGISTRAZIONE_BUONO'] if row['DT_REGISTRAZIONE_BUONO'] is not None else '0001-01-01 00:00'
             item.price = row['VALORE_CONVENZIONALE']
-            item.location = row['DS_SPAZIO']
+            item.location = row['DS_SPAZIO'] if row['DS_SPAZIO'] is not None else ''
             item.depreciation_starting_date = row['DT_INI_AMMORTAMENTO']
-            if row['VALORE_RESIDUO'] is not None:
-                item.residual_value = row['VALORE_RESIDUO']
-            else:
-                item.residual_value = -1
+            item.residual_value = row['VALORE_RESIDUO'] if row['VALORE_RESIDUO'] is not None else -1
 
             # item = Item(None,item_id,description,purchase_date,price,location,depreciation_starting_date)
             item.save()
@@ -135,11 +132,11 @@ def updateLocalDB(request):
             # Se non esiste viene creato un nuovo oggetto
             item_id = row['ID_INVENTARIO_BENI']
             description = row['DS_BENE']
-            purchase_date = row['DT_REGISTRAZIONE_BUONO']
+            purchase_date = row['DT_REGISTRAZIONE_BUONO'] if row['DT_REGISTRAZIONE_BUONO'] is not None else '0001-01-01 00:00'
             price = row['VALORE_CONVENZIONALE']
-            location = row['DS_SPAZIO']
+            location = row['DS_SPAZIO'] if row['DS_SPAZIO'] is not None else ''
             depreciation_starting_date = row['DT_INI_AMMORTAMENTO']
-            residual_value = row['VALORE_RESIDUO']
+            residual_value = row['VALORE_RESIDUO'] if row['VALORE_RESIDUO'] is not None else -1
 
             item = Item(None,item_id,description,purchase_date,price,location,depreciation_starting_date,residual_value)
             item.save()
@@ -326,7 +323,7 @@ def uploadPicture(request):
             try:
                 item = Item.objects.get(id=id)          # ricava l'item di cui fare l'upload della foto dall'ID
                 print request.FILES['picture']
-                item.picture = request.FILES['picture'] # valorizza l'immagine con il path dove è contenuta
+                item.picture = request.FILES['picture'] # valorizza l'immagine con il path dove e' contenuta
                 item.save()
             except Item.DoesNotExist:
                 print "Item DoesNotExist"
