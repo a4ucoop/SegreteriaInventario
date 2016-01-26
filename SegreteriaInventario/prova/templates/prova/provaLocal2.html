@@ -1,8 +1,10 @@
 {% load staticfiles %}
+{% load i18n %}
+
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Bootstrap Table Examples</title>
+    <title>Inventario Unicam</title>
     <link href="{% static 'css/bootstrap/bootstrap/bootstrap.min.css'%}" rel="stylesheet">
     <link href="{% static 'css/bootstrap/bootstrap-table/bootstrap-table.css'%}" rel="stylesheet">
     <link href="{% static 'css/starter-template.css' %}" rel="stylesheet">
@@ -28,8 +30,13 @@
         <div id="navbar" class="collapse navbar-collapse">
             <ul class="nav navbar-nav">
                 <li class="active"><a href="{% url 'prova.views.index' %}">Home</a></li>
-                <li><a href="#about">About</a></li>
-                <li><a href="#contact">Contact</a></li>
+                <li><a href="#about">{% trans 'About' %}</a></li>
+                <li><a href="#contact">{% trans 'Contact' %}</a></li>
+                {% if user.is_authenticated %}
+                <li><a href="{% url 'logout' %}">{% trans 'Logout' %}</a></li>
+                {% else %}
+                <li><a href="{% url 'login' %}">{% trans 'Login' %}</a></li>
+                {% endif %}
             </ul>
         </div>
     </div>
@@ -173,50 +180,50 @@
                     }, 
                 {
                     field: 'id',
-                    title: 'ID Local',
+                    title: 'ID Locale',
                     class: 'id',
                     formatter: 'showSingleItem',
                     sortable: true,
                     align: 'center'
                 }, {
                     field: 'item_id',
-                    title: 'ID Remote',
+                    title: 'ID Remoto',
                     class: 'item_id',
                     sortable: true,
                     align: 'center'
                 }, {
                     field: 'description',
-                    title: 'Description',
+                    title: 'Descrizione',
                     class: 'description',
                     sortable: true,
                     align: 'center'
                 }, {
                     field: 'purchase_date',
-                    title: 'Purchase Date',
+                    title: 'Data di acquisto',
                     class: 'purchase_date',
                     sortable: true,
                     align: 'center'
                 }, {
                     field: 'price',
-                    title: 'Price',
+                    title: 'Prezzo',
                     class: 'price',
                     sortable: true,
                     align: 'center'
                 }, {
                     field: 'location',
-                    title: 'Location',
+                    title: 'Locazione',
                     class: 'location',
                     sortable: true,
                     align: 'center'
                 }, {
                     field: 'depreciation_starting_date',
-                    title: 'Depreciation Starting Date',
+                    title: 'Data di inizio ammortamento',
                     class: 'depreciation_starting_date',
                     sortable: true,
                     align: 'center'
                 }, {
                     field: 'residual_value',
-                    title: 'Residual Value',
+                    title: 'Valore residuo',
                     class: 'residual_value',
                     sortable: true,
                     align: 'center'

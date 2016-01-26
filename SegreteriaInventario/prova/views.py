@@ -119,11 +119,11 @@ def updateLocalDB(request):
 
             # Se l'oggetto esiste i dati vengono aggiornati
             item.item_id = row['ID_INVENTARIO_BENI']
-            item.description = row['DS_BENE']
+            item.description = row['DS_BENE'] if row['DS_BENE'] else ''
             item.purchase_date = row['DT_REGISTRAZIONE_BUONO'] if row['DT_REGISTRAZIONE_BUONO'] is not None else '0001-01-01 00:00'
-            item.price = row['VALORE_CONVENZIONALE']
+            item.price = row['VALORE_CONVENZIONALE'] if row['VALORE_CONVENZIONALE'] else -1
             item.location = row['DS_SPAZIO'] if row['DS_SPAZIO'] is not None else ''
-            item.depreciation_starting_date = row['DT_INI_AMMORTAMENTO']
+            item.depreciation_starting_date = row['DT_INI_AMMORTAMENTO'] if row['DT_INI_AMMORTAMENTO'] else '0001-01-01 00:00'
             item.residual_value = row['VALORE_RESIDUO'] if row['VALORE_RESIDUO'] is not None else -1
 
             # item = Item(None,item_id,description,purchase_date,price,location,depreciation_starting_date)
@@ -131,11 +131,11 @@ def updateLocalDB(request):
         except Item.DoesNotExist:
             # Se non esiste viene creato un nuovo oggetto
             item_id = row['ID_INVENTARIO_BENI']
-            description = row['DS_BENE']
+            description = row['DS_BENE'] if row['DS_BENE'] else ''
             purchase_date = row['DT_REGISTRAZIONE_BUONO'] if row['DT_REGISTRAZIONE_BUONO'] is not None else '0001-01-01 00:00'
-            price = row['VALORE_CONVENZIONALE']
+            price = row['VALORE_CONVENZIONALE'] if row['VALORE_CONVENZIONALE'] else -1
             location = row['DS_SPAZIO'] if row['DS_SPAZIO'] is not None else ''
-            depreciation_starting_date = row['DT_INI_AMMORTAMENTO']
+            depreciation_starting_date = row['DT_INI_AMMORTAMENTO'] if row['DT_INI_AMMORTAMENTO'] else '0001-01-01 00:00'
             residual_value = row['VALORE_RESIDUO'] if row['VALORE_RESIDUO'] is not None else -1
 
             item = Item(None,item_id,description,purchase_date,price,location,depreciation_starting_date,residual_value)
@@ -303,7 +303,7 @@ def getData(request):
         "purchase_date": ' + json.dumps(str(row.purchase_date.date())) + ', \
         "price": ' + json.dumps(str(row.price)) + ', \
         "location": ' + json.dumps(row.location) + ', \
-        "depreciation_starting_date": ' + json.dumps(str(row.depreciation_starting_date.date())) + ', \
+        "depreciation_starting_date": ' + (json.dumps(str(row.depreciation_starting_date.date())) if row.depreciation_starting_date else "") + ', \
         "residual_value": ' + json.dumps(str(row.residual_value)) + ', \
         "picture": ' + json.dumps(str(row.picture)) + \
         ' }, '
