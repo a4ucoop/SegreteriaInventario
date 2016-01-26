@@ -7,4 +7,10 @@
 <p class="text-left"><b>Prezzo: </b>{{ price }}</p>
 <p class="text-left"><b>Ubicazione: </b>{{ location }}</p>
 <p class="text-left"><b>Data inizio ammortamento: </b>{{ depreciation_starting_date }}</p>
+<p class="text-left"><b>Foto: </b></p><p class="text-left">
+{% if picture %}
+	<img src="/prova{{ picture.url }}" ></p>
+{% else %}
+	<p class="text-left text-danger"><b>Foto non disponibile</b></p>
+{% endif %}
 {% endblock %}

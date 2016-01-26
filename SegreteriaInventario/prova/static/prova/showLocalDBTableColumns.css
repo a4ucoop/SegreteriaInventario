@@ -1,0 +1,73 @@
+.actions {
+    min-width:50px !important;
+    max-width: 50px;
+    word-wrap: break-word !important;
+}
+
+.id {
+    min-width:70px !important;
+    max-width: 70px;
+    word-wrap: break-word !important;
+}
+
+.item_id {
+    min-width:70px !important;
+    max-width: 70px;
+    word-wrap: break-word !important;
+}
+
+.description {
+    min-width:100px !important;
+    max-width: 300px;
+    word-wrap: break-word !important;
+}
+
+.purchase_date {
+    min-width:100px !important;
+    max-width: 100px;
+    word-wrap: break-word !important;
+}
+
+.price {
+    min-width:100px !important;
+    max-width: 100px;
+    word-wrap: break-word !important;
+}
+
+.location {
+    min-width:100px !important;
+    max-width: 200px;
+    word-wrap: break-word !important;
+}
+
+.depreciation_starting_date {
+    min-width:100px !important;
+    max-width: 100px;
+    word-wrap: break-word !important;
+}
+
+.residual_value {
+    min-width:100px !important;
+    max-width: 100px;
+    word-wrap: break-word !important;
+}
+
+.btn-file {
+    position: relative;
+    overflow: hidden;
+}
+.btn-file input[type=file] {
+    position: absolute;
+    top: 0;
+    right: 0;
+    min-width: 100%;
+    min-height: 100%;
+    font-size: 100px;
+    text-align: right;
+    filter: alpha(opacity=0);
+    opacity: 0;
+    outline: none;
+    background: white;
+    cursor: inherit;
+    display: block;
+}

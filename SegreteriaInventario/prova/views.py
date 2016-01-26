@@ -7,9 +7,8 @@ from django.shortcuts import redirect
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.cache import never_cache
 from django.contrib.auth.views import login as django_auth_login
-
 from models import Item
-
+from forms import PictureForm
 import datetime
 import json
 
@@ -47,12 +46,14 @@ def showRemoteDB(request):
 		    	INV.VALORE_CONVENZIONALE,\
 		    	SPA.DS_SPAZIO,\
 		    	INV.DT_INI_AMMORTAMENTO,\
-			INV.VALORE_CONVENZIONALE - (LEAST((extract(year from sysdate) - EXTRACT(year FROM INV.DT_INI_AMMORTAMENTO)),AMM.NUM_ANNUALITA) * (INV.VALORE_CONVENZIONALE / AMM.NUM_ANNUALITA)) AS VALORE_RESIDUO\
+                INV.VALORE_CONVENZIONALE - \
+                (LEAST((extract(year from sysdate) - EXTRACT(year FROM INV.DT_INI_AMMORTAMENTO)),AMM.NUM_ANNUALITA) * \
+                    (INV.VALORE_CONVENZIONALE / AMM.NUM_ANNUALITA)) AS VALORE_RESIDUO\
 	    	FROM\
 	    		(((V_IE_CO_MOVIMENTI_BENE MOV INNER JOIN V_IE_CO_INVENTARIO_BENI INV\
 	    		ON MOV.ID_INVENTARIO_BENI = INV.ID_INVENTARIO_BENI) INNER JOIN\
 	    		V_IE_AC_SPAZI SPA ON INV.CD_UBICAZIONE = SPA.CD_SPAZIO) INNER JOIN\
-			V_IE_CO_AS_TIP_AMM_CAT_GRP_INV AMM on INV.CD_CATEG_GRUPPO = AMM.CD_CATEG_GRUPPO )\
+                V_IE_CO_AS_TIP_AMM_CAT_GRP_INV AMM on INV.CD_CATEG_GRUPPO = AMM.CD_CATEG_GRUPPO )\
 	    	ORDER BY\
 	    		MOV.ID_INVENTARIO_BENI DESC\
     		)\
@@ -70,8 +71,10 @@ def showRemoteDB(request):
 
 @login_required
 def showLocalDB(request):
+
+    form = PictureForm()  # costruisce una form per l'upload dell'immagine
     rows = Item.objects.using('default').all().order_by('-item_id')
-    context ={'rows': rows}
+    context ={'rows': rows, 'form': form}
     return render (request,'prova/provaLocal2.html',context)
 
 
@@ -92,10 +95,12 @@ def updateLocalDB(request):
                 INV.DT_INI_AMMORTAMENTO,\
 			    INV.VALORE_CONVENZIONALE - (LEAST((extract(year from sysdate) - EXTRACT(year FROM INV.DT_INI_AMMORTAMENTO)),AMM.NUM_ANNUALITA) * (INV.VALORE_CONVENZIONALE / AMM.NUM_ANNUALITA)) AS VALORE_RESIDUO\
             FROM\
-                (((V_IE_CO_MOVIMENTI_BENE MOV INNER JOIN V_IE_CO_INVENTARIO_BENI INV\
-                ON MOV.ID_INVENTARIO_BENI = INV.ID_INVENTARIO_BENI) INNER JOIN\
+                (((V_IE_CO_MOVIMENTI_BENE MOV RIGHT JOIN V_IE_CO_INVENTARIO_BENI INV\
+                ON MOV.ID_INVENTARIO_BENI = INV.ID_INVENTARIO_BENI) LEFT JOIN\
 	    		V_IE_AC_SPAZI SPA ON INV.CD_UBICAZIONE = SPA.CD_SPAZIO) INNER JOIN\
 			    V_IE_CO_AS_TIP_AMM_CAT_GRP_INV AMM on INV.CD_CATEG_GRUPPO = AMM.CD_CATEG_GRUPPO )\
+            WHERE\
+                (AMM.ESERCIZIO - EXTRACT(year FROM INV.DT_INI_AMMORTAMENTO)) = 0\
             ORDER BY\
                 MOV.ID_INVENTARIO_BENI DESC"
         )
@@ -106,29 +111,29 @@ def updateLocalDB(request):
     for row in rows:
         # Per ogni riga vede se l'oggetto esiste gia' nel database
         try:
+            #print "obj ",row['ID_INVENTARIO_BENI'],"val res: ",row['VALORE_RESIDUO']
             item = Item.objects.get(item_id=row['ID_INVENTARIO_BENI'])
 
             # Se l'oggetto esiste i dati vengono aggiornati
             item.item_id = row['ID_INVENTARIO_BENI']
-            item.description = row['DS_BENE']
-            item.purchase_date = row['DT_REGISTRAZIONE_BUONO']
-            item.price = row['VALORE_CONVENZIONALE']
-            item.location = row['DS_SPAZIO']
-            item.depreciation_starting_date = row['DT_INI_AMMORTAMENTO']
-            item.residual_value = row['VALORE_RESIDUO']
+            item.description = row['DS_BENE'] if row['DS_BENE'] else ''
+            item.purchase_date = row['DT_REGISTRAZIONE_BUONO'] if row['DT_REGISTRAZIONE_BUONO'] is not None else '0001-01-01 00:00'
+            item.price = row['VALORE_CONVENZIONALE'] if row['VALORE_CONVENZIONALE'] else -1
+            item.location = row['DS_SPAZIO'] if row['DS_SPAZIO'] is not None else ''
+            item.depreciation_starting_date = row['DT_INI_AMMORTAMENTO'] if row['DT_INI_AMMORTAMENTO'] else '0001-01-01 00:00'
+            item.residual_value = row['VALORE_RESIDUO'] if row['VALORE_RESIDUO'] is not None else -1
 
             # item = Item(None,item_id,description,purchase_date,price,location,depreciation_starting_date)
             item.save()
         except Item.DoesNotExist:
             # Se non esiste viene creato un nuovo oggetto
             item_id = row['ID_INVENTARIO_BENI']
-            description = row['DS_BENE']
-            purchase_date = row['DT_REGISTRAZIONE_BUONO']
-            price = row['VALORE_CONVENZIONALE']
-            location = row['DS_SPAZIO']
-            depreciation_starting_date = row['DT_INI_AMMORTAMENTO']
-            residual_value = row['VALORE_RESIDUO']
-
+            description = row['DS_BENE'] if row['DS_BENE'] else ''
+            purchase_date = row['DT_REGISTRAZIONE_BUONO'] if row['DT_REGISTRAZIONE_BUONO'] is not None else '0001-01-01 00:00'
+            price = row['VALORE_CONVENZIONALE'] if row['VALORE_CONVENZIONALE'] else -1
+            location = row['DS_SPAZIO'] if row['DS_SPAZIO'] is not None else ''
+            depreciation_starting_date = row['DT_INI_AMMORTAMENTO'] if row['DT_INI_AMMORTAMENTO'] else '0001-01-01 00:00'
+            residual_value = row['VALORE_RESIDUO'] if row['VALORE_RESIDUO'] is not None else -1
             item = Item(None,item_id,description,purchase_date,price,location,depreciation_starting_date,residual_value)
             item.save()
 
@@ -221,6 +226,7 @@ def showSingleItem(request, local_id):
         'price': item.price,
         'location': item.location,
         'depreciation_starting_date': item.depreciation_starting_date,
+        'picture': item.picture,
     }
     return render (request, 'prova/singleItem.html', context)
 
@@ -293,8 +299,9 @@ def getData(request):
         "purchase_date": ' + json.dumps(str(row.purchase_date.date())) + ', \
         "price": ' + json.dumps(str(row.price)) + ', \
         "location": ' + json.dumps(row.location) + ', \
-        "depreciation_starting_date": ' + json.dumps(str(row.depreciation_starting_date.date())) + ', \
-        "residual_value": ' + json.dumps(str(row.residual_value)) +  \
+        "depreciation_starting_date": ' + (json.dumps(str(row.depreciation_starting_date.date())) if row.depreciation_starting_date else "") + ', \
+        "residual_value": ' + json.dumps(str(row.residual_value)) + ', \
+        "picture": ' + json.dumps(str(row.picture)) + \
         ' }, '
 
     # remove last "," character for the last item
@@ -302,3 +309,20 @@ def getData(request):
         html = html[0:len(html)-2]
     html = html + ' ] }'
     return HttpResponse(html)
+
+def uploadPicture(request):
+    # Handle file upload
+    if request.method == 'POST':
+        form = PictureForm(request.POST, request.FILES)
+        if form.is_valid():
+            id = int(form.cleaned_data['id'])
+            try:
+                item = Item.objects.get(id=id)          # ricava l'item di cui fare l'upload della foto dall'ID
+                print request.FILES['picture']
+                item.picture = request.FILES['picture'] # valorizza l'immagine con il path dove e' contenuta
+                item.save()
+            except Item.DoesNotExist:
+                print "Item DoesNotExist"
+
+    # Redirect to the document list after POST
+    return redirect ('showLocalDB')
