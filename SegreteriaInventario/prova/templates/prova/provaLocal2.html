@@ -7,6 +7,7 @@
     <title>Inventario Unicam</title>
     <link href="{% static 'css/bootstrap/bootstrap/bootstrap.min.css'%}" rel="stylesheet">
     <link href="{% static 'css/bootstrap/bootstrap-table/bootstrap-table.css'%}" rel="stylesheet">
+    <link href="{% static 'css/bootstrap/bootstrap-table/extensions/editable/bootstrap-editable.css'%}" rel="stylesheet">
     <link href="{% static 'css/starter-template.css' %}" rel="stylesheet">
     <link href="{% static 'prova/showLocalDBTableColumns.css'%}" rel="stylesheet">
 
@@ -74,7 +75,32 @@
             <span class="glyphicon glyphicon-qrcode" aria-hidden="true"></span>
           </button>
         </div>
+        <div class="btn-group" role="group">
+          <button type="button"
+                  class="btn btn-default"
+                  onClick="showNewAccLocationDiv()"
+                  data-toggle="tooltip"
+                  data-placement="bottom"
+                  title="Nuova posizione"
+                  >
+            <span class="glyphicon glyphicon-map-marker" aria-hidden="true"></span>
+          </button>
+        </div>
+        <div id="newAccLocationDiv" class="btn-group" role="group" style="display:none">
+            <div class="btn-group" role="group">
+                <input type="text" class="form-control" id="newAccLocationText" placeholder="Nuova posizione...">
+            </div>
+            <div class="btn-group" role="group">
+              <button type="button"
+                      class="btn btn-default"
+                      onClick="addLocation()"
+                      >
+                <span class="glyphicon glyphicon-ok" aria-hidden="true"></span>
+              </button>
+            </div>
+        </div>
     </div>
+
 
     <table id="table"
            data-toolbar="#toolbar"
@@ -216,6 +242,25 @@
                     sortable: true,
                     align: 'center'
                 }, {
+                    field: 'accurate_location',
+                    title: 'Posizione Precisa',
+                    class: 'accurate_location',
+                    editable: {
+                        type: 'select',
+                        inputclass: 'accurate-location-select',
+                        source: '/prova/examples/bootstrap_table_editable/getAccurateLocationList',
+                        title: 'Posizione Precisa',
+                        validate: function (value) {
+                            value = $.trim(value);
+                            if (!value) return 'This field is required';
+                        },
+                        url: '/prova/examples/bootstrap_table_editable/editAccurateLocation',
+                        params: { csrfmiddlewaretoken:'{{csrf_token}}'},
+                    },
+                    sortable: true,
+                    align: 'center'
+                }, 
+                {
                     field: 'depreciation_starting_date',
                     title: 'Data di inizio ammortamento',
                     class: 'depreciation_starting_date',
@@ -322,7 +367,10 @@
 
     $(function () {
         var scripts = [
-                    location.search.substring(1) || "{% static 'js/bootstrap/bootstrap-table/bootstrap-table.js' %}"
+                    location.search.substring(1) || 
+                    "{% static 'js/bootstrap/bootstrap-table/bootstrap-table.js' %}",
+                    "{% static 'js/bootstrap/bootstrap-table/extensions/editable/bootstrap-table-editable.js' %}",
+                    "{% static 'js/bootstrap/bootstrap-table/extensions/editable/bootstrap-editable.js' %}"
                 ],
                 eachSeries = function (arr, iterator, callback) {
                     callback = callback || function () {
@@ -449,17 +497,36 @@
         }
     }
 
+    // mostra/nasconde l'input per aggiungere una nuova posizione
+    function showNewAccLocationDiv () {
+        if ($("#newAccLocationDiv").is(":visible")==false) $("#newAccLocationDiv").show();
+        else $("#newAccLocationDiv").hide();
+    }
+
+    // chiamata ajax per salvare la nuova posizione nel DB ricarica la pagina al success per aggiornare la lista delle posizioni
+    function addLocation () {
+        // alert($("#newAccLocationText").val());
+        newLocation = $("#newAccLocationText").val();
+        $.ajax({
+            type: "POST",
+            url: '/prova/examples/bootstrap_table_editable/addAccurateLocation',
+            data: ({ newLocation : newLocation, csrfmiddlewaretoken:'{{csrf_token}}' }),
+            success: function(result) {
+                // alert('Nuova posizione aggiunta');
+                location.reload();
+                // $('#table').bootstrapTable('refresh');
+            },
+            error: function() {
+                alert('Error occured');
+            }
+        });
+    }
+
 </script>
 <script>
     $(document).ready(function () {
         $('[data-toggle="tooltip"]').tooltip();
-
     });
-</script>
-<script>
-$(document).ready(function(){
-    $('[data-toggle="tooltip"]').tooltip();   
-});
 </script>
 </body>
 </html>

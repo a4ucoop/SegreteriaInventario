@@ -1,6 +1,7 @@
 from django.shortcuts import render
 from django.template import RequestContext, loader
-from django.http import HttpResponse
+from django.http import HttpResponse, HttpResponseServerError
+from django.http import JsonResponse
 from django.db import connections
 from django.db.models import Q
 from django.shortcuts import redirect
@@ -8,6 +9,7 @@ from django.contrib.auth.decorators import login_required
 from django.views.decorators.cache import never_cache
 from django.contrib.auth.views import login as django_auth_login
 from models import Item
+from models import AccurateLocation
 from forms import PictureForm
 import datetime
 import json
@@ -265,6 +267,7 @@ def getData(request):
             Q(purchase_date__icontains = search) | \
             Q(price__icontains = search) | \
             Q(location__icontains = search) | \
+            Q(accurate_location__location__icontains = search) | \
             Q(depreciation_starting_date__icontains = search) | \
             Q(residual_value__icontains = search) \
             ).count()
@@ -277,6 +280,7 @@ def getData(request):
             Q(purchase_date__icontains = search) | \
             Q(price__icontains = search) | \
             Q(location__icontains = search) | \
+            Q(accurate_location__location__icontains = search) | \
             Q(depreciation_starting_date__icontains = search) | \
             Q(residual_value__icontains = search) \
             ).order_by(order)[offset:offset + limit]
@@ -292,6 +296,8 @@ def getData(request):
     # we construct the JSON response, we use json.dumps() to excape undesired characters
     html = '{ "total": ' + json.dumps(str(total)) + ', "rows": [ '
     for row in rows:
+        # we get the id of the accurate_location_id because we need to display it instead of the text value (that will be matched with the list in the view)
+        accurate_location_id = row.accurate_location.id if (row.accurate_location is not None) else None
         html = html + '{ \
         "id": ' + json.dumps(str(row.id)) + ', \
         "item_id": ' + json.dumps(str(row.item_id)) + ', \
@@ -299,6 +305,7 @@ def getData(request):
         "purchase_date": ' + json.dumps(str(row.purchase_date.date())) + ', \
         "price": ' + json.dumps(str(row.price)) + ', \
         "location": ' + json.dumps(row.location) + ', \
+        "accurate_location": ' + json.dumps(str(accurate_location_id)) + ', \
         "depreciation_starting_date": ' + (json.dumps(str(row.depreciation_starting_date.date())) if row.depreciation_starting_date else "") + ', \
         "residual_value": ' + json.dumps(str(row.residual_value)) + ', \
         "picture": ' + json.dumps(str(row.picture)) + \
@@ -326,3 +333,37 @@ def uploadPicture(request):
 
     # Redirect to the document list after POST
     return redirect ('showLocalDB')
+
+def editAccurateLocation(request):
+    postID = int(request.POST.get("pk"))
+    value = str(request.POST.get("value"))
+
+    try:
+        # we retrieve the item which must be edited
+        item = Item.objects.get(id=postID)
+        # we get the corrisponding accurateLocation obj, according to the id we received
+        al = AccurateLocation.objects.get(id=value)
+        item.accurate_location = al # we edit the location
+        item.save()
+    except (Item.DoesNotExist, AccurateLocation.DoesNotExist):
+        return HttpResponseServerError("Non e' stato possibile modificare il valore")
+
+    return HttpResponse("OK")
+
+def getAccurateLocationList(request):
+    list = "["
+    # we get all the accurateLocation in the DB
+    rows = AccurateLocation.objects.using('default').all()
+    # we create the JSON response according to the x-edit plugin data format
+    for row in rows:
+        list = list + "{ \"value\": \"" + str(row.id) + "\", " + "\"text\": " + json.dumps(str(row.location)) + "},"
+    list = list[:-1] + "]"
+    # the HttpResponse contains the JSON data
+    return HttpResponse(list)
+
+def addAccurateLocation(request):
+    newLocation = str(request.POST.get("newLocation"))
+    al = AccurateLocation()
+    al.location = newLocation
+    al.save()
+    return HttpResponse("OK")
