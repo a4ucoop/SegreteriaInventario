@@ -182,10 +182,17 @@
 </div>
 
 <script>
+    var AccurateLocationsList = [];     // the list with the parsed JSON needed by the editable plugin
+    var AccurateLocationsArray = [];    // the array containing key-value elements to display when the row is expanded
+
+    // the function parse the JSON data in the above 2 formats
+    getAccurateLocationList(AccurateLocationsList, AccurateLocationsArray);  
+
     var $table = $('#table'),
             selections = [];
 
     function initTable() {
+
         $table.bootstrapTable({
             height: getHeight(),
             columns: [
@@ -248,7 +255,7 @@
                     editable: {
                         type: 'select',
                         inputclass: 'accurate-location-select',
-                        source: '/prova/examples/bootstrap_table_editable/getAccurateLocationList',
+                        source: AccurateLocationsList,
                         title: 'Posizione Precisa',
                         validate: function (value) {
                             value = $.trim(value);
@@ -321,12 +328,23 @@
     function detailFormatter(index, row) {
         var html = [];
         $.each(row, function (key, value) {
-            if(key == 'picture')
+            // if we're displaying the accurate location we must match the id with the actual text value
+            if (key == 'accurate_location') 
+            {
+                if (value != "None")
+                    html.push('<p><b>' + key + ':</b> ' + AccurateLocationsArray[value] + '</p>');
+                else
+                    html.push('<p><b>' + key + ':</b> Empty </p>');
+            }
+            // we need to show the render the picture based on the filepath
+            else if(key == 'picture')
                 if ( value != "")
                     html.push('<p><b>' + key + ':</b></p><p><img style="max-width:100px;max-height:100px" src="/prova/media/' + value + '"></p>');
                 else
                     html.push('<p><b>' + key + ': </b><b class="text-left text-danger">Foto non disponibile</b></p>');
-            if(key != 'picture' && key != 'state')
+            // we hide the state 
+            else if (key == 'state'){}
+            else
                 html.push('<p><b>' + key + ':</b> ' + value + '</p>');
         });
         return html.join('');
@@ -496,6 +514,25 @@
             );
         }
     }
+
+    function getAccurateLocationList (ALL, ALA) {
+        url = '/prova/examples/bootstrap_table_editable/getAccurateLocationList';
+        items = [];
+        $.ajax({ 
+            type: 'GET', 
+            url: url, 
+            dataType: 'json',
+            success: function (data) { 
+                $.each(data, function(index, element) {
+                        // alert("id= " + element.value + " value= " + element.text);
+                        item = { value: element.value, text: element.text };
+                        ALL.push(item);
+                        ALA[element.value] = element.text;
+                });
+            }
+        });
+    }
+
 
     // mostra/nasconde l'input per aggiungere una nuova posizione
     function showNewAccLocationDiv () {

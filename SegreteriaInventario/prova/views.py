@@ -227,6 +227,7 @@ def showSingleItem(request, local_id):
         'purchase_date': item.purchase_date,
         'price': item.price,
         'location': item.location,
+        'accurate_location': item.accurate_location,
         'depreciation_starting_date': item.depreciation_starting_date,
         'picture': item.picture,
     }
