@@ -73,10 +73,14 @@ def showRemoteDB(request):
 
 @login_required
 def showLocalDB(request):
-
     form = PictureForm()  # costruisce una form per l'upload dell'immagine
-    rows = Item.objects.using('default').all().order_by('-item_id')
-    context ={'rows': rows, 'form': form}
+    # prende le location dal DB per popolare il menu della quicksearch
+    locations = Item.objects.using('default').values_list('location', flat=True).distinct()
+    locations = filter(None, locations)
+    locations = [l.split('-')[0].lower() for l in locations]
+    # prende le accurateLocation dal DB per popolare il menu della quicksearch
+    accurateLocations = AccurateLocation.objects.using('default').all()
+    context ={'locations': locations, 'accurateLocations': accurateLocations, 'form': form}
     return render (request,'prova/provaLocal2.html',context)
 
 

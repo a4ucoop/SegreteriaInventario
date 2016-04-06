@@ -9,7 +9,8 @@
     <link href="{% static 'css/bootstrap/bootstrap-table/bootstrap-table.css'%}" rel="stylesheet">
     <link href="{% static 'css/bootstrap/bootstrap-table/extensions/editable/bootstrap-editable.css'%}" rel="stylesheet">
     <link href="{% static 'css/starter-template.css' %}" rel="stylesheet">
-    <link href="{% static 'prova/showLocalDBTableColumns.css'%}" rel="stylesheet">
+    <link href="{% static 'css/bootstrap/simple-sidebar/simple-sidebar.css'%}" rel="stylesheet">
+    <!--link href="{% static 'prova/showLocalDBTableColumns.css'%}" rel="stylesheet"-->
 
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
     <script src="{% static 'js/bootstrap/bootstrap/bootstrap.min.js' %}"></script>
@@ -42,6 +43,39 @@
         </div>
     </div>
 </nav>
+
+<div id="wrapper">
+
+    <!-- Sidebar -->
+    <div id="sidebar-wrapper">
+        <ul class="sidebar-nav">
+            <li class="sidebar-brand">
+                <a href="#">
+                    Ricerca rapida
+                </a>
+            </li>
+            <!--  Ubicazioni  -->
+            <li>
+                <a href="#" id="btn-1" data-toggle="collapse" data-target="#submenu1" aria-expanded="false">Ubicazioni</a>
+                <ul class="nav collapse" id="submenu1" role="menu" aria-labelledby="btn-1">
+                {% for l in locations %}
+                    <li ><a style="line-height:10px" href="#" onClick="quickSearch('{{l}}')">{{l}}</a></li>
+                {%endfor%}
+                </ul>    
+            </li>
+            <!--  Ubicazioni Precise  -->
+            <li>
+                <a href="#" id="btn-2" data-toggle="collapse" data-target="#submenu2" aria-expanded="false">Ubicazioni Precise</a>
+                <ul class="nav collapse" id="submenu2" role="menu" aria-labelledby="btn-2">
+                {% for al in accurateLocations %}
+                    <li ><a style="line-height:10px" href="#" onClick="quickSearch('{{al}}')">{{al}}</a></li>
+                {%endfor%}
+                </ul>    
+            </li>
+        </ul>
+    </div>
+    <!-- /#sidebar-wrapper -->
+
 <div class="container">
     <div id="toolbar">
         <div class="btn-group" role="group">
@@ -180,6 +214,7 @@
     </div>
 
 </div>
+</div>
 
 <script>
     var AccurateLocationsList = [];     // the list with the parsed JSON needed by the editable plugin
@@ -244,13 +279,13 @@
                     align: 'center'
                 }, {
                     field: 'location',
-                    title: 'Locazione',
+                    title: 'Ubicazione',
                     class: 'location',
                     sortable: true,
                     align: 'center'
                 }, {
                     field: 'accurate_location',
-                    title: 'Posizione Precisa',
+                    title: 'Ubicazione Precisa',
                     class: 'accurate_location',
                     editable: {
                         type: 'select',
@@ -564,6 +599,12 @@
     $(document).ready(function () {
         $('[data-toggle="tooltip"]').tooltip();
     });
+</script>
+<script>
+function quickSearch(keyword) {
+    searchUrl = "/prova/examples/bootstrap_table/data?search=" + keyword + "&order=asc&limit=10&offset=0";
+    $('#table').bootstrapTable('refresh', {url: searchUrl});
+}
 </script>
 </body>
 </html>
