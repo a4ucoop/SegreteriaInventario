@@ -18,27 +18,27 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-#: prova/templates/prova/provaLocal2.html:33
+#: inventario/templates/inventario/provaLocal2.html:33
 msgid "About"
 msgstr "Informazioni"
 
-#: prova/templates/prova/provaLocal2.html:34
+#: inventario/templates/inventario/provaLocal2.html:34
 msgid "Contact"
 msgstr "Contatti"
 
-#: prova/templates/registration/login.html:40
-#: prova/templates/registration/login.html:73
+#: inventario/templates/registration/login.html:40
+#: inventario/templates/registration/login.html:73
 msgid "Log in"
 msgstr "Accedi"
 
-#: prova/templates/registration/login.html:43
+#: inventario/templates/registration/login.html:43
 msgid "Please correct the error below."
 msgstr "Errore di inserimento"
 
-#: prova/templates/registration/login.html:43
+#: inventario/templates/registration/login.html:43
 msgid "Please correct the errors below."
 msgstr "Ci sono degli errori di inserimento"
 
-#: prova/templates/registration/login.html:68
+#: inventario/templates/registration/login.html:68
 msgid "Forgotten your password or username?"
 msgstr "Password o username dimenticati ?"

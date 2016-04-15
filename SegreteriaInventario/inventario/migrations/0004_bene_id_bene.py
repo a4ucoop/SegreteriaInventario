@@ -7,14 +7,13 @@ from django.db import models, migrations
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('prova', '0002_item_item_id'),
+        ('inventario', '0003_auto_20160410_2211'),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='item',
-            name='residual_value',
-            field=models.DecimalField(default=0, max_digits=12, decimal_places=2),
-            preserve_default=False,
+            model_name='bene',
+            name='id_bene',
+            field=models.IntegerField(default=None),
         ),
     ]

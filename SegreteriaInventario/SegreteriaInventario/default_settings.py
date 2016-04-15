@@ -40,7 +40,7 @@ INSTALLED_APPS = (
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'prova',
+    'inventario',
 )
 
 MIDDLEWARE_CLASSES = (
@@ -114,7 +114,7 @@ STATICFILES_DIRS = (
     #'/var/www/static/',
 )
 
-URL_PREFIX = "prova/"
+URL_PREFIX = "inventario/"
 
 LOGIN_URL = "/%saccounts/login/" % URL_PREFIX
 LOGIN_REDIRECT_URL = "/%s" % URL_PREFIX

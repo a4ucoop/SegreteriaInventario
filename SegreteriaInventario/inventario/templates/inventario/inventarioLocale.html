@@ -29,7 +29,7 @@
     <tbody>
 	{% for row in rows %}
 		<tr>
-			<td><a href="{% url 'prova.views.showSingleItem' row.id %}">{{ row.id }}</a></td>
+			<td><a href="{% url 'inventario.views.showSingleItem' row.id %}">{{ row.id }}</a></td>
             <td>{{ row.item_id }}</td>
 			<td>{{ row.description }}</td>
 			<td>{{ row.purchase_date }}</td>

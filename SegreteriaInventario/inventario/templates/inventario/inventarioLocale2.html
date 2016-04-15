@@ -10,7 +10,7 @@
     <link href="{% static 'css/bootstrap/bootstrap-table/extensions/editable/bootstrap-editable.css'%}" rel="stylesheet">
     <link href="{% static 'css/starter-template.css' %}" rel="stylesheet">
     <link href="{% static 'css/bootstrap/simple-sidebar/simple-sidebar.css'%}" rel="stylesheet">
-    <!--link href="{% static 'prova/showLocalDBTableColumns.css'%}" rel="stylesheet"-->
+    <!--link href="{% static 'inventario/showLocalDBTableColumns.css'%}" rel="stylesheet"-->
 
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
     <script src="{% static 'js/bootstrap/bootstrap/bootstrap.min.js' %}"></script>
@@ -31,7 +31,7 @@
         </div>
         <div id="navbar" class="collapse navbar-collapse">
             <ul class="nav navbar-nav">
-                <li class="active"><a href="{% url 'prova.views.index' %}">Home</a></li>
+                <li class="active"><a href="{% url 'inventario.views.index' %}">Home</a></li>
                 <li><a href="#about">{% trans 'About' %}</a></li>
                 <li><a href="#contact">{% trans 'Contact' %}</a></li>
                 {% if user.is_authenticated %}
@@ -101,7 +101,7 @@
         <div class="btn-group" role="group">
           <button type="button"
                   class="btn btn-default"
-                  onClick="openDialog()"
+                  onClick="printQrCodes()"
                   data-toggle="tooltip"
                   data-placement="bottom"
                   title="Stampa codici QR selezionati"
@@ -151,7 +151,7 @@
            data-page-list="[1, 10, 25, 50, 100, ALL]"
            data-show-footer="false"
            data-side-pagination="server"
-           data-url="/prova/examples/bootstrap_table/data"
+           data-url="/inventario/table/getData"
            data-response-handler="responseHandler">
     </table>
 
@@ -191,7 +191,7 @@
                 </div>
                 <div class="modal-body">
                     <!-- Upload form. Note enctype attribute! -->
-                    <form action="{% url "prova.views.uploadPicture" %}" method="post" enctype="multipart/form-data">
+                    <form action="{% url "inventario.views.uploadPicture" %}" method="post" enctype="multipart/form-data">
                         {% csrf_token %}
                         <p>{{ form.non_field_errors }}</p>
                         <p>{{ form.picture.label_tag }} {{ form.picture.help_text }}</p>
@@ -248,45 +248,51 @@
                     }, 
                 {
                     field: 'id',
-                    title: 'ID Locale',
+                    title: 'ID',
                     class: 'id',
                     formatter: 'showSingleItem',
                     sortable: true,
                     align: 'center'
                 }, {
-                    field: 'item_id',
-                    title: 'ID Remoto',
-                    class: 'item_id',
+                    field: 'cd_invent',
+                    title: 'cd inv',
+                    class: 'cd_invent',
                     sortable: true,
                     align: 'center'
                 }, {
-                    field: 'description',
-                    title: 'Descrizione',
-                    class: 'description',
+                    field: 'pg_bene',
+                    title: 'numero inventario',
+                    formatter: 'numeroInventarioFormatter',
                     sortable: true,
                     align: 'center'
                 }, {
-                    field: 'purchase_date',
-                    title: 'Data di acquisto',
-                    class: 'purchase_date',
+                    field: 'ds_bene',
+                    title: 'descrizione bene',
+                    class: 'ds_bene',
                     sortable: true,
                     align: 'center'
                 }, {
-                    field: 'price',
-                    title: 'Prezzo',
-                    class: 'price',
+                    field: 'cd_categ_gruppo',
+                    title: 'categoria',
+                    formatter: 'categoriaFormatter',
                     sortable: true,
                     align: 'center'
                 }, {
-                    field: 'location',
-                    title: 'Ubicazione',
-                    class: 'location',
+                    field: 'dt_registrazione_buono',
+                    title: 'data acquisto',
+                    class: 'dt_registrazione_buono',
                     sortable: true,
                     align: 'center'
                 }, {
-                    field: 'accurate_location',
+                    field: 'ds_spazio',
+                    title: 'ubicazione',
+                    class: 'ds_spazio',
+                    sortable: true,
+                    align: 'center'
+                }, {
+                    field: 'ubicazione_precisa',
                     title: 'Ubicazione Precisa',
-                    class: 'accurate_location',
+                    class: 'ubicazione_precisa',
                     editable: {
                         type: 'select',
                         inputclass: 'accurate-location-select',
@@ -296,22 +302,27 @@
                             value = $.trim(value);
                             if (!value) return 'This field is required';
                         },
-                        url: '/prova/examples/bootstrap_table_editable/editAccurateLocation',
+                        url: '/inventario/table/editable/editAccurateLocation',
                         params: { csrfmiddlewaretoken:'{{csrf_token}}'},
                     },
                     sortable: true,
                     align: 'center'
-                }, 
-                {
-                    field: 'depreciation_starting_date',
-                    title: 'Data di inizio ammortamento',
-                    class: 'depreciation_starting_date',
+                }, {
+                    field: 'dt_ini_ammortamento',
+                    title: 'data ini amm',
+                    class: 'dt_ini_ammortamento',
                     sortable: true,
                     align: 'center'
                 }, {
-                    field: 'residual_value',
-                    title: 'Valore residuo',
-                    class: 'residual_value',
+                    field: 'valore_convenzionale',
+                    title: 'valore convenzionale',
+                    class: 'valore_convenzionale',
+                    sortable: true,
+                    align: 'center'
+                }, {
+                    field: 'valore_residuo',
+                    title: 'valore residuo',
+                    class: 'valore_residuo',
                     sortable: true,
                     align: 'center'
                 },
@@ -371,10 +382,10 @@
                 else
                     html.push('<p><b>' + key + ':</b> Empty </p>');
             }
-            // we need to show the render the picture based on the filepath
-            else if(key == 'picture')
+            // we need to show the render the immagine based on the filepath
+            else if(key == 'immagine')
                 if ( value != "")
-                    html.push('<p><b>' + key + ':</b></p><p><img style="max-width:100px;max-height:100px" src="/prova/media/' + value + '"></p>');
+                    html.push('<p><b>' + key + ':</b></p><p><img style="max-width:100px;max-height:100px" src="/inventario/media/' + value + '"></p>');
                 else
                     html.push('<p><b>' + key + ': </b><b class="text-left text-danger">Foto non disponibile</b></p>');
             // we hide the state 
@@ -415,7 +426,17 @@
     }
 
     function showSingleItem(value, row) {
-        return "<a href='/prova/show/" + row.id + "'>" + value + "</a>";
+        return "<a href='/inventario/show/" + row.id + "'>" + value + "</a>";
+    }
+
+    function numeroInventarioFormatter(value, row) {
+        // return "<a href='/inventario/show/" + row.id + "'>" + value + "</a>";
+        return row.pg_bene + "-" + row.pg_bene_sub;
+    }
+
+    function categoriaFormatter(value, row) {
+        // return "<a href='/inventario/show/" + row.id + "'>" + value + "</a>";
+        return row.cd_categ_gruppo + " - " + row.ds_categ_gruppo;
     }
 
     $(function () {
@@ -496,6 +517,14 @@
         $('#myModal').modal('show');
 
     }
+
+    function printQrCodes() {
+        selected = getIdSelections();
+        console.log(selected.toString());
+        makeQR(selected);
+        printDiv();
+    }
+
     // function openOneDialog() {
     //     $('#myModal').on('shown.bs.modal', function (e) {
     //         makeQR(selected);
@@ -508,14 +537,12 @@
 
     // }
     function printDiv(text) {
-        var printContents = "" ;
+        var printContents = "";
         for(var i=0;i<immagine.length; i++)
         {
             printContents += immagine[i];
             i++;
-            printContents += '</br>';
             printContents += immagine[i];
-            printContents += '</br>';
         }
         console.log(printContents);
         document.body.innerHTML = printContents;
@@ -530,28 +557,26 @@
         img = [];
         for (var i = 0; i < text.length; i++) {
             var text1 = text[i];
-            var url = document.location.origin + '/prova/show/'+ text1 +'/';
+            var url = document.location.origin + '/inventario/show/'+ text1 +'/';
             console.log(url);
             jQuery(function () {
                         $("#qrcode").qrcode({
                             text: url,
                             render: 'canvas',
-                            size: 200
+                            size: 100
                         });
                         var canvas = $('#qrcode canvas');
                         console.log(canvas);
                         var img1 = canvas.get(i).toDataURL('image/png');
-                        immagine.push(text1);
-                        immagine.push('<img src="' + img1 + '"/>');
+                        immagine.push('<div style="float:left;padding: 10px"><img src="' + img1 + '"/><br><span>' + text1 + '</span></div>');
                         console.log(immagine[i]);
-                        //document.write('<img src="' + img + '"/>');
                     }
             );
         }
     }
 
     function getAccurateLocationList (ALL, ALA) {
-        url = '/prova/examples/bootstrap_table_editable/getAccurateLocationList';
+        url = '/inventario/table/editable/getAccurateLocationList';
         items = [];
         $.ajax({ 
             type: 'GET', 
@@ -578,11 +603,11 @@
     // chiamata ajax per salvare la nuova posizione nel DB ricarica la pagina al success per aggiornare la lista delle posizioni
     function addLocation () {
         // alert($("#newAccLocationText").val());
-        newLocation = $("#newAccLocationText").val();
+        nuovaUbicazione = $("#newAccLocationText").val();
         $.ajax({
             type: "POST",
-            url: '/prova/examples/bootstrap_table_editable/addAccurateLocation',
-            data: ({ newLocation : newLocation, csrfmiddlewaretoken:'{{csrf_token}}' }),
+            url: '/inventario/table/editable/addAccurateLocation',
+            data: ({ nuovaUbicazione : nuovaUbicazione, csrfmiddlewaretoken:'{{csrf_token}}' }),
             success: function(result) {
                 // alert('Nuova posizione aggiunta');
                 location.reload();
@@ -602,7 +627,7 @@
 </script>
 <script>
 function quickSearch(keyword) {
-    searchUrl = "/prova/examples/bootstrap_table/data?search=" + keyword + "&order=asc&limit=10&offset=0";
+    searchUrl = "/inventario/table/getData?search=" + keyword + "&order=asc&limit=10&offset=0";
     $('#table').bootstrapTable('refresh', {url: searchUrl});
 }
 </script>
