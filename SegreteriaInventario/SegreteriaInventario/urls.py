@@ -24,4 +24,5 @@ urlpatterns = [
     url(r'^admin/', include(admin.site.urls)),
     url(r'^inventario/', include(inventario_urls)),
     url(r'^%saccounts/logout/$' % settings.URL_PREFIX, 'django.contrib.auth.views.logout_then_login', name='logout'),
+    url(r'^accounts/', include('registration.backends.hmac.urls')),
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

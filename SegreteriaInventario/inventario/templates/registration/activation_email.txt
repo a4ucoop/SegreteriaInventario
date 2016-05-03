@@ -1,0 +1,14 @@
+Hai richiestodi registrare un account per il sito {{ site.name }}.  
+
+Se non hai fatto nessuna richiesta di registrazione, semplicemente ignora questo 
+messaggio e il tuo indirizzo verrà rimosso dai nostri _____.
+
+Per attivare il tuo account, clicca sul seguente link entro {{ expiration_days }} giorni
+dalla ricezione di questa email:
+
+http://{{site.domain}}/accounts/activate/{{ activation_key }}
+
+Se non dovesse funzionare, copia e incolla questo link nella barra di ricerca del browser.
+
+Sinceramente,
+{{ site.name }} staff

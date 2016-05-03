@@ -21,3 +21,12 @@ class Bene(models.Model):
 	valore_convenzionale = models.DecimalField(max_digits=15, decimal_places=2)
 	valore_residuo = models.DecimalField(max_digits=15, decimal_places=2)
 	immagine = models.FileField(upload_to='pictures/%Y/%m/%d', null=True)
+
+class RicognizioneInventariale(models.Model):
+	id_ric_inv = models.IntegerField(default=None)
+	cd_invent = models.CharField(max_length=8)
+	pg_bene = models.IntegerField(default=None)
+	pg_bene_sub = models.IntegerField(default=None)
+	ds_spazio = models.CharField(max_length=2000, null=True)
+	ubicazione_precisa = models.ForeignKey(UbicazionePrecisa, null=True, on_delete=models.SET_NULL)
+	immagine = models.FileField(upload_to='pictures/%Y/%m/%d', null=True)

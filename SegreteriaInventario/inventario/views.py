@@ -8,10 +8,12 @@ from django.shortcuts import redirect
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.cache import never_cache
 from django.contrib.auth.views import login as django_auth_login
-from models import Bene
-from models import UbicazionePrecisa
-from forms import PictureForm
-from forms import AdvancedSearchForm
+from django.views.generic.edit import CreateView
+
+from models import Bene, UbicazionePrecisa, RicognizioneInventariale
+
+from forms import PictureForm, RicognizioneInventarialeForm, AdvancedSearchForm
+
 import datetime
 import json
 
@@ -22,10 +24,6 @@ def index(request):
 def login(request, *args, **kw):
     print request, args, kw
     return django_auth_login(request, *args, **kw)
-
-def registration(request):
-    """TODO"""
-    return ""
 
 # prende il cursore che ha eseguito la query, estrae i risultati sotto
 # forma di dizionario che ha come chiave il nome del campo
@@ -569,3 +567,23 @@ def advancedSearch(request):
         return HttpResponse(html)
         # Redirect to the document list after POST
         return redirect ('showLocalDB')
+
+class RicognizioneInventarialeCreateView(CreateView):
+    """ """
+    
+    form_class = RicognizioneInventarialeForm
+    template_name = "inventario/RicognizioneInventariale/create.html"
+
+    #def get_form(self, form_class):
+    #    """ """
+
+    #    form = form_class(self.request, **self.get_form_kwargs())
+    #    return form
+
+    def form_valid(self, form):
+
+        form.save()
+        success_url = ""
+        return HttpResponse("OK")
+
+

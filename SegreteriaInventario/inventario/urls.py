@@ -17,6 +17,6 @@ urlpatterns = [
     url(r'^table/editable/getAccurateLocationList', views.getAccurateLocationList, name='getAccurateLocationList'),
     url(r'^table/editable/addAccurateLocation', views.addAccurateLocation, name='addAccurateLocation'),  
     url(r'^accounts/login/$', views.login, {'template_name': 'registration/login.html'}, name = 'login'),
-    url(r'^accounts/registration/$', views.registration),
 	url(r'^upload/immagine$', views.uploadPicture),
+	url(r'^ricinv/create$', views.RicognizioneInventarialeCreateView.as_view(),name='ricinv_add'),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

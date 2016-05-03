@@ -2,6 +2,7 @@
 
 from django import forms
 from models import Bene
+from inventario.models import RicognizioneInventariale
 
 
 class PictureForm(forms.Form):
@@ -118,3 +119,8 @@ class AdvancedSearchForm(forms.Form):
 		label='valore residuo massimo', 
 		min_value=0
 	)
+
+class RicognizioneInventarialeForm(forms.ModelForm):
+    class Meta:
+        model = RicognizioneInventariale
+        fields = ['cd_invent','pg_bene','pg_bene_sub','ds_spazio','ubicazione_precisa','immagine']

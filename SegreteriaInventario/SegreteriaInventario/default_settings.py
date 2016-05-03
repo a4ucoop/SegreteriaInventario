@@ -42,6 +42,7 @@ INSTALLED_APPS = (
     'django.contrib.staticfiles',
     'inventario',
     'widget_tweaks',
+    'crispy_forms',
 )
 
 MIDDLEWARE_CLASSES = (
@@ -120,4 +121,10 @@ URL_PREFIX = "inventario/"
 LOGIN_URL = "/%saccounts/login/" % URL_PREFIX
 LOGIN_REDIRECT_URL = "/%s" % URL_PREFIX
 LOGOUT_URL = "/%saccounts/logout/" % URL_PREFIX
+
+#django registration
+ACCOUNT_ACTIVATION_DAYS = 7
+
+EMAIL_BACKEND = 'django.core.mail.backends.filebased.EmailBackend'
+EMAIL_FILE_PATH = '/tmp/app-messages' # change this to a proper location
 
