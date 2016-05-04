@@ -1,134 +1,656 @@
 {% extends "base.html" %}
+{% load staticfiles %}
+{% load widget_tweaks %}
+{% load i18n %}
+
+{% block stylesheets %}
+
+<link href="{% static 'css/bootstrap/bootstrap-table/extensions/editable/bootstrap-editable.css'%}" rel="stylesheet">
+<link href="{% static 'css/bootstrap/simple-sidebar/simple-sidebar.css'%}" rel="stylesheet">
+<link href="{% static 'inventario/css/showLocalDBTableColumns.css'%}" rel="stylesheet">
+{% endblock %}
+
+
+
+{% block javascripts %}
+
+<script type="text/javascript" src="{% static 'js/jquery.qrcode-0.12.0.min.js' %}"></script>
+<!-- <script type="text/javascript" src="{% static 'js/bootstrap/bootstrap-table/extensions/export/bootstrap-table-export.js' %}"></script>
+<script type="text/javascript" src="{% static 'js/bootstrap/bootstrap-table/extensions/export/tableExport.js' %}"></script> -->
+{% endblock %}
+
+
+{% block toggle_sidebar %}
+
+<!-- <a href="#menu-toggle" class="btn btn-default" id="menu-toggle">Toggle Menu</a> -->
+<li><a href="#about" id="menu-toggle" >Ricerca Rapida</a></li>
+
+{% endblock %}
+
+
 {% block body %}
-<div class="btn-group" role="group" aria-label="...">
-    <button type="button" class="btn btn-success" onClick="location.href='{% url 'checkUpdate' %}'"
-            data-toggle="tooltip" title="Aggiorna solo i dati nuovi (non modifica quelli già presenti)">Aggiornameto
-        Parziale
-    </button>
-</div>
-<div class="btn-group" role="group" aria-label="...">
-    <button type="button" class="btn btn-danger" onClick="location.href='{% url 'updateLocalDB' %}'"
-            data-toggle="tooltip" title="Aggiorna tutti i dati (può richiedere del tempo)">Aggiornameto Completo
-    </button>
-</div>
-<br><br>
-{% if message %}
-<div class="alert alert-success" role="alert">{{ message }}</div>{% endif %}
-<table id="tableID" data-toggle="table" data-cache="false">
-    <thead>
-    <tr>
-        <th data-halign="center">ID</th>
-        <th data-halign="center">Item ID</th>
-        <th data-halign="center">Descrizione</th>
-        <th data-halign="center">Data Acquisto</th>
-        <th data-halign="center">Valore</th>
-        <th data-halign="center">Ubicazione</th>
-        <th data-halign="center">Data Inizio Ammortamento</th>
-    </tr>
-    </thead>
-    <tbody>
-	{% for row in rows %}
-		<tr>
-			<td><a href="{% url 'inventario.views.showSingleItem' row.id %}">{{ row.id }}</a></td>
-            <td>{{ row.item_id }}</td>
-			<td>{{ row.description }}</td>
-			<td>{{ row.purchase_date }}</td>
-			<td>{{ row.price }}</td>
-			<td>{{ row.location }}</td>
-			<td>{{ row.depreciation_starting_date }}</td>
-		</tr>
-	{% endfor %}
-    </tbody>
-</table>
+<div id="wrapper">
 
-<!-- Modal -->
-<div id="myModal" class="modal fade" role="dialog">
-    <div class="modal-dialog">
+    <!-- Sidebar -->
+    <div id="sidebar-wrapper">
+        <ul class="sidebar-nav">
+            <li class="sidebar-brand">
+                <a href="#">
+                    Ricerca rapida
+                </a>
+            </li>
+            <!--  Ubicazioni  -->
+              <li>
+                  <a href="#" id="btn-1" data-toggle="collapse" data-target="#submenu1" aria-expanded="false">Ubicazioni</a>
+                  <ul class="nav collapse" id="submenu1" role="menu" aria-labelledby="btn-1">
+                  {% for l in locations %}
+                      <li ><a style="line-height:10px" href="#" title="{{l}}" onClick="locationSearch('{{l}}')">{{l}}</a></li>
+                  {%endfor%}
+                  </ul>    
+              </li>
+            <!--  Ubicazioni Precise  -->
+            <li>
+                <a href="#" id="btn-2" data-toggle="collapse" data-target="#submenu2" aria-expanded="false">Ubicazioni Precise</a>
+                <ul class="nav collapse" id="submenu2" role="menu" aria-labelledby="btn-2">
+                {% for al in accurateLocations %}
+                    <li ><a style="line-height:10px" href="#" title="{{al}}" onClick="accurateLocationSearch('{{al}}')">{{al}}</a></li>
+                {%endfor%}
+                </ul>    
+            </li>
+        </ul>
+    </div>
+    <!-- /#sidebar-wrapper -->
 
-        <!-- Modal content-->
-        <div class="modal-content">
-            <div class="modal-header">
-                <button type="button" class="close" data-dismiss="modal">&times;</button>
-                <h4 class="modal-title">QR CODE</h4>
+    <div class="container col-xs-12" style="height:100%">
+        <div id="toolbar">
+            <div class="btn-group" role="group">
+              <button type="button"
+                      class="btn btn-default"
+                      onClick="location.href='{% url 'checkUpdate' %}'"
+                      title="Aggiornamento Parziale"
+                      >
+                <span class="glyphicon glyphicon-repeat" aria-hidden="true"></span>
+              </button>
+              <button type="button"
+                      class="btn btn-default"
+                      onClick="location.href='{% url 'updateLocalDB' %}'"
+                      title="Aggiornamento Completo"
+                      >
+                <span class="glyphicon glyphicon-refresh" aria-hidden="true"></span>
+              </button>
             </div>
-            <div class="modal-body">
-                <div id="qrcode">
-
+            <div class="btn-group" role="group">
+              <button type="button"
+                      class="btn btn-default"
+                      onClick="printQrCodes()"
+                      title="Stampa codici QR selezionati"
+                      >
+                <span class="glyphicon glyphicon-qrcode" aria-hidden="true"></span>
+              </button>
+            </div>
+            <div class="btn-group" role="group">
+              <button type="button"
+                      class="btn btn-default"
+                      onClick="showNewAccLocationDiv()"
+                      title="Nuova posizione"
+                      >
+                <span class="glyphicon glyphicon-map-marker" aria-hidden="true"></span>
+              </button>
+            </div>
+            <div id="newAccLocationDiv" class="btn-group" role="group" style="display:none">
+                <div class="btn-group" role="group">
+                    <input type="text" class="form-control" id="newAccLocationText" placeholder="Nuova posizione...">
                 </div>
-                <button type="button" onclick="printDiv('qrcode');">Stampa QR Code</button>
+                <div class="btn-group" role="group">
+                  <button type="button"
+                          class="btn btn-default"
+                          onClick="addLocation()"
+                          >
+                    <!-- <span class="glyphicon glyphicon-ok" aria-hidden="true"></span> -->
+                  <b>ok</b>
+                  </button>
+                </div>
             </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+            <div class="btn-group" role="group">
+              <button type="button"
+                      class="btn btn-default"
+                      onClick="$('#advancedSearchModal').modal();"
+                      title="Ricerca Avanzata"
+                      >
+                <span class="glyphicon glyphicon-search" aria-hidden="true"></span>
+              </button>
+            </div>
+            <div class="btn-group" role="group">
+              <button type="button"
+                      class="btn btn-default"
+                      onClick="clearFilters();"
+                      title="Rimuovi i filtri"
+                      >
+                <span class="glyphicon glyphicon-remove" aria-hidden="true"></span>
+              </button>
             </div>
         </div>
 
-    </div>
+<div class="table-responsive">
+        <table id="table"
+               data-toolbar="#toolbar"
+               data-search="true"
+               data-show-refresh="false"
+               data-show-toggle="false"
+               data-show-columns="true"
+               data-show-export="true"
+               data-detail-view="true"
+               data-detail-formatter="detailFormatter"
+               data-minimum-count-columns="2"
+               data-show-pagination-switch="false"
+               data-pagination="true"
+               data-id-field="id"
+               data-page-size="25"  
+               data-page-list="[1, 10, 25, 50, 100, ALL]"
+               data-show-footer="false"
+               data-side-pagination="server"
+               data-url="/inventario/table/getData"
+               data-response-handler="responseHandler">
+        </table>
 </div>
+
+
+        <div id="qrcode" style="display: none;"></div>
+
+        <!-- Upload picture -->
+        <div id="uploadPictureModal" class="modal fade" role="dialog">
+            <div class="modal-dialog">
+
+                <!-- Modal content-->
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal">&times;</button>
+                        <h4 class="modal-title">Carica Foto</h4>
+                    </div>
+                    <div class="modal-body">
+                        <!-- Upload form. Note enctype attribute! -->
+                        <form action="{% url "inventario.views.uploadPicture" %}" method="post" enctype="multipart/form-data">
+                            {% csrf_token %}
+                            <p>{{ picform.non_field_errors }}</p>
+                            <p>{{ picform.picture.label_tag }} {{ picform.picture.help_text }}</p>
+                            <p>
+                                {{ picform.picture.errors }}
+                                <span class="btn btn-primary btn-file">
+                                    Scegli un Immagine... {{ picform.picture }}
+                                </span>
+                                {{ picform.id }}
+                            </p>
+                            <button type="submit" class="btn btn-default">Invia</button>
+                        </form>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-default" data-dismiss="modal">Chiudi</button>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+        <!-- Upload picture -->
+
+        <!-- Advanced Search -->
+        <div id="advancedSearchModal" class="modal modal-wide fade" role="dialog">
+            <div class="modal-dialog">
+
+                <!-- Modal content-->
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal">&times;</button>
+                        <h4 class="modal-title">Ricerca Avanzata</h4>
+                    </div>
+                    <div class="modal-body">
+                        <div class="form-group">
+                            <form name="advancedSearchForm" action="{% url "inventario.views.advancedSearch" %}" method="post">
+                                {% csrf_token %}
+                                <p>{{ asform.non_field_errors }}</p>
+
+                                <!-- ID -->
+                                <p>{{ asform.min_id.errors }}</p>
+                                <p>{{ asform.max_id.errors }}</p>
+                                <div class="col-xs-12"><p><div class="col-xs-6">{{ asform.min_id.label_tag }} {{ asform.min_id.help_text }}{% render_field asform.min_id class+="form-control" %}</div><div class="col-xs-6">
+                                {{ asform.max_id.label_tag }} {{ asform.max_id.help_text }}{% render_field asform.max_id class+="form-control" %}</div></p></div>
+                                <!-- codice inventario -->
+                                <div class="col-xs-12" style="margin-top:20px;padding-left:2.5%;padding-right:2.5%"><p>{{ asform.codice_inventario.label_tag }} {{ asform.codice_inventario.help_text }}{{ asform.codice_inventario.errors }}</p>
+                                <div class="col-xs-12" style="padding-left:1%;padding-right:1%">
+                                <ul class="list-group row">
+                                {% for c in asform.codice_inventario %}
+                                <li class="list-group-item col-xs-3">{{ c }}</li>
+                                {% endfor %}
+                                </ul></div></div>
+                                <!-- numero inventario -->
+                                <p>{{ asform.min_pg_bene.errors }}</p>
+                                <p>{{ asform.max_pg_bene.errors }}</p>
+                                <div class="col-xs-12"><p><div class="col-xs-6">{{ asform.min_pg_bene.label_tag }} {{ asform.min_pg_bene.help_text }}{% render_field asform.min_pg_bene class+="form-control" %}</div><div class="col-xs-6">
+                                {{ asform.max_pg_bene.label_tag }} {{ asform.max_pg_bene.help_text }}{% render_field asform.max_pg_bene class+="form-control" %}</div></p></div>
+                                <!-- descrizione bene -->
+                                <div class="col-xs-12" style="padding-left:2.5%;padding-right:2.5%;">
+                                  <p>
+                                      <p>{{ asform.ds_bene.errors }}</p>
+                                      <p>{{ asform.ds_bene.label_tag }} {{ asform.ds_bene.help_text }} {% render_field asform.ds_bene class+="form-control" %}</p>
+                                  </p>
+                                </div>
+                                <!-- data acquisto -->
+                                <p>{{ asform.from_dt_acquisto.errors }}</p>
+                                <p>{{ asform.to_dt_acquisto.errors }}</p>
+                                <div class="col-xs-12"><p><div class="col-xs-6">{{ asform.from_dt_acquisto.label_tag }} {{ asform.from_dt_acquisto.help_text }}{% render_field asform.from_dt_acquisto class+="form-control datepicker" %}</div><div class="col-xs-6">
+                                {{ asform.to_dt_acquisto.label_tag }} {{ asform.to_dt_acquisto.help_text }}{% render_field asform.to_dt_acquisto class+="form-control datepicker" %}</div></p></div>
+                                <!-- categorie inventariali -->
+                                <div class="col-xs-12" style="margin-top:20px;padding-left:2.5%;padding-right:2.5%"><p>{{ asform.categorie_inventariali.label_tag }} {{ asform.categorie_inventariali.help_text }}{{ asform.categorie_inventariali.errors }}</p>
+                                <div class="col-xs-12" style="padding-left:1%;padding-right:1%">
+                                <ul class="list-group row">
+                                {% for c in asform.categorie_inventariali %}
+                                <li class="list-group-item col-xs-4">{{ c }}</li>
+                                {% endfor %}
+                                </ul></div></div>
+                                <!-- ubicazione -->
+                                <div class="col-xs-12" style="padding-left:2.5%;padding-right:2.5%;">
+                                  <p>
+                                      <p>{{ asform.ubicazione.errors }}</p>
+                                      <p>{{ asform.ubicazione.label_tag }} {{ asform.ubicazione.help_text }} {% render_field asform.ubicazione class+="form-control" %}</p>
+                                  </p>
+                                </div>
+                                <!-- ubicazione precisa -->
+                                <div class="col-xs-12" style="padding-left:2.5%;padding-right:2.5%;">
+                                  <p>
+                                      <p>{{ asform.ubicazione_precisa.errors }}</p>
+                                      <p>{{ asform.ubicazione_precisa.label_tag }} {{ asform.ubicazione_precisa.help_text }} {% render_field asform.ubicazione_precisa class+="form-control" %}</p>
+                                  </p>
+                                </div>
+                                <!-- data inizio ammortamento -->
+                                <p>{{ asform.from_dt_ini_ammortamento.errors }}</p>
+                                <p>{{ asform.to_dt_ini_ammortamento.errors }}</p>
+                                <div class="col-xs-12"><p><div class="col-xs-6">{{ asform.from_dt_ini_ammortamento.label_tag }} {{ asform.from_dt_ini_ammortamento.help_text }}{% render_field asform.from_dt_ini_ammortamento class+="form-control datepicker" %}</div><div class="col-xs-6">
+                                {{ asform.to_dt_ini_ammortamento.label_tag }} {{ asform.to_dt_ini_ammortamento.help_text }}{% render_field asform.to_dt_ini_ammortamento class+="form-control datepicker" %}</div></p></div>
+                                <!-- Valore convenzionale -->
+                                <p>{{ asform.min_valore_convenzionale.errors }}</p>
+                                <p>{{ asform.max_valore_convenzionale.errors }}</p>
+                                <div class="col-xs-12"><p><div class="col-xs-6">{{ asform.min_valore_convenzionale.label_tag }} {{ asform.min_valore_convenzionale.help_text }}{% render_field asform.min_valore_convenzionale class+="form-control" %}</div><div class="col-xs-6">
+                                {{ asform.max_valore_convenzionale.label_tag }} {{ asform.max_valore_convenzionale.help_text }}{% render_field asform.max_valore_convenzionale class+="form-control" %}</div></p></div>
+                                <!-- Valore residuo -->
+                                <p>{{ asform.min_valore_residuo.errors }}</p>
+                                <p>{{ asform.max_valore_residuo.errors }}</p>
+                                <div class="col-xs-12"><p><div class="col-xs-6">{{ asform.min_valore_residuo.label_tag }} {{ asform.min_valore_residuo.help_text }}{% render_field asform.min_valore_residuo class+="form-control" %}</div><div class="col-xs-6">
+                                {{ asform.max_valore_residuo.label_tag }} {{ asform.max_valore_residuo.help_text }}{% render_field asform.max_valore_residuo class+="form-control" %}</div></p></div>
+                                <div class="col-md-12 text-center" style="margin-top:20px;margin-bottom:20px;"> 
+                                    <button type="button" class="btn btn-primary" style="width:15%;" onClick="advancedSearch()">Cerca</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-default" data-dismiss="modal">Chiudi</button>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+        <!-- Advanced Search -->
+
+    </div>
+    <!-- /#container -->
+</div>
+<!-- /#wrapper -->
 {% endblock %}
 
-{% block javascripts %}
-<script>
-    var img;
-    $(document).ready(function () {
-        $('[data-toggle="tooltip"]').tooltip();
-        addRowHandlers();
+
+
+{% block scripts %}
+<script type="text/javascript">
+    var AccurateLocationsList = [];     // the list with the parsed JSON needed by the editable plugin
+    var AccurateLocationsArray = [];    // the array containing key-value elements to display when the row is expanded
+
+    // the function parse the JSON data in the above 2 formats
+    getAccurateLocationList(AccurateLocationsList, AccurateLocationsArray);  
+
+    var $table = $('#table'),
+            selections = [];
+
+    function initTable() {
+
+        $table.bootstrapTable({
+            height: getHeight(),
+            columns: [
+                [
+                    {
+                        field: 'state',
+                        checkbox: true,
+                        align: 'center',
+                        valign: 'middle'
+                    },
+                {
+                        field: 'operate',
+                        title: 'azioni',
+                        class: 'actions',
+                        align: 'center',
+                        events: operateEvents,
+                        formatter: operateFormatter
+                    }, 
+                {
+                    field: 'id',
+                    title: 'ID',
+                    class: 'id',
+                    formatter: 'showSingleItem',
+                    sortable: true,
+                    align: 'center'
+                }, {
+                    field: 'cd_invent',
+                    title: 'codice inventario',
+                    class: 'cd_invent',
+                    sortable: true,
+                    align: 'center'
+                }, {
+                    field: 'pg_bene',
+                    title: 'numero inventario',
+                    formatter: 'numeroInventarioFormatter',
+                    sortable: true,
+                    align: 'center'
+                }, {
+                    field: 'ds_bene',
+                    title: 'descrizione bene',
+                    class: 'ds_bene',
+                    sortable: true,
+                    align: 'center'
+                }, {
+                    field: 'cd_categ_gruppo',
+                    title: 'categoria',
+                    class: 'cd_categ_gruppo',
+                    formatter: 'categoriaFormatter',
+                    sortable: true,
+                    align: 'center'
+                }, {
+                    field: 'dt_registrazione_buono',
+                    title: 'data acquisto',
+                    class: 'dt_registrazione_buono',
+                    sortable: true,
+                    align: 'center'
+                }, {
+                    field: 'ds_spazio',
+                    title: 'ubicazione',
+                    class: 'ds_spazio',
+                    sortable: true,
+                    align: 'center'
+                }, {
+                    field: 'ubicazione_precisa',
+                    title: 'Ubicazione precisa',
+                    class: 'ubicazione_precisa',
+                    editable: {
+                        type: 'select',
+                        inputclass: 'accurate-location-select',
+                        source: AccurateLocationsList,
+                        title: 'Posizione Precisa',
+                        validate: function (value) {
+                            value = $.trim(value);
+                            if (!value) return 'This field is required';
+                        },
+                        url: '/inventario/table/editable/editAccurateLocation',
+                        params: { csrfmiddlewaretoken:'{{csrf_token}}'},
+                    },
+                    sortable: true,
+                    align: 'center'
+                }, {
+                    field: 'dt_ini_ammortamento',
+                    title: 'data inizio ammortamento',
+                    class: 'dt_ini_ammortamento',
+                    sortable: true,
+                    align: 'center'
+                }, {
+                    field: 'valore_convenzionale',
+                    title: 'valore convenzionale',
+                    class: 'valore_convenzionale',
+                    sortable: true,
+                    align: 'center'
+                }, {
+                    field: 'valore_residuo',
+                    title: 'valore residuo',
+                    class: 'valore_residuo',
+                    sortable: true,
+                    align: 'center'
+                },
+                ]
+            ]
+        });
+
+        // sometimes footer render error.
+        setTimeout(function () {
+            $table.bootstrapTable('resetView');
+        }, 200);
+
+        // handler check, unckeck
+        $table.on('check.bs.table uncheck.bs.table ' +
+                'check-all.bs.table uncheck-all.bs.table', function () {
+
+            // save your data, here just save the current page
+            selections = getIdSelections();
+            // push or splice the selections if you want to save all data selections
+        });
+        $table.on('all.bs.table', function (e, name, args) {
+            console.log(name, args);
+        });
+
+        // resize handler
+        $(window).resize(function () {
+            $table.bootstrapTable('resetView', {
+                height: getHeight()
+            });
+        });
+    }
+
+    // which rows are selected
+    function getIdSelections() {
+        return $.map($table.bootstrapTable('getSelections'), function (row) {
+            return row.id
+        });
+    }
+
+    // put the data in the table
+    function responseHandler(res) {
+        $.each(res.rows, function (i, row) {
+            row.state = $.inArray(row.id, selections) !== -1;
+        });
+        return res;
+    }
+
+    // handles the text formattation when the row is open
+    function detailFormatter(index, row) {
+        var html = [];
+        $.each(row, function (key, value) {
+            // if we're displaying the accurate location we must match the id with the actual text value
+            if (key == 'accurate_location') 
+            {
+                if (value != "None")
+                    html.push('<p><b>' + key + ':</b> ' + AccurateLocationsArray[value] + '</p>');
+                else
+                    html.push('<p><b>' + key + ':</b> Empty </p>');
+            }
+            // we need to show the render the immagine based on the filepath
+            else if(key == 'immagine')
+                if ( value != "")
+                    html.push('<p><b>' + key + ':</b></p><p><img style="max-width:100px;max-height:100px" src="/inventario/media/' + value + '"></p>');
+                else
+                    html.push('<p><b>' + key + ': </b><b class="text-left text-danger">Foto non disponibile</b></p>');
+            // we hide the state 
+            else if (key == 'state'){}
+            else
+                html.push('<p><b>' + key + ':</b> ' + value + '</p>');
+        });
+        return html.join('');
+    }
+
+
+    function operateFormatter(value, row, index) {
+        return [
+            '<a class="Picture" href="javascript:void(0)" title="Carica una foto">',
+            '<i class="glyphicon glyphicon-picture"></i>',
+            '</a>  ',
+
+            '<a class="QRcode" href="javascript:void(0)" title="Stampa il QRcode di questo bene">',
+            '<i class="glyphicon glyphicon-qrcode"></i>',
+            '</a>'
+        ].join('');
+    }
+
+    window.operateEvents = {
+        'click .Picture': function (e, value, row, index) {
+            $('#id_id').val(row.id);
+            $('#uploadPictureModal').modal();
+        },
+        'click .QRcode': function (e, value, row, index) {
+            // alert('You click like action, row: ' + JSON.stringify(row));
+            // makeQR(row.id);
+            printSingleQrCode(row.id)
+            // alert("makeQR " + row.id);
+        }
+    };
+
+    function getHeight() {
+        return $(window).height() - $('#navbar1').outerHeight(true);
+    }
+
+    function showSingleItem(value, row) {
+        return "<a href='/inventario/show/" + row.id + "'>" + value + "</a>";
+    }
+
+    function numeroInventarioFormatter(value, row) {
+        // return "<a href='/inventario/show/" + row.id + "'>" + value + "</a>";
+        return row.pg_bene + "-" + row.pg_bene_sub;
+    }
+
+    function categoriaFormatter(value, row) {
+        // return "<a href='/inventario/show/" + row.id + "'>" + value + "</a>";
+        return row.cd_categ_gruppo + " - " + row.ds_categ_gruppo;
+    }
+
+    $(function () {
+        var scripts = [
+                    location.search.substring(1) || 
+                    "{% static 'js/bootstrap/bootstrap-table/bootstrap-table.js' %}",
+                    "{% static 'js/bootstrap/bootstrap-table/extensions/editable/bootstrap-table-editable.js' %}",
+                    "{% static 'js/bootstrap/bootstrap-table/extensions/editable/bootstrap-editable.js' %}",
+                    "{% static 'js/bootstrap/bootstrap-table/extensions/export/bootstrap-table-export.js' %}",
+                    "{% static 'js/bootstrap/bootstrap-table/extensions/export/tableExport.js' %}"
+
+                ],
+                eachSeries = function (arr, iterator, callback) {
+                    callback = callback || function () {
+                            };
+                    if (!arr.length) {
+                        return callback();
+                    }
+                    var completed = 0;
+                    var iterate = function () {
+                        iterator(arr[completed], function (err) {
+                            if (err) {
+                                callback(err);
+                                callback = function () {
+                                };
+                            }
+                            else {
+                                completed += 1;
+                                if (completed >= arr.length) {
+                                    callback(null);
+                                }
+                                else {
+                                    iterate();
+                                }
+                            }
+                        });
+                    };
+                    iterate();
+                };
+
+        eachSeries(scripts, getScript, initTable);
     });
 
-    function addRowHandlers() {
-        var table = document.getElementById("tableID");
-        var rows = table.getElementsByTagName("tr");
-        for (i = 0; i < rows.length; i++) {
-            var currentRow = table.rows[i];
-            var createClickHandler =
-                    function (row) {
-                        return function () {
-                            var cell = row.getElementsByTagName("td")[0];
-                            var id = cell.innerHTML;
-                            openDialog(id);
-                        };
-                    };
+    function getScript(url, callback) {
+        var head = document.getElementsByTagName('head')[0];
+        var script = document.createElement('script');
+        script.src = url;
 
-            currentRow.onclick = createClickHandler(currentRow);
-        }
+        var done = false;
+        // Attach handlers for all browsers
+        script.onload = script.onreadystatechange = function () {
+            if (!done && (!this.readyState ||
+                    this.readyState == 'loaded' || this.readyState == 'complete')) {
+                done = true;
+                if (callback)
+                    callback();
+
+                // Handle memory leak in IE
+                script.onload = script.onreadystatechange = null;
+            }
+        };
+
+        head.appendChild(script);
+
+        // We handle everything using the script element injection
+        return undefined;
     }
 
-    function openDialog(id_qr) {
-        var text = id_qr.toString();
-        $('#myModal').on('shown.bs.modal', function (e) {
-            idCode = text;
-            makeQR(text);
+    function getAccurateLocationList (ALL, ALA) {
+        url = '/inventario/table/editable/getAccurateLocationList';
+        items = [];
+        $.ajax({ 
+            type: 'GET', 
+            url: url, 
+            dataType: 'json',
+            success: function (data) { 
+                $.each(data, function(index, element) {
+                        // alert("id= " + element.value + " value= " + element.text);
+                        item = { value: element.value, text: element.text };
+                        ALL.push(item);
+                        ALA[element.value] = element.text;
+                });
+            }
         });
-        $('#myModal').on('hidden.bs.modal', function (e) {
-            $("#qrcode").empty();
-        });
-
-        $('#myModal').modal('show');
-
     }
 
-    function makeQR(text) {
-        $("#qrcode").empty();
-        jQuery(function () {
-            $("#qrcode").qrcode({
-                text: text,
-                render: 'canvas',
-                size: 200
+
+    // mostra/nasconde l'input per aggiungere una nuova posizione
+    function showNewAccLocationDiv () {
+        if ($("#newAccLocationDiv").is(":visible")==false) $("#newAccLocationDiv").show();
+        else $("#newAccLocationDiv").hide();
+    }
+
+    // chiamata ajax per salvare la nuova posizione nel DB ricarica la pagina al success per aggiornare la lista delle posizioni
+    function addLocation () {
+        // alert($("#newAccLocationText").val());
+        nuovaUbicazione = $("#newAccLocationText").val();
+        $.ajax({
+            type: "POST",
+            url: '/inventario/table/editable/addAccurateLocation',
+            data: ({ nuovaUbicazione : nuovaUbicazione, csrfmiddlewaretoken:'{{csrf_token}}' }),
+            success: function(result) {
+                // alert('Nuova posizione aggiunta');
+                location.reload();
+                // $('#table').bootstrapTable('refresh');
+            },
+            error: function() {
+                alert('Error occured');
+            }
+        });
+    }
+
+</script>
+
+<!-- scripts to manage QrCodes -->
+<script type="text/javascript" src="{% static 'inventario/js/inventarioLocale/QrCodeScripts.js'%}"></script>
+<!-- script to manage the quick search -->
+<script type="text/javascript" src="{% static 'inventario/js/inventarioLocale/QuickSearch.js'%}"></script>
+<!-- script to manage the advanced search -->
+<script type="text/javascript" src="{% static 'inventario/js/inventarioLocale/AdvancedSearch.js'%}"></script>
+<!-- script to manage the table export -->
+<script>
+    var $table = $('#table');
+    $(function () {
+        $('#toolbar').find('select').change(function () {
+            $table.bootstrapTable('destroy').bootstrapTable({
+                exportDataType: $(this).val()
             });
-            var canvas = $('#qrcode canvas');
-            console.log(canvas);
-            img = canvas.get(0).toDataURL("image/png");
-            //document.write('<img src="' + img + '"/>');
         });
-    }
-
-    function printDiv(divName) {
-        var printContents = '<img src="' + img + '"/>';
-        var originalContents = document.body.innerHTML;
-
-        document.body.innerHTML = printContents;
-
-        window.print();
-        window.location.reload();
-    }
+    })
 </script>
 {% endblock %}

@@ -1,0 +1,48 @@
+.modal.modal-wide .modal-dialog {
+  width: 70%;
+}
+.modal-wide .modal-body {
+  overflow-y: auto;
+}
+
+#tallModal .modal-body p { margin-bottom: 900px }
+
+.actions {
+    min-width:50px !important;
+    word-wrap: break-word !important;
+}
+
+.ds_bene {
+    min-width:500px !important;
+    word-wrap: break-word !important;
+}
+
+.cd_categ_gruppo{
+    min-width:500px !important;
+    word-wrap: break-word !important;
+}
+
+.ds_spazio{
+    min-width:500px !important;
+    word-wrap: break-word !important;
+}
+
+.btn-file {
+    position: relative;
+    overflow: hidden;
+}
+.btn-file input[type=file] {
+    position: absolute;
+    top: 0;
+    right: 0;
+    min-width: 100%;
+    min-height: 100%;
+    font-size: 100px;
+    text-align: right;
+    filter: alpha(opacity=0);
+    opacity: 0;
+    outline: none;
+    background: white;
+    cursor: inherit;
+    display: block;
+}

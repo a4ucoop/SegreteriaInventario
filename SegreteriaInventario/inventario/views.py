@@ -11,6 +11,7 @@ from django.contrib.auth.views import login as django_auth_login
 from models import Bene
 from models import UbicazionePrecisa
 from forms import PictureForm
+from forms import AdvancedSearchForm
 import datetime
 import json
 
@@ -73,15 +74,16 @@ def showRemoteDB(request):
 
 @login_required
 def showLocalDB(request):
-    form = PictureForm()  # costruisce una form per l'upload dell'immagine
+    picform = PictureForm()  # costruisce una form per l'upload dell'immagine
+    asform = AdvancedSearchForm()  # costruisce una form per l'upload dell'immagine
     # prende le location dal DB per popolare il menu della quicksearch
     locations = Bene.objects.using('default').values_list('ds_spazio', flat=True).distinct()
     locations = filter(None, locations)
     locations = [l.split('-')[0].lower() for l in locations]
     # prende le accurateLocation dal DB per popolare il menu della quicksearch
     accurateLocations = UbicazionePrecisa.objects.using('default').all()
-    context ={'locations': locations, 'accurateLocations': accurateLocations, 'form': form}
-    return render (request,'inventario/inventarioLocale2.html',context)
+    context ={'locations': locations, 'accurateLocations': accurateLocations, 'picform': picform, 'asform': asform}
+    return render (request,'inventario/inventarioLocale.html',context)
 
 
 
@@ -267,7 +269,7 @@ def checkUpdate(request):
         #     'rows': localRows,
         #     'message': "Il Database e' aggiornato"
         # }
-        # return render (request,'inventario/inventarioLocale2.html',context)
+        # return render (request,'inventario/inventarioLocale.html',context)
         return redirect('showLocalDB')
 
 
@@ -443,3 +445,127 @@ def addAccurateLocation(request):
     up.ubicazione = nuovaUbicazione
     up.save()
     return HttpResponse("OK")
+
+
+@login_required
+def advancedSearch(request):
+    if request.method == 'GET':
+        min_id = int(request.GET.get('min_id')) if (request.GET.get('min_id') is not None) else None
+        max_id = int(request.GET.get('max_id')) if (request.GET.get('max_id') is not None) else None
+        cods = request.GET.getlist('cods')
+        min_pg_bene = int(request.GET.get('min_pg_bene')) if (request.GET.get('min_pg_bene') is not None) else None
+        max_pg_bene = int(request.GET.get('max_pg_bene')) if (request.GET.get('max_pg_bene') is not None) else None
+        ds_bene = request.GET.get('ds_bene')
+        # da controllare il formato della data!
+        from_dt_acquisto = datetime.datetime.strptime(request.GET.get('from_dt_acquisto'), "%d/%m/%Y") if (request.GET.get('from_dt_acquisto') is not None) else None
+        to_dt_acquisto = datetime.datetime.strptime(request.GET.get('to_dt_acquisto'), "%d/%m/%Y") if (request.GET.get('to_dt_acquisto') is not None) else None
+        categ = request.GET.getlist('categ')
+        ubicazione = request.GET.get('ubicazione')
+        ubicazione_precisa = request.GET.get('ubicazione_precisa')
+        # da controllare il formato della data!
+        from_dt_ini_ammortamento = datetime.datetime.strptime(request.GET.get('from_dt_ini_ammortamento'), "%d/%m/%Y") if (request.GET.get('from_dt_ini_ammortamento') is not None) else None
+        to_dt_ini_ammortamento = datetime.datetime.strptime(request.GET.get('to_dt_ini_ammortamento'), "%d/%m/%Y") if (request.GET.get('to_dt_ini_ammortamento') is not None) else None
+        min_valore_convenzionale = int(request.GET.get('min_valore_convenzionale')) if (request.GET.get('min_valore_convenzionale') is not None) else None
+        max_valore_convenzionale = int(request.GET.get('max_valore_convenzionale')) if (request.GET.get('max_valore_convenzionale') is not None) else None
+        min_valore_residuo = int(request.GET.get('min_valore_residuo')) if (request.GET.get('min_valore_residuo') is not None) else None
+        max_valore_residuo = int(request.GET.get('max_valore_residuo')) if (request.GET.get('max_valore_residuo') is not None) else None
+
+        # # stampe debug
+        # print("min_id", min_id);
+        # print("max_id", max_id);
+        # print("cods", cods);
+        # print("min_pg_bene", min_pg_bene);
+        # print("max_pg_bene", max_pg_bene);
+        # print("ds_bene", ds_bene);
+        # print("from_dt_acquisto", from_dt_acquisto);
+        # print("to_dt_acquisto", to_dt_acquisto);
+        # print("categ", categ)
+        # print("ubicazione", ubicazione);
+        # print("ubicazione_precisa", ubicazione_precisa);
+        # print("from_dt_ini_ammortamento", from_dt_ini_ammortamento);
+        # print("to_dt_ini_ammortamento", to_dt_ini_ammortamento);
+        # print("min_valore_convenzionale", min_valore_convenzionale);
+        # print("max_valore_convenzionale", max_valore_convenzionale);
+        # print("min_valore_residuo", min_valore_residuo);
+        # print("max_valore_residuo", max_valore_residuo);
+
+        requestOrder = request.GET.get('order', None)
+        sort = request.GET.get('sort', None)
+        # get numeric parameter if they are defined in the url to avoid None conversion exceptions
+        # if limit is not defined in the url it is set as the number of objects in the database
+        limit = int(request.GET.get('limit')) if (request.GET.get('limit') is not None) else Bene.objects.count()
+        offset = int(request.GET.get('offset')) if (request.GET.get('offset') is not None) else 0
+
+        # the number of object retrieved, default value is 0, will be calculated afterwards
+        total = 0
+
+        # if sort is defined the order must be according to the field specified
+        if sort is not None:
+            # if the order is asc we must prepend a "-" to the sort (ex. order by bene_id asc -> order by -bene_id)
+            order = sort if requestOrder == 'asc' else '-' + sort
+        else:
+            # default is order by bene_id asc
+            order = '-id_bene'
+        
+        rows = Bene.objects.using('default').all()
+        # filter id range
+        if (min_id is not None and max_id is not None):
+            rows = rows.filter(id__range=(min_id, max_id))
+        # filter inventory code in selection list
+        if (cods is not None and cods):
+            rows = rows.filter(cd_invent__in=cods)
+        if (min_pg_bene is not None and max_pg_bene is not None):
+            rows = rows.filter(pg_bene__range=(min_pg_bene, max_pg_bene))
+        if (ds_bene is not None):
+            rows = rows.filter(ds_bene__icontains=ds_bene)
+        if (from_dt_acquisto is not None and to_dt_acquisto is not None):
+            rows = rows.filter(dt_registrazione_buono__range=(from_dt_acquisto, to_dt_acquisto))
+        if (categ is not None and categ):
+            rows = rows.filter(ds_categ_gruppo__in=categ)
+        if (ubicazione is not None):
+            rows = rows.filter(ds_spazio__icontains=ubicazione)
+        if (ubicazione is not None):
+            rows = rows.filter(ds_spazio__icontains=ubicazione)
+        if (ubicazione_precisa is not None):
+            rows = rows.filter(ubicazione_precisa__ubicazione__icontains=ubicazione_precisa)
+        if (from_dt_ini_ammortamento is not None and to_dt_ini_ammortamento is not None):
+            rows = rows.filter(dt_ini_ammortamento__range=(from_dt_ini_ammortamento, to_dt_ini_ammortamento))
+        if (min_valore_convenzionale is not None and max_valore_convenzionale is not None):
+            rows = rows.filter(valore_convenzionale__range=(min_valore_convenzionale, max_valore_convenzionale))
+        if (min_valore_residuo is not None and max_valore_residuo is not None):
+            rows = rows.filter(valore_convenzionale__range=(min_valore_residuo, max_valore_residuo))
+
+        total = rows.count();
+        rows = rows.order_by(order)[offset:offset + limit]
+
+
+
+        # we construct the JSON response, we use json.dumps() to excape undesired characters
+        html = '{ "total": ' + json.dumps(str(total)) + ', "rows": [ '
+        for row in rows:
+            # we get the id of the ubicazione_precisa because we need to display it instead of the text value (that will be matched with the list in the view)
+            ubicazione_precisa = row.ubicazione_precisa.id if (row.ubicazione_precisa is not None) else None
+            html = html + '{ \
+            "id": ' + json.dumps(str(row.id)) + ', \
+            "cd_invent": ' + json.dumps(row.cd_invent) + ', \
+            "pg_bene": ' + json.dumps(str(row.pg_bene)) + ', \
+            "pg_bene_sub": ' + json.dumps(str(row.pg_bene_sub)) + ', \
+            "ds_bene": ' + json.dumps(row.ds_bene) + ', \
+            "dt_registrazione_buono": ' + json.dumps(str(row.dt_registrazione_buono.date()) if row.dt_registrazione_buono is not None else "") + ', \
+            "cd_categ_gruppo": ' + json.dumps(row.cd_categ_gruppo) + ', \
+            "ds_categ_gruppo": ' + json.dumps(row.ds_categ_gruppo) + ', \
+            "ds_spazio": ' + json.dumps(row.ds_spazio) + ', \
+            "ubicazione_precisa": ' + json.dumps(str(row.ubicazione_precisa_id)) + ', \
+            "dt_ini_ammortamento": ' + json.dumps(str(row.dt_ini_ammortamento.date()) if row.dt_ini_ammortamento is not None else "") + ', \
+            "valore_convenzionale": ' + json.dumps(str(row.valore_convenzionale)) + ', \
+            "valore_residuo": ' + json.dumps(str(row.valore_residuo)) + ', \
+            "immagine": ' + json.dumps(str(row.immagine)) + \
+            ' }, '
+
+        # remove last "," character for the last item
+        if rows.count() > 0:
+            html = html[0:len(html)-2]
+        html = html + ' ] }'
+        return HttpResponse(html)
+        # Redirect to the document list after POST
+        return redirect ('showLocalDB')

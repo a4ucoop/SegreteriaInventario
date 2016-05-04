@@ -7,3 +7,4 @@ Installation:
 2. install requirements:
 
   pip install -r requirements/base.txt
+  pip install django-widget-tweaks

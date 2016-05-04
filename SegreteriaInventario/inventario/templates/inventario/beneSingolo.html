@@ -1,20 +1,22 @@
 {% extends "base.html" %}
 {% block body %}
-<p class="text-left"><b>ID: </b>{{ id }}</p>
-<p class="text-left"><b>codice inventario: </b>{{ cd_invent }}</p>
-<p class="text-left"><b>numero inventario: </b>{{ pg_bene }}-{{ pg_bene_sub }}</p>
-<p class="text-left"><b>descrizione: </b>{{ ds_bene }}</p>
-<p class="text-left"><b>categoria: </b>{{ cd_categ_gruppo }} - {{ ds_categ_gruppo }}</p>
-<p class="text-left"><b>data acquisto: </b>{{ dt_registrazione_buono }}</p>
-<p class="text-left"><b>ubicazione: </b>{{ ds_spazio }}</p>
-<p class="text-left"><b>ubicazione precisa: </b>{{ ubicazione_precisa }}</p>
-<p class="text-left"><b>data inizio ammortamento: </b>{{ dt_ini_ammortamento }}</p>
-<p class="text-left"><b>valore convenzionale: </b>{{ valore_convenzionale }}</p>
-<p class="text-left"><b>valore residuo: </b>{{ valore_residuo }}</p>
-<p class="text-left"><b>immagine: </b></p><p class="text-left">
-{% if immagine %}
-	<img src="/inventario{{ immagine.url }}" ></p>
-{% else %}
-	<p class="text-left text-danger"><b>Foto non disponibile</b></p>
-{% endif %}
+<div class="container">
+	<p class="text-left"><b>ID: </b>{{ id }}</p>
+	<p class="text-left"><b>codice inventario: </b>{{ cd_invent }}</p>
+	<p class="text-left"><b>numero inventario: </b>{{ pg_bene }}-{{ pg_bene_sub }}</p>
+	<p class="text-left"><b>descrizione: </b>{{ ds_bene }}</p>
+	<p class="text-left"><b>categoria: </b>{{ cd_categ_gruppo }} - {{ ds_categ_gruppo }}</p>
+	<p class="text-left"><b>data acquisto: </b>{{ dt_registrazione_buono }}</p>
+	<p class="text-left"><b>ubicazione: </b>{{ ds_spazio }}</p>
+	<p class="text-left"><b>ubicazione precisa: </b>{{ ubicazione_precisa }}</p>
+	<p class="text-left"><b>data inizio ammortamento: </b>{{ dt_ini_ammortamento }}</p>
+	<p class="text-left"><b>valore convenzionale: </b>{{ valore_convenzionale }}</p>
+	<p class="text-left"><b>valore residuo: </b>{{ valore_residuo }}</p>
+	<p class="text-left"><b>immagine: </b></p><p class="text-left">
+	{% if immagine %}
+		<img style="max-width:20%;" src="/inventario{{ immagine.url }}" ></p>
+	{% else %}
+		<p class="text-left text-danger"><b>Foto non disponibile</b></p>
+	{% endif %}
+</div>
 {% endblock %}

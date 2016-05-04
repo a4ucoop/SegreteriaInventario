@@ -12,6 +12,7 @@ urlpatterns = [
     url(r'^update/complete', views.updateLocalDB, name='updateLocalDB'),
     url(r'^show/([0-9]+)/$', views.showSingleItem, name='showSingleItem'),
     url(r'^table/getData', views.getData, name='getData'),
+    url(r'^table/advancedSearch$', views.advancedSearch, name='advancedSearch'),
     url(r'^table/editable/editAccurateLocation', views.editAccurateLocation, name='editAccurateLocation'),
     url(r'^table/editable/getAccurateLocationList', views.getAccurateLocationList, name='getAccurateLocationList'),
     url(r'^table/editable/addAccurateLocation', views.addAccurateLocation, name='addAccurateLocation'),  
