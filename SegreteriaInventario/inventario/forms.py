@@ -4,6 +4,8 @@ from django import forms
 from models import Bene
 from inventario.models import RicognizioneInventariale
 
+from django.forms.widgets import Select
+
 
 class PictureForm(forms.Form):
 	# foto da caricare
@@ -123,4 +125,45 @@ class AdvancedSearchForm(forms.Form):
 class RicognizioneInventarialeForm(forms.ModelForm):
     class Meta:
         model = RicognizioneInventariale
-        fields = ['cd_invent','pg_bene','pg_bene_sub','ds_spazio','ubicazione_precisa','immagine']
+        fields = ['cd_invent','pg_bene','pg_bene_sub','ds_spazio','ubicazione_precisa','ds_bene','immagine']
+        widgets = {
+            'ds_spazio' : Select(choices=[('','---------')] + [(item,item) for item in Bene.objects.using('default').values_list('ds_spazio', flat=True).distinct()]),
+        }
+
+
+class AdvancedSearchRicognizioneInventarialeForm(forms.Form):
+	min_id = forms.IntegerField(		
+		required=False,
+		label='id minimo', 
+		min_value=0,
+	)
+	max_id = forms.IntegerField(		
+		required=False,
+		label='id massimo', 
+		min_value=0,
+	)
+	codice_inventario = forms.MultipleChoiceField(
+		required=False,
+        widget=forms.CheckboxSelectMultiple,
+        choices=codici_inventario
+    )
+	min_pg_bene = forms.IntegerField(		
+		required=False,
+		label='pg minimo', 
+		min_value=0
+	)
+	max_pg_bene = forms.IntegerField(		
+		required=False,
+		label='pg massimo', 
+		min_value=0
+	)
+	ubicazione = forms.CharField(		
+		required=False,
+		label='ubicazione', 
+		max_length=None
+	)
+	ubicazione_precisa = forms.CharField(		
+		required=False,
+		label='ubicazione precisa', 
+		max_length=None
+	)

@@ -23,10 +23,10 @@ class Bene(models.Model):
 	immagine = models.FileField(upload_to='pictures/%Y/%m/%d', null=True)
 
 class RicognizioneInventariale(models.Model):
-	id_ric_inv = models.IntegerField(default=None)
 	cd_invent = models.CharField(max_length=8)
 	pg_bene = models.IntegerField(default=None)
 	pg_bene_sub = models.IntegerField(default=None)
+	ds_bene = models.CharField(max_length=400, null=True)
 	ds_spazio = models.CharField(max_length=2000, null=True)
 	ubicazione_precisa = models.ForeignKey(UbicazionePrecisa, null=True, on_delete=models.SET_NULL)
-	immagine = models.FileField(upload_to='pictures/%Y/%m/%d', null=True)
+	immagine = models.FileField(upload_to='pictures/%Y/%m/%d', blank=True, null=True)

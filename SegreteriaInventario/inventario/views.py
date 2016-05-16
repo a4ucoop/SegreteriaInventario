@@ -12,13 +12,19 @@ from django.views.generic.edit import CreateView
 
 from models import Bene, UbicazionePrecisa, RicognizioneInventariale
 
-from forms import PictureForm, RicognizioneInventarialeForm, AdvancedSearchForm
+from forms import PictureForm, RicognizioneInventarialeForm, AdvancedSearchForm, AdvancedSearchRicognizioneInventarialeForm
+
+#from django.forms import ChoiceField,ModelForm
+from django.forms.widgets import Select
 
 import datetime
 import json
 
 def index(request):
 	return showLocalDB(request)
+
+def ricinv(request):
+	return showRicognizioniInventariali(request)
 
 @never_cache
 def login(request, *args, **kw):
@@ -568,17 +574,12 @@ def advancedSearch(request):
         # Redirect to the document list after POST
         return redirect ('showLocalDB')
 
+
 class RicognizioneInventarialeCreateView(CreateView):
     """ """
     
     form_class = RicognizioneInventarialeForm
     template_name = "inventario/RicognizioneInventariale/create.html"
-
-    #def get_form(self, form_class):
-    #    """ """
-
-    #    form = form_class(self.request, **self.get_form_kwargs())
-    #    return form
 
     def form_valid(self, form):
 
@@ -586,4 +587,168 @@ class RicognizioneInventarialeCreateView(CreateView):
         success_url = ""
         return HttpResponse("OK")
 
+
+@login_required
+def showRicognizioniInventariali(request):
+    #picform = PictureForm()  # costruisce una form per l'upload dell'immagine
+    asform = AdvancedSearchRicognizioneInventarialeForm()  # costruisce una form per l'upload dell'immagine
+    ricinv_form = RicognizioneInventarialeForm()
+    # prende le location dal DB per popolare il menu della quicksearch
+    locations = Bene.objects.using('default').values_list('ds_spazio', flat=True).distinct()
+    locations = filter(None, locations)
+    locations = [l.split('-')[0].lower() for l in locations]
+    # prende le accurateLocation dal DB per popolare il menu della quicksearch
+    accurateLocations = UbicazionePrecisa.objects.using('default').all()
+    context ={'form' : ricinv_form,'asform' : asform, 'locations' : locations,'accurateLocations': accurateLocations}
+    return render (request,'inventario/ricognizioniInventariali.html',context)
+
+@login_required
+def getRicognizioniData(request):
+    
+    # get string parameters from the url
+    requestOrder = request.GET.get('order', None)
+    sort = request.GET.get('sort', None)
+    search = request.GET.get('search', None)
+    # get numeric parameter if they are defined in the url to avoid None conversion exceptions
+    # if limit is not defined in the url it is set as the number of objects in the database
+    limit = int(request.GET.get('limit')) if (request.GET.get('limit') is not None) else Bene.objects.count()
+    offset = int(request.GET.get('offset')) if (request.GET.get('offset') is not None) else 0
+
+    # the number of object retrieved, default value is 0, will be calculated afterwards
+    total = 0
+
+    # if sort is defined the order must be according to the field specified
+    if sort is not None:
+        # if the order is asc we must prepend a "-" to the sort (ex. order by bene_id asc -> order by -bene_id)
+        order = sort if requestOrder == 'asc' else '-' + sort
+    else:
+        # default is order by bene_id asc
+        order = '-id'
+
+    # if search is defined we filter the results with the case-insensitive LIKE statement
+    # of all the fields of the model
+    if search is not None:
+
+        # counts the number of objects that match the query
+        total = RicognizioneInventariale.objects.using('default').filter(\
+            Q(cd_invent__icontains= search) | \
+            Q(pg_bene__icontains= search) | \
+            Q(pg_bene_sub__icontains= search) | \
+            Q(ds_spazio__icontains= search) | \
+            Q(ubicazione_precisa__ubicazione__icontains= search)  \
+            ).count()
+
+        # retrieve the objects that match the query
+        rows = RicognizioneInventariale.objects.using('default').filter(\
+            Q(cd_invent__icontains= search) | \
+            Q(pg_bene__icontains= search) | \
+            Q(pg_bene_sub__icontains= search) | \
+            Q(ds_spazio__icontains= search) | \
+            Q(ubicazione_precisa__ubicazione__icontains= search)  \
+            ).order_by(order)[offset:offset + limit]
+
+    else:
+
+        # counts the number of objects
+        total = RicognizioneInventariale.objects.using('default').all().count()
+
+        # retrieve the objects
+        rows = RicognizioneInventariale.objects.using('default').all().order_by(order)[offset:offset + limit]
+    
+    # we construct the JSON response, we use json.dumps() to excape undesired characters
+    html = '{ "total": ' + json.dumps(str(total)) + ', "rows": [ '
+    for row in rows:
+        # we get the id of the ubicazione_precisa because we need to display it instead of the text value (that will be matched with the list in the view)
+        ubicazione_precisa = row.ubicazione_precisa.id if (row.ubicazione_precisa is not None) else None
+        html = html + '{ \
+        "cd_invent": ' + json.dumps(row.cd_invent) + ', \
+        "pg_bene": ' + json.dumps(str(row.pg_bene)) + ', \
+        "pg_bene_sub": ' + json.dumps(str(row.pg_bene_sub)) + ', \
+        "ds_spazio": ' + json.dumps(row.ds_spazio) + ', \
+        "ubicazione_precisa": ' + json.dumps(str(row.ubicazione_precisa_id)) + ', \
+        "immagine": ' + json.dumps(str(row.immagine)) + \
+        ' }, '
+
+    # remove last "," character for the last item
+    if rows.count() > 0:
+        html = html[0:len(html)-2]
+    html = html + ' ] }'
+    return HttpResponse(html)
+
+@login_required
+def advancedRicognizioneInventarialeSearch(request):
+    if request.method == 'GET':
+        min_id = int(request.GET.get('min_id')) if (request.GET.get('min_id') is not None) else None
+        max_id = int(request.GET.get('max_id')) if (request.GET.get('max_id') is not None) else None
+        cods = request.GET.getlist('cods')
+        min_pg_bene = int(request.GET.get('min_pg_bene')) if (request.GET.get('min_pg_bene') is not None) else None
+        max_pg_bene = int(request.GET.get('max_pg_bene')) if (request.GET.get('max_pg_bene') is not None) else None
+        ds_bene = request.GET.get('ds_bene')
+        ubicazione = request.GET.get('ubicazione')
+        ubicazione_precisa = request.GET.get('ubicazione_precisa')
+        print request.GET, ubicazione_precisa
+
+        requestOrder = request.GET.get('order', None)
+        sort = request.GET.get('sort', None)
+        # get numeric parameter if they are defined in the url to avoid None conversion exceptions
+        # if limit is not defined in the url it is set as the number of objects in the database
+        limit = int(request.GET.get('limit')) if (request.GET.get('limit') is not None) else RicognizioneInventariale.objects.count()
+        offset = int(request.GET.get('offset')) if (request.GET.get('offset') is not None) else 0
+
+        # the number of object retrieved, default value is 0, will be calculated afterwards
+        total = 0
+
+        # if sort is defined the order must be according to the field specified
+        if sort is not None:
+            # if the order is asc we must prepend a "-" to the sort (ex. order by bene_id asc -> order by -bene_id)
+            order = sort if requestOrder == 'asc' else '-' + sort
+        else:
+            # default is order by id asc
+            order = '-id'
+        
+        rows = RicognizioneInventariale.objects.using('default').all()
+        # filter id range
+        if (min_id is not None and max_id is not None):
+            rows = rows.filter(id__range=(min_id, max_id))
+        if (cods is not None and cods):
+            rows = rows.filter(cd_invent__in=cods)
+        if (min_pg_bene is not None and max_pg_bene is not None):
+            rows = rows.filter(pg_bene__range=(min_pg_bene, max_pg_bene))
+        if (ds_bene is not None):
+            rows = rows.filter(ds_bene__icontains=ds_bene)
+        if (ubicazione is not None):
+            rows = rows.filter(ds_spazio__icontains=ubicazione)
+        if (ubicazione_precisa is not None):
+            print rows, ubicazione_precisa
+            rows = rows.filter(ubicazione_precisa__ubicazione__icontains=ubicazione_precisa)
+            print rows
+
+        total = rows.count();
+        rows = rows.order_by(order)[offset:offset + limit]
+
+
+
+        # we construct the JSON response, we use json.dumps() to excape undesired characters
+        html = '{ "total": ' + json.dumps(str(total)) + ', "rows": [ '
+        for row in rows:
+            # we get the id of the ubicazione_precisa because we need to display it instead of the text value (that will be matched with the list in the view)
+            ubicazione_precisa = row.ubicazione_precisa.id if (row.ubicazione_precisa is not None) else None
+            html = html + '{ \
+            "id": ' + json.dumps(str(row.id)) + ', \
+            "cd_invent": ' + json.dumps(row.cd_invent) + ', \
+            "pg_bene": ' + json.dumps(str(row.pg_bene)) + ', \
+            "pg_bene_sub": ' + json.dumps(str(row.pg_bene_sub)) + ', \
+            "ds_bene": ' + json.dumps(row.ds_bene) + ', \
+            "ds_spazio": ' + json.dumps(row.ds_spazio) + ', \
+            "ubicazione_precisa": ' + json.dumps(str(row.ubicazione_precisa_id)) + ', \
+            "immagine": ' + json.dumps(str(row.immagine)) + \
+            ' }, '
+
+        # remove last "," character for the last item
+        if rows.count() > 0:
+            html = html[0:len(html)-2]
+        html = html + ' ] }'
+        return HttpResponse(html)
+        # Redirect to the document list after POST
+        return redirect ('ricinv')
 

@@ -19,3 +19,15 @@ function clearFilters() {
     searchUrl = "/inventario/table/getData";
     $('#table').bootstrapTable('refresh', {url: searchUrl});
 }
+function ricognizioneInventarialeLocationSearch(keyword) {
+  searchUrl = "/inventario/table/advancedRicognizioneInventarialeSearch?ubicazione=" + keyword;
+  $('#table').bootstrapTable('refresh', {url: searchUrl});
+}
+function ricognizioneInventarialeAccurateLocationSearch(keyword) {
+  searchUrl = "/inventario/table/advancedRicognizioneInventarialeSearch?ubicazione_precisa=" + keyword;
+  $('#table').bootstrapTable('refresh', {url: searchUrl});
+}
+function ricognizioneInventarialeClearFilters() {
+    searchUrl = "/inventario/table/getRicognizioniData";
+    $('#table').bootstrapTable('refresh', {url: searchUrl});
+}
