@@ -1,3 +1,4 @@
+{% load widget_tweaks %}
 <div class="modal-dialog">
 
     <!-- Modal content-->
@@ -7,15 +8,47 @@
             <h4 class="modal-title">Nuova Ricognizione Inventariale</h4>
         </div>
         <div class="modal-body">
-            <form name="ricinv_form" method="POST" action="">                            
+            <form name="ricinv_form" id="ricinv_form_id" method="POST" action="">                            
             {% csrf_token %}
-            {{form.as_p}}                                                             
-            <input type="submit" value="Crea Ricognizione Inventariale"/>                                   
+            <!-- cd_invent -->
+            <p>{{ form.cd_invent.errors }}</p>
+            <div class="col-xs-12"><p>{{ form.cd_invent.label_tag }}{{ form.cd_invent.help_text }}{% render_field form.cd_invent class+="form-control" %}</p></div>
+
+            <!-- pg_bene -->
+            <p>{{ form.pg_bene.errors }}</p>
+            <div class="col-xs-12"><p>{{ form.pg_bene.label_tag }}{{ form.pg_bene.help_text }}{% render_field form.pg_bene class+="form-control" %}</p></div>
+            <!-- pg_bene_sub -->
+            <p>{{ form.pg_bene_sub.errors }}</p>
+            <div class="col-xs-12"><p>{{ form.pg_bene_sub.label_tag }}{{ form.pg_bene_sub.help_text }}{% render_field form.pg_bene_sub class+="form-control" %}</p></div>
+            <!-- ds_spazio -->
+            <p>{{ form.ds_spazio.errors }}</p>
+            <div class="col-xs-12"><p>{{ form.ds_spazio.label_tag }}{{ form.ds_spazio.help_text }}{% render_field form.ds_spazio class+="form-control" %}</p></div>
+            <!-- ubicazione_precisa -->
+            <p>{{ form.ubicazione_precisa.errors }}</p>
+            <div class="col-xs-12"><p>{{ form.ubicazione_precisa.label_tag }}{{ form.ubicazione_precisa.help_text }}{% render_field form.ubicazione_precisa class+="form-control" %}</p></div>
+            <!-- descrizione bene -->
+            <div class="col-xs-12" style="padding-left:2.5%;padding-right:2.5%;">
+              <p>
+                  <p>{{ form.ds_bene.errors }}</p>
+                  <p>{{ form.ds_bene.label_tag }} {{ form.ds_bene.help_text }} {% render_field form.ds_bene class+="form-control" %}</p>
+              </p>
+            </div>
+            <!-- immagine -->
+            <div class="col-xs-12" style="padding-left:2.5%;padding-right:2.5%;">
+                <p>{{ form.non_field_errors }}</p>
+                <p>{{ form.immagine.label_tag }} {{ form.immagine.help_text }}</p>
+                <p>
+                    {{ form.immagine.errors }}
+                    <span class="btn btn-primary btn-file">
+                        Scegli un Immagine... {{ form.immagine }}
+                    </span>
+                </p>
+            </div>
             </form>
         </div>
         <div class="modal-footer">
+            <input id="submit_btn_id" type="submit" class="btn btn-primary" value="Crea"/>
             <button type="button" class="btn btn-default" data-dismiss="modal">Chiudi</button>
         </div>
     </div>
-
 </div>

@@ -42,3 +42,6 @@ msgstr "Ci sono degli errori di inserimento"
 #: inventario/templates/registration/login.html:68
 msgid "Forgotten your password or username?"
 msgstr "Password o username dimenticati ?"
+
+msgid "Sign Up"
+msgstr "Registrati"

@@ -1,5 +1,6 @@
 {% load i18n %}
 {% load staticfiles %}
+{% load widget_tweaks %}
 <html lang="en">
 <head>
     <meta charset="utf-8">
@@ -52,12 +53,18 @@
   <div class="form-group">
     {{ form.username.label_tag }}
     <p class="text-danger">{{ form.username.errors|striptags }}</p>
-    {{ form.username }}
+        <!-- username -->
+      <label for="inputUsername" class="sr-only">{% render_field form.username.label %}</label>
+      <p class="help-block">{% render_field form.username.help_text %}</p>
+      {% render_field form.username required+="true" autofocus+="true" type+="username" id+="inputUsername" class+="form-control" placeholder+="nome utente" %}
   </div>
   <div class="form-group">
     {{ form.password.label_tag }}
     <p class="text-danger">{{ form.password.errors|striptags }}</p>
-    {{ form.password }}
+      <!-- password -->
+      <label for="inputPassword" class="sr-only">{% render_field form.password.label %}</label>
+      <p class="help-block">{% render_field form.password.help_text %}</p>
+      {% render_field form.password required+="true" type+="password" id+="inputPassword" class+="form-control" placeholder+="password" %}
     <input type="hidden" name="next" value="{{ next }}" />
   </div>
   {% url 'admin_password_reset' as password_reset_url %}
@@ -69,7 +76,9 @@
   </div>
   {% endif %}
   <div class="form-actions clearfix">
-      <input type="submit" value="{% trans 'Log in' %}" class="btn btn-lg btn-primary btn-block" />
+    <div class="col-xs-6"><input type="submit" value="{% trans 'Log in' %}" class="btn btn-lg btn-primary btn-block" /></div>
+<!--     <div class="col-xs-6"><input type="submit" value="{% trans 'Sign Up' %}" class="btn btn-lg btn-success btn-block" /></div> -->
+    <div class="col-xs-6"><a href="{% url 'registration_register' %}" class="btn btn-lg btn-success btn-block" role="button">{% trans 'Sign Up' %}</a></div>
   </div>
   </div>
 </form>

@@ -1,25 +1,95 @@
-{% extends "base.html" %}
-{% load crispy_forms_tags %}
+{% load staticfiles %}
+{% load widget_tweaks %}
+{% load i18n %}
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
+    <meta name="description" content="">
+    <meta name="author" content="">
+    <link rel="icon" href="../../favicon.ico">
 
-{% block title %}Registration{% endblock %}
+    <title>Registrazione</title>
 
-{% block content %}
+    <!-- Bootstrap core CSS -->
+    <link href="{% static 'css/bootstrap/bootstrap/bootstrap.min.css' %}" rel="stylesheet">
+    <!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
+    <link href="{% static 'registration/css/ie10-viewport-bug-workaround.css' %}" rel="stylesheet">
+    <!-- Custom styles for this template -->
+    <link href="{% static 'registration/css/signin.css' %}" rel="stylesheet">
 
-<div class="container">
-    <div class="row">
-        <div class="span12 ">
-            <h1>{% block header %}Registration{% endblock %}</h1>
-            <form class="form-horizontal" method="post" action="{% url 'registration_register' %}">
-                {% csrf_token %}
-                {{ form|crispy }}
-                <div class="control-group">
-                  <div class="controls">
+  </head>
 
-                    <button type="submit" class="btn">Sign in</button>
-                  </div>
-                </div>
-            </form>
+  <body>
+
+    <div class="container">
+
+      <form class="form-signin" method="post" action="{% url 'registration_register' %}">
+        {% csrf_token %}
+        <h2 class="form-signin-heading">Registrazione</h2>
+        <!-- <label for="inputEmail" class="sr-only">Email address</label> -->
+<!--         <input type="email" id="inputEmail" class="form-control" placeholder="Email address" required autofocus> -->
+        {% if form.username.errors %}
+        <div class="alert alert-danger" role="alert">
+          <span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>
+          <span class="sr-only">Error:</span>
+          {% render_field form.username.errors %}
         </div>
-    </div>
-</div>
-{% endblock %}
+        {% endif %}
+        {% if form.email.errors %}
+        <div class="alert alert-danger" role="alert">
+          <span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>
+          <span class="sr-only">Error:</span>
+          {% render_field form.email.errors %}
+        </div>
+        {% endif %}
+        {% if form.password1.errors %}
+        <div class="alert alert-danger" role="alert">
+          <span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>
+          <span class="sr-only">Error:</span>
+          {% render_field form.password1.errors %}
+        </div>
+        {% endif %}
+        {% if form.password2.errors %}
+        <div class="alert alert-danger" role="alert">
+          <span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>
+          <span class="sr-only">Error:</span>
+          {% render_field form.password2.errors %}
+        </div>
+        {% endif %}
+
+        <!-- username -->
+        <label for="inputUsername" class="sr-only">{% render_field form.username.label %}</label>
+        <p class="help-block">{% render_field form.username.help_text %}</p>
+        {% render_field form.username required+="true" autofocus+="true" type+="username" id+="inputUsername" class+="form-control" placeholder+="nome utente" %}
+        <!-- email -->
+        <label for="inputEmail" class="sr-only">{% render_field form.email.label %}</label>
+        <p class="help-block">{% render_field form.email.help_text %}</p>
+        {% render_field form.email required+="true" type+="email" id+="inputEmail" class+="form-control" placeholder+="email" %}
+        <!-- password -->
+        <label for="inputPassword1" class="sr-only">{% render_field form.password1.label %}</label>
+        <p class="help-block">{% render_field form.password1.help_text %}</p>
+        {% render_field form.password1 required+="true" type+="password" id+="inputPassword1" class+="form-control" placeholder+="password" %}
+        <!-- controllo password -->
+        <label for="inputPassword2" class="sr-only">{% render_field form.password2.label %}</label>
+        <p class="help-block">{% render_field form.password2.help_text %}</p>
+        {% render_field form.password2 required+="true" type+="password" id+="inputPassword2" class+="form-control" placeholder+="controllo password" %}
+
+        <div class="checkbox">
+          <label>
+            <input type="checkbox" value="remember-me"> Ricordami
+          </label>
+        </div>
+        <button class="btn btn-lg btn-primary btn-block" type="submit">Registrati</button>
+      </form>
+
+    </div> <!-- /container -->
+
+
+    <!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
+    <script src="{% static 'registration/js/ie10-viewport-bug-workaround.js' %}"></script>
+  </body>
+</html>

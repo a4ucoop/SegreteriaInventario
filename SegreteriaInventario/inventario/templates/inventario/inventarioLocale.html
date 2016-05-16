@@ -275,13 +275,11 @@
                                 <p>{{ asform.max_valore_residuo.errors }}</p>
                                 <div class="col-xs-12"><p><div class="col-xs-6">{{ asform.min_valore_residuo.label_tag }} {{ asform.min_valore_residuo.help_text }}{% render_field asform.min_valore_residuo class+="form-control" %}</div><div class="col-xs-6">
                                 {{ asform.max_valore_residuo.label_tag }} {{ asform.max_valore_residuo.help_text }}{% render_field asform.max_valore_residuo class+="form-control" %}</div></p></div>
-                                <div class="col-md-12 text-center" style="margin-top:20px;margin-bottom:20px;"> 
-                                    <button type="button" class="btn btn-primary" style="width:15%;" onClick="advancedSearch()">Cerca</button>
-                                </div>
                             </form>
                         </div>
                     </div>
                     <div class="modal-footer">
+                        <button type="button" class="btn btn-primary"  onClick="advancedSearch()">Cerca</button>
                         <button type="button" class="btn btn-default" data-dismiss="modal">Chiudi</button>
                     </div>
                 </div>

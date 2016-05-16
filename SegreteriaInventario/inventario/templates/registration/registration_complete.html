@@ -1,5 +1,38 @@
-{% extends "base.html" %}
-{% block title %}Mail di attivazione inviata{% endblock %}
-{% block content %}
-<p>La richiesta di attivazione è stata inviata. Controlla che la mail sia arrivata al tuo indirizzo email e clicca sul link all'interno della mail stessa per attivare il tuo account.</p>
-{% endblock %}
+{% load staticfiles %}
+{% load widget_tweaks %}
+{% load i18n %}
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
+    <meta name="description" content="">
+    <meta name="author" content="">
+    <link rel="icon" href="../../favicon.ico">
+
+    <title>Registrazione</title>
+
+    <!-- Bootstrap core CSS -->
+    <link href="{% static 'css/bootstrap/bootstrap/bootstrap.min.css' %}" rel="stylesheet">
+    <!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
+    <link href="{% static 'registration/css/ie10-viewport-bug-workaround.css' %}" rel="stylesheet">
+    <!-- Custom styles for this template -->
+    <link href="{% static 'registration/css/signin.css' %}" rel="stylesheet">
+
+  </head>
+
+  <body>
+
+    <div class="container">
+    <div class="col-xs-12 text-center" >
+    <p>La richiesta di attivazione è stata inviata. Controlla che la mail sia arrivata al tuo indirizzo email e clicca sul link all'interno della mail stessa per attivare il tuo account.</p>
+    <a href="{% url 'inventario.views.index' %}">clikka qui per effettuare l'accesso</a></div>
+    </div> <!-- /container -->
+
+
+    <!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
+    <script src="{% static 'registration/js/ie10-viewport-bug-workaround.js' %}"></script>
+  </body>
+</html>
