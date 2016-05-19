@@ -8,7 +8,7 @@
             <h4 class="modal-title">Nuova Ricognizione Inventariale</h4>
         </div>
         <div class="modal-body">
-            <form name="ricinv_form" id="ricinv_form_id" method="POST" action="">                            
+            <form name="ricinv_form" id="ricinv_form_id" method="POST" action="{% url "inventario.views.ricognizioneInventarialeCreateView" %}">                            
             {% csrf_token %}
             <!-- cd_invent -->
             <p>{{ form.cd_invent.errors }}</p>

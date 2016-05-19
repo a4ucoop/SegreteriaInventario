@@ -157,7 +157,7 @@
                     </div>
                     <div class="modal-body">
                         <div class="form-group">
-                            <form name="advancedSearchForm" action="{% url "inventario.views.advancedRicognizioneInventarialeSearch" %}" method="post">
+                            <form name="advancedRicognizioneInventarialeSearchForm" action="{% url "inventario.views.advancedRicognizioneInventarialeSearch" %}" method="post">
                                 {% csrf_token %}
                                 <p>{{ asform.non_field_errors }}</p>
 
@@ -204,7 +204,7 @@
                         </div>
                     </div>
                     <div class="modal-footer">
-                        <button type="button" class="btn btn-primary" onClick="advancedSearch()">Cerca</button>
+                        <button type="button" class="btn btn-primary" onClick="advancedSearchRicInv()">Cerca</button>
                         <button type="button" class="btn btn-default" data-dismiss="modal">Chiudi</button>
                     </div>
                 </div>
@@ -527,7 +527,7 @@
 <!-- script to manage the quick search -->
 <script type="text/javascript" src="{% static 'inventario/js/inventarioLocale/QuickSearch.js'%}"></script>
 <!-- script to manage the advanced search -->
-<script type="text/javascript" src="{% static 'inventario/js/inventarioLocale/AdvancedSearch.js'%}"></script>
+<script type="text/javascript" src="{% static 'inventario/js/inventarioLocale/AdvancedSearchRicInv.js'%}"></script>
 <!-- script to manage the table export -->
 <script>
     var $table = $('#table');

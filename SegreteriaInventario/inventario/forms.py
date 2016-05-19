@@ -157,6 +157,11 @@ class AdvancedSearchRicognizioneInventarialeForm(forms.Form):
 		label='pg massimo', 
 		min_value=0
 	)
+	ds_bene = forms.CharField(		
+		required=False,
+		label='descrizione', 
+		max_length=None
+	)
 	ubicazione = forms.CharField(		
 		required=False,
 		label='ubicazione', 

@@ -575,17 +575,46 @@ def advancedSearch(request):
         return redirect ('showLocalDB')
 
 
-class RicognizioneInventarialeCreateView(CreateView):
+#class RicognizioneInventarialeCreateView(CreateView):
+#    """ """
+#    
+#    form_class = RicognizioneInventarialeForm
+#    template_name = "inventario/RicognizioneInventariale/create.html"
+#
+#    def form_valid(self, form):
+#
+#        form.save()
+#        success_url = ""
+#        return HttpResponse("OK")
+def ricognizioneInventarialeCreateView(request):
     """ """
+    if request.method == 'POST':
+        cd_invent = request.POST.get('cd_invent',None)
+        pg_bene = int(request.POST.get('pg_bene')) if (request.POST.get('pg_bene_sub') is not None) else None
+        pg_bene_sub = int(request.POST.get('pg_bene_sub')) if (request.POST.get('pg_bene_sub') is not None) else None
+        ds_spazio = request.POST.get('ds_spazio',None)
+        ubicazione_precisa = int(request.POST.get('ubicazione_precisa')) if(request.POST.get('ubicazione_precisa') is not None) else None
+        ds_bene = request.POST.get('ds_bene',None)
+        immagine = request.POST.get('immagine',None)
+        
+        if ubicazione_precisa:
+            ubicazione_precisa = UbicazionePrecisa.objects.using('default').get(pk=ubicazione_precisa)
+
+        if ((cd_invent is not None) and (pg_bene is not None) and (pg_bene_sub is not None)):
+            RicognizioneInventariale.objects.using('default').create(
+                cd_invent = cd_invent,
+                pg_bene = pg_bene,
+                pg_bene_sub = pg_bene_sub,
+                ds_spazio = ds_spazio,
+                ubicazione_precisa = ubicazione_precisa,
+                ds_bene = ds_bene,
+                immagine = immagine
+            )
+        else:
+            return HttpResponse("Not created")
     
-    form_class = RicognizioneInventarialeForm
-    template_name = "inventario/RicognizioneInventariale/create.html"
 
-    def form_valid(self, form):
-
-        form.save()
-        success_url = ""
-        return HttpResponse("OK")
+    return redirect ('ricinv')
 
 
 @login_required
@@ -634,6 +663,7 @@ def getRicognizioniData(request):
             Q(cd_invent__icontains= search) | \
             Q(pg_bene__icontains= search) | \
             Q(pg_bene_sub__icontains= search) | \
+            Q(ds_bene__icontains= search) | \
             Q(ds_spazio__icontains= search) | \
             Q(ubicazione_precisa__ubicazione__icontains= search)  \
             ).count()
@@ -643,6 +673,7 @@ def getRicognizioniData(request):
             Q(cd_invent__icontains= search) | \
             Q(pg_bene__icontains= search) | \
             Q(pg_bene_sub__icontains= search) | \
+            Q(ds_bene__icontains= search) | \
             Q(ds_spazio__icontains= search) | \
             Q(ubicazione_precisa__ubicazione__icontains= search)  \
             ).order_by(order)[offset:offset + limit]
@@ -664,6 +695,7 @@ def getRicognizioniData(request):
         "cd_invent": ' + json.dumps(row.cd_invent) + ', \
         "pg_bene": ' + json.dumps(str(row.pg_bene)) + ', \
         "pg_bene_sub": ' + json.dumps(str(row.pg_bene_sub)) + ', \
+        "ds_bene": ' + json.dumps(row.ds_bene) + ', \
         "ds_spazio": ' + json.dumps(row.ds_spazio) + ', \
         "ubicazione_precisa": ' + json.dumps(str(row.ubicazione_precisa_id)) + ', \
         "immagine": ' + json.dumps(str(row.immagine)) + \
