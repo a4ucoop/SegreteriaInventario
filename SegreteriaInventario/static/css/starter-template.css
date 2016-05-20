@@ -1,10 +1,25 @@
-body {
-  padding-top: 50px;
-}
 .starter-template {
   padding: 40px 15px;
   text-align: center;
 }
 .foo{
     background : white;
+}
+body {
+    margin-top: 80px;
+}
+
+.navbar-fixed-top .nav {
+    padding: 15px 0;
+}
+
+@media (max-width: 767px) { 
+    .navbar-brand {
+        padding: 0;        
+    }
+
+    .navbar-brand img {
+        margin-top: 5px;
+        margin-left: 5px;
+    }
 }

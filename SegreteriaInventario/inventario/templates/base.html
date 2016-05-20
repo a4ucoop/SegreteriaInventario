@@ -37,7 +37,7 @@
 <body>
 
 <nav id="navbar1" class="navbar navbar-inverse navbar-fixed-top">
-    <div class="container">
+    <div>
         <div class="navbar-header">
             <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar"
                     aria-expanded="false" aria-controls="navbar">
@@ -46,29 +46,24 @@
                 <span class="icon-bar"></span>
                 <span class="icon-bar"></span>
             </button>
-            <a class="navbar-brand" href="{% url 'inventario.views.index' %}">Inventario Unicam</a>
-        </div>
-        <div class="navbar-header">
-            <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar"
-                    aria-expanded="false" aria-controls="navbar">
-                <span class="sr-only">Toggle navigation</span>
-                <span class="icon-bar"></span>
-                <span class="icon-bar"></span>
-                <span class="icon-bar"></span>
-            </button>
-            <a class="navbar-brand" href="{% url 'inventario.views.ricinv' %}">Ricognizioni Inventariali</a>
+            <a class="navbar-brand" href="{% url 'inventario.views.index' %}">
+                <!-- <img alt="Brand" style="height:30px; width:30px" src="{% static 'logo_unicam.png' %}"> -->
+                <img class="hidden-xs" src="http://placehold.it/150x50&text=Logo" alt="">
+                <img class="visible-xs" src="http://placehold.it/120x40&text=Logo" alt=""> 
+            </a>
         </div>
         <div id="navbar" class="collapse navbar-collapse">
-            <ul class="nav navbar-nav">
+            <ul class="nav navbar-nav navbar-left">
+                <li id="inventarioLocaleLink"><a href="{% url 'inventario.views.index' %}"><b>Inventario Unicam</b></a></li>
+                <li id="ricInvLink"><a href="{% url 'inventario.views.ricinv' %}"><b>Ricognizioni Inventariali</b></a></li>
+            </ul>
+            <ul class="nav navbar-nav navbar-right" style="margin-right:20px;">
                 {% block toggle_sidebar %}
                 {% endblock %}
-                <li class="active"><a href="{% url 'inventario.views.index' %}">Home</a></li>
-                <li><a href="#about">{% trans 'About' %}</a></li>
-                <li><a href="#contact">{% trans 'Contact' %}</a></li>
                 {% if user.is_authenticated %}
-                <li><a href="{% url 'logout' %}">{% trans 'Logout' %}</a></li>
+                <li><a href="{% url 'logout' %}"><b>{% trans 'Logout' %}</b></a></li>
                 {% else %}
-                <li><a href="{% url 'login' %}">{% trans 'Login' %}</a></li>
+                <li><a href="{% url 'login' %}"><b>{% trans 'Login' %}</b></a></li>
                 {% endif %}
             </ul>
         </div>

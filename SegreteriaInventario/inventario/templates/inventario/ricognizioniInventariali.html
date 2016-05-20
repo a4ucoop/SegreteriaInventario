@@ -22,20 +22,19 @@
 
 {% block toggle_sidebar %}
 
-<!-- <a href="#menu-toggle" class="btn btn-default" id="menu-toggle">Toggle Menu</a> -->
-<li><a href="#about" id="menu-toggle" >Ricerca Rapida</a></li>
+<li id="showRapidSearch"><a href="#" ><b>Ricerca Rapida</b></a></li>
 
 {% endblock %}
 
 
 {% block body %}
-<div id="wrapper">
+<div id="wrapper" class="toggled">
 
     <!-- Sidebar -->
     <div id="sidebar-wrapper">
         <ul class="sidebar-nav">
             <li class="sidebar-brand">
-                <a href="#">
+                <a id="hideRapidSearch" href="#">
                     Ricerca rapida
                 </a>
             </li>
@@ -547,6 +546,12 @@ window.addEventListener("DOMContentLoaded", function () {
   document.getElementById("submit_btn_id").addEventListener("click", function () {
     form.submit();
   });
+});
+</script>
+
+<script type="text/javascript">
+$( document ).ready(function() {
+    $( "#ricInvLink" ).addClass( "active" );
 });
 </script>
 {% endblock %}
