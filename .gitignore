@@ -13,3 +13,4 @@ settings.py
 .idea/
 /static/
 /media/
+SegreteriaInventario/settings.py

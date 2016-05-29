@@ -111,15 +111,26 @@ def updateLocalDB(request):
                 SPA.DS_SPAZIO,\
                 INV.DT_INI_AMMORTAMENTO,\
                 INV.VALORE_CONVENZIONALE,\
-                INV.VALORE_CONVENZIONALE - (LEAST((extract(year from sysdate) - EXTRACT(year FROM INV.DT_INI_AMMORTAMENTO)), AMM.NUM_ANNUALITA) * (INV.VALORE_CONVENZIONALE / AMM.NUM_ANNUALITA)) AS VALORE_RESIDUO\
+                MOV.AMM_IVA_DETR,\
+                MOV.AMM_IVA_INDETR,\
+                MOV.AMM_IVA_DETR,\
         FROM\
-                ((((SIACO_UNICAM_PROD.V_IE_CO_INVENTARIO_BENI INV JOIN SIACO_UNICAM_PROD.V_IE_CO_CATEG_GRP_INVENT GRP\
-                ON INV.CD_CATEG_GRUPPO = GRP.CD_CATEG_GRUPPO) JOIN SIACO_UNICAM_PROD.V_IE_AC_SPAZI SPA\
-                ON INV.CD_UBICAZIONE = SPA.CD_SPAZIO) JOIN SIACO_UNICAM_PROD.V_IE_CO_MOVIMENTI_BENE MOV\
-                ON INV.CD_INVENT = MOV.CD_INVENT AND INV.PG_BENE = MOV.PG_BENE AND INV.PG_BENE_SUB = MOV.PG_BENE_SUB) JOIN V_IE_CO_AS_TIP_AMM_CAT_GRP_INV AMM\
-                ON INV.CD_CATEG_GRUPPO = AMM.CD_CATEG_GRUPPO)\
-        WHERE\
-            (AMM.ESERCIZIO - EXTRACT(year FROM INV.DT_INI_AMMORTAMENTO)) = 0"
+                SIACO_UNICAM_PROD.V_IE_CO_INVENTARIO_BENI INV\
+                INNER JOIN SIACO_UNICAM_PROD.V_IE_CO_MOVIMENTI_BENE MOV\
+                ON INV.ID_INVENTARIO_BENI = MOV.ID_INVENTARIO_BENI\
+                INNER JOIN V_IE_AC_NODI_AB NODI\
+                on MOV.uo_numerante=NODI.cd_nodo\
+                INNER JOIN V_IE_DG02_DG DG02\
+                on MOV.num_registrazione_dg = DG02.num_registrazione and NODI.id_ab=DG02.id_uo_origine\
+                and MOV.tipo_dg=DG02.nome_tipo_dg and extract(year from MOV.dt_registrazione_buono) = DG02.anno_rif\
+                INNER JOIN SIACO_UNICAM_PROD.V_IE_CO_CATEG_GRP_INVENT GRP\
+                ON INV.CD_CATEG_GRUPPO = GRP.CD_CATEG_GRUPPO\
+                INNER JOIN SIACO_UNICAM_PROD.V_IE_AC_SPAZI SPA\
+                ON INV.CD_UBICAZIONE = SPA.CD_SPAZIO\
+                INNER JOIN V_IE_AC_AB_ALL ACAB\
+                ON INV.ID_FORNITORE = ACAB.ID_AB\
+        ORDER BY\
+                INV.ID_INVENTARIO_BENI ASC"
         )
 
     rows = rows_to_dict_list(cursor)
@@ -144,13 +155,18 @@ def updateLocalDB(request):
             bene.ds_spazio = row['DS_SPAZIO'] if row['DS_SPAZIO'] is not None else ''
             bene.dt_ini_ammortamento = row['DT_INI_AMMORTAMENTO'] if row['DT_INI_AMMORTAMENTO'] is not None else '0001-01-01 00:00'
             bene.valore_convenzionale = row['VALORE_CONVENZIONALE'] if row['VALORE_CONVENZIONALE'] is not None else ''
-            bene.valore_residuo = row['VALORE_RESIDUO'] if row['VALORE_RESIDUO'] is not None else -1
+            bene.amm_iva_detr = row['AMM_IVA_DETR'] if row['AMM_IVA_DETR'] is not None else -1
+            bene.amm_iva_indetr = row['AMM_IVA_INDETR'] if row['AMM_IVA_DETR'] is not None else -1
+            bene.nome_tipo_dg = row['NOME_TIPO_DG'] if row['NOME_TIPO_DG'] is not None else ''
+            bene.num_doc_rif = row['NUM_DOC_RIF'] if row['NUMERO_DOC_RIF'] is not None else -1
+            bene.num_registrazione = row['NUM_REGISTRAZIONE'] if row['NUM_REGISTRAZIONE'] is not None else -1
+            bene.denominazione = row['DENOMINAZIONE'] if row['DENOMINAZIONE'] is not None else ''
 
             # item = Item(None,item_id,description,purchase_date,price,location,depreciation_starting_date)
             bene.save()
         except Bene.DoesNotExist:
             # Se non esiste viene creato un nuovo oggetto
-            bene.id_bene = row['ID_INVENTARIO_BENI'] if row['ID_INVENTARIO_BENI'] is not None else -1
+            id_bene = row['ID_INVENTARIO_BENI'] if row['ID_INVENTARIO_BENI'] is not None else -1
             cd_invent = row['CD_INVENT'] if row['CD_INVENT'] is not None else -1
             pg_bene = row['PG_BENE'] if row['PG_BENE'] is not None else -1
             pg_bene_sub = row['PG_BENE_SUB'] if row['PG_BENE_SUB'] is not None else -1
@@ -161,7 +177,13 @@ def updateLocalDB(request):
             ds_spazio = row['DS_SPAZIO'] if row['DS_SPAZIO'] is not None else ''
             dt_ini_ammortamento = row['DT_INI_AMMORTAMENTO'] if row['DT_INI_AMMORTAMENTO'] is not None else '0001-01-01 00:00'
             valore_convenzionale = row['VALORE_CONVENZIONALE'] if row['VALORE_CONVENZIONALE'] is not None else ''
-            valore_residuo = row['VALORE_RESIDUO'] if row['VALORE_RESIDUO'] is not None else -1
+            amm_iva_detr = row['AMM_IVA_DETR'] if row['AMM_IVA_DETR'] is not None else -1
+            amm_iva_indetr = row['AMM_IVA_INDETR'] if row['AMM_IVA_DETR'] is not None else -1
+            nome_tipo_dg = row['NOME_TIPO_DG'] if row['NOME_TIPO_DG'] is not None else ''
+            num_doc_rif = row['NUM_DOC_RIF'] if row['NUMERO_DOC_RIF'] is not None else -1
+            num_registrazione = row['NUM_REGISTRAZIONE'] if row['NUM_REGISTRAZIONE'] is not None else -1
+            denominazione = row['DENOMINAZIONE'] if row['DENOMINAZIONE'] is not None else ''
+
             bene = Bene(id_bene = id_bene, 
                         cd_invent = cd_invent, 
                         pg_bene = pg_bene,
@@ -173,7 +195,12 @@ def updateLocalDB(request):
                         ds_spazio = ds_spazio,
                         dt_ini_ammortamento = dt_ini_ammortamento,
                         valore_convenzionale = valore_convenzionale,
-                        valore_residuo = valore_residuo) 
+                        amm_iva_detr = amm_iva_detr,
+                        amm_iva_indetr = amm_iva_indetr,
+                        nome_tipo_dg = nome_tipo_dg,
+                        num_doc_rif = num_doc_rif,
+                        num_registrazioneone = num_registrazioneone,
+                        denominazione = denominazione) 
             bene.save()
 
     return redirect ('showLocalDB')
@@ -205,25 +232,36 @@ def checkUpdate(request):
         # Vengono ricavati tutti i nuovi items ovvero
         # quelli che hanno ID maggiore del massimo locale
         cursor.execute(
-            "SELECT DISTINCT\
-                    INV.ID_INVENTARIO_BENI,\
-                    INV.CD_INVENT,\
-                    INV.PG_BENE,\
-                    INV.PG_BENE_SUB,\
-                    INV.DS_BENE,\
-                    MOV.DT_REGISTRAZIONE_BUONO,\
-                    INV.CD_CATEG_GRUPPO,\
-                    GRP.DS_CATEG_GRUPPO,\
-                    SPA.DS_SPAZIO,\
-                    INV.DT_INI_AMMORTAMENTO,\
-                    INV.VALORE_CONVENZIONALE,\
-                    INV.VALORE_CONVENZIONALE - (LEAST((extract(year from sysdate) - EXTRACT(year FROM INV.DT_INI_AMMORTAMENTO)), AMM.NUM_ANNUALITA) * (INV.VALORE_CONVENZIONALE / AMM.NUM_ANNUALITA)) AS VALORE_RESIDUO\
-            FROM\
-                    ((((SIACO_UNICAM_PROD.V_IE_CO_INVENTARIO_BENI INV JOIN SIACO_UNICAM_PROD.V_IE_CO_CATEG_GRP_INVENT GRP\
-                    ON INV.CD_CATEG_GRUPPO = GRP.CD_CATEG_GRUPPO) JOIN SIACO_UNICAM_PROD.V_IE_AC_SPAZI SPA\
-                    ON INV.CD_UBICAZIONE = SPA.CD_SPAZIO) JOIN SIACO_UNICAM_PROD.V_IE_CO_MOVIMENTI_BENE MOV\
-                    ON INV.CD_INVENT = MOV.CD_INVENT AND INV.PG_BENE = MOV.PG_BENE AND INV.PG_BENE_SUB = MOV.PG_BENE_SUB) JOIN V_IE_CO_AS_TIP_AMM_CAT_GRP_INV AMM\
-                    ON INV.CD_CATEG_GRUPPO = AMM.CD_CATEG_GRUPPO)\
+        "SELECT DISTINCT\
+                INV.ID_INVENTARIO_BENI,\
+                INV.CD_INVENT,\
+                INV.PG_BENE,\
+                INV.PG_BENE_SUB,\
+                INV.DS_BENE,\
+                MOV.DT_REGISTRAZIONE_BUONO,\
+                INV.CD_CATEG_GRUPPO,\
+                GRP.DS_CATEG_GRUPPO,\
+                SPA.DS_SPAZIO,\
+                INV.DT_INI_AMMORTAMENTO,\
+                INV.VALORE_CONVENZIONALE,\
+                MOV.AMM_IVA_DETR,\
+                MOV.AMM_IVA_INDETR,\
+                MOV.AMM_IVA_DETR,\
+        FROM\
+                SIACO_UNICAM_PROD.V_IE_CO_INVENTARIO_BENI INV\
+                INNER JOIN SIACO_UNICAM_PROD.V_IE_CO_MOVIMENTI_BENE MOV\
+                ON INV.ID_INVENTARIO_BENI = MOV.ID_INVENTARIO_BENI\
+                INNER JOIN V_IE_AC_NODI_AB NODI\
+                on MOV.uo_numerante=NODI.cd_nodo\
+                INNER JOIN V_IE_DG02_DG DG02\
+                on MOV.num_registrazione_dg = DG02.num_registrazione and NODI.id_ab=DG02.id_uo_origine\
+                and MOV.tipo_dg=DG02.nome_tipo_dg and extract(year from MOV.dt_registrazione_buono) = DG02.anno_rif\
+                INNER JOIN SIACO_UNICAM_PROD.V_IE_CO_CATEG_GRP_INVENT GRP\
+                ON INV.CD_CATEG_GRUPPO = GRP.CD_CATEG_GRUPPO\
+                INNER JOIN SIACO_UNICAM_PROD.V_IE_AC_SPAZI SPA\
+                ON INV.CD_UBICAZIONE = SPA.CD_SPAZIO\
+                INNER JOIN V_IE_AC_AB_ALL ACAB\
+                ON INV.ID_FORNITORE = ACAB.ID_AB\
             WHERE\
                 INV.ID_INVENTARIO_BENI > %s\
             ORDER BY\
@@ -251,7 +289,13 @@ def checkUpdate(request):
             ds_spazio = row['DS_SPAZIO'] if row['DS_SPAZIO'] is not None else ''
             dt_ini_ammortamento = row['DT_INI_AMMORTAMENTO'] if row['DT_INI_AMMORTAMENTO'] is not None else '0001-01-01 00:00'
             valore_convenzionale = row['VALORE_CONVENZIONALE'] if row['VALORE_CONVENZIONALE'] is not None else ''
-            valore_residuo = row['VALORE_RESIDUO'] if row['VALORE_RESIDUO'] is not None else -1
+            amm_iva_detr = row['AMM_IVA_DETR'] if row['AMM_IVA_DETR'] is not None else -1
+            amm_iva_indetr = row['AMM_IVA_INDETR'] if row['AMM_IVA_DETR'] is not None else -1
+            nome_tipo_dg = row['NOME_TIPO_DG'] if row['NOME_TIPO_DG'] is not None else ''
+            num_doc_rif = row['NUM_DOC_RIF'] if row['NUMERO_DOC_RIF'] is not None else -1
+            num_registrazione = row['NUM_REGISTRAZIONE'] if row['NUM_REGISTRAZIONE'] is not None else -1
+            denominazione = row['DENOMINAZIONE'] if row['DENOMINAZIONE'] is not None else ''
+
             bene = Bene(id_bene = id_bene, 
                         cd_invent = cd_invent, 
                         pg_bene = pg_bene,
@@ -263,7 +307,12 @@ def checkUpdate(request):
                         ds_spazio = ds_spazio,
                         dt_ini_ammortamento = dt_ini_ammortamento,
                         valore_convenzionale = valore_convenzionale,
-                        valore_residuo = valore_residuo) 
+                        amm_iva_detr = amm_iva_detr,
+                        amm_iva_indetr = amm_iva_indetr,
+                        nome_tipo_dg = nome_tipo_dg,
+                        num_doc_rif = num_doc_rif,
+                        num_registrazioneone = num_registrazioneone,
+                        denominazione = denominazione) 
             bene.save()
         return redirect('showLocalDB')
 
@@ -294,7 +343,12 @@ def showSingleItem(request, local_id):
         'ubicazione_precisa': bene.ubicazione_precisa,
         'dt_ini_ammortamento': bene.dt_ini_ammortamento,
         'valore_convenzionale': bene.valore_convenzionale,
-        'valore_residuo': bene.valore_residuo,
+        'amm_iva_detr' : amm_iva_detr,
+        'amm_iva_indetr' : amm_iva_indetr,
+        'nome_tipo_dg' : nome_tipo_dg,
+        'num_doc_rif' : num_doc_rif,
+        'num_registrazioneone' : num_registrazioneone,
+        'denominazione' : denominazione, 
         'immagine': bene.immagine,
     }
     return render (request, 'inventario/beneSingolo.html', context)
@@ -340,7 +394,12 @@ def getData(request):
             Q(ubicazione_precisa__ubicazione__icontains= search) | \
             Q(dt_ini_ammortamento__icontains= search) | \
             Q(valore_convenzionale__icontains= search) | \
-            Q(valore_residuo__icontains= search) \
+            Q(amm_iva_detr__icontains= search) | \
+            Q(amm_iva_indetr__icontains= search) | \
+            Q(nome_tipo_dg__icontains= search) | \
+            Q(num_doc_rif__icontains= search) | \
+            Q(num_registrazioneone__icontains= search) | \
+            Q(denominazione_icontains= search) \
             ).count()
 
         # retrieve the objects that match the query
@@ -357,7 +416,12 @@ def getData(request):
             Q(ubicazione_precisa__ubicazione__icontains= search) | \
             Q(dt_ini_ammortamento__icontains= search) | \
             Q(valore_convenzionale__icontains= search) | \
-            Q(valore_residuo__icontains= search) \
+            Q(amm_iva_detr__icontains= search) | \
+            Q(amm_iva_indetr__icontains= search) | \
+            Q(nome_tipo_dg__icontains= search) | \
+            Q(num_doc_rif__icontains= search) | \
+            Q(num_registrazioneone__icontains= search) | \
+            Q(denominazione_icontains= search) \
             ).order_by(order)[offset:offset + limit]
 
     else:
@@ -386,7 +450,12 @@ def getData(request):
         "ubicazione_precisa": ' + json.dumps(str(row.ubicazione_precisa_id)) + ', \
         "dt_ini_ammortamento": ' + json.dumps(str(row.dt_ini_ammortamento.date()) if row.dt_ini_ammortamento is not None else "") + ', \
         "valore_convenzionale": ' + json.dumps(str(row.valore_convenzionale)) + ', \
-        "valore_residuo": ' + json.dumps(str(row.valore_residuo)) + ', \
+        "amm_iva_detr" : ' + json.dumps(str(row.amm_iva_detr)) + ', \
+        "amm_iva_indetr" : ' + json.dumps(str(row.amm_iva_indetr)) + ', \
+        "nome_tipo_dg" : ' + json.dumps(str(row.nome_tipo_dg)) + ', \
+        "num_doc_rif" : ' + json.dumps(str(row.num_doc_rif)) + ', \
+        "num_registrazioneone" : ' + json.dumps(str(row.num_registrazioneone)) + ', \
+        "denominazione" : ' + json.dumps(str(row.denominazione)) + ', \
         "immagine": ' + json.dumps(str(row.immagine)) + \
         ' }, '
 
@@ -472,8 +541,16 @@ def advancedSearch(request):
         to_dt_ini_ammortamento = datetime.datetime.strptime(request.GET.get('to_dt_ini_ammortamento'), "%d/%m/%Y") if (request.GET.get('to_dt_ini_ammortamento') is not None) else None
         min_valore_convenzionale = int(request.GET.get('min_valore_convenzionale')) if (request.GET.get('min_valore_convenzionale') is not None) else None
         max_valore_convenzionale = int(request.GET.get('max_valore_convenzionale')) if (request.GET.get('max_valore_convenzionale') is not None) else None
-        min_valore_residuo = int(request.GET.get('min_valore_residuo')) if (request.GET.get('min_valore_residuo') is not None) else None
-        max_valore_residuo = int(request.GET.get('max_valore_residuo')) if (request.GET.get('max_valore_residuo') is not None) else None
+        min_amm_iva_detr = int(request.GET.get('min_amm_iva_detr')) if (request.GET.get('min_amm_iva_detr') is not None) else None
+        max_amm_iva_detr = int(request.GET.get('max_amm_iva_detr')) if (request.GET.get('max_amm_iva_detr') is not None) else None
+        min_amm_iva_indetr = int(request.GET.get('min_amm_iva_indetr')) if (request.GET.get('min_amm_iva_indetr') is not None) else None
+        max_amm_iva_indetr = int(request.GET.get('max_amm_iva_indetr')) if (request.GET.get('max_amm_iva_indetr') is not None) else None
+        nome_tipo_dg = request.GET.get('max_amm_iva_detr') 
+        min_num_doc_rif = int(request.GET.get('min_num_doc_rif')) if (request.GET.get('min_num_doc_rif') is not None) else None
+        max_num_doc_rif = int(request.GET.get('max_num_doc_rif')) if (request.GET.get('max_num_doc_rif') is not None) else None
+        min_num_registrazione = int(request.GET.get('min_num_registrazione')) if (request.GET.get('min_num_registrazione') is not None) else None
+        max_num_registrazione = int(request.GET.get('max_num_registrazione')) if (request.GET.get('max_num_registrazione') is not None) else None
+        denominazione = request.GET.get('denominazione')
 
         # # stampe debug
         # print("min_id", min_id);
@@ -537,8 +614,18 @@ def advancedSearch(request):
             rows = rows.filter(dt_ini_ammortamento__range=(from_dt_ini_ammortamento, to_dt_ini_ammortamento))
         if (min_valore_convenzionale is not None and max_valore_convenzionale is not None):
             rows = rows.filter(valore_convenzionale__range=(min_valore_convenzionale, max_valore_convenzionale))
-        if (min_valore_residuo is not None and max_valore_residuo is not None):
-            rows = rows.filter(valore_convenzionale__range=(min_valore_residuo, max_valore_residuo))
+        if (min_amm_iva_detr is not None and max_amm_iva_detr is not None):
+            rows = rows.filter(amm_iva_detr__range=(min_amm_iva_detr, max_amm_iva_detr))
+        if (min_amm_iva_indetr is not None and max_amm_iva_indetr is not None):
+            rows = rows.filter(amm_iva_indetr__range=(min_amm_iva_indetr, max_amm_iva_indetr))
+        if (nome_tipo_dg is not None):
+            rows = rows.filter(nome_tipo_dg__icontains=nome_tipo_dg)
+        if (min_num_doc_rif is not None and max_num_doc_rif is not None):
+            rows = rows.filter(num_doc_rif__range=(min_num_doc_rif, max_num_doc_rif))
+        if (min_num_registrazione is not None and max_num_registrazione is not None):
+            rows = rows.filter(num_registrazione__range=(min_num_registrazione, max_num_registrazione))
+        if (denominazione is not None):
+            rows = rows.filter(nome_dominazione__icontains=denominazione)
 
         total = rows.count();
         rows = rows.order_by(order)[offset:offset + limit]
@@ -563,7 +650,12 @@ def advancedSearch(request):
             "ubicazione_precisa": ' + json.dumps(str(row.ubicazione_precisa_id)) + ', \
             "dt_ini_ammortamento": ' + json.dumps(str(row.dt_ini_ammortamento.date()) if row.dt_ini_ammortamento is not None else "") + ', \
             "valore_convenzionale": ' + json.dumps(str(row.valore_convenzionale)) + ', \
-            "valore_residuo": ' + json.dumps(str(row.valore_residuo)) + ', \
+            "amm_iva_detr" : ' + json.dumps(str(row.amm_iva_detr)) + ', \
+            "amm_iva_indetr" : ' + json.dumps(str(row.amm_iva_indetr)) + ', \
+            "nome_tipo_dg" : ' + json.dumps(str(row.nome_tipo_dg)) + ', \
+            "num_doc_rif" : ' + json.dumps(str(row.num_doc_rif)) + ', \
+            "num_registrazioneone" : ' + json.dumps(str(row.num_registrazioneone)) + ', \
+            "denominazione" : ' + json.dumps(str(row.denominazione)) + ', \
             "immagine": ' + json.dumps(str(row.immagine)) + \
             ' }, '
 
