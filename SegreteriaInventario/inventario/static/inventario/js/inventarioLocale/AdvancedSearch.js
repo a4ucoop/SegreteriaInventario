@@ -41,8 +41,22 @@ function advancedSearch (argument) {
     var to_dt_ini_ammortamento = document.forms["advancedSearchForm"]["to_dt_ini_ammortamento"].value;
     var min_valore_convenzionale = document.forms["advancedSearchForm"]["min_valore_convenzionale"].value;
     var max_valore_convenzionale = document.forms["advancedSearchForm"]["max_valore_convenzionale"].value;
-    var min_valore_residuo = document.forms["advancedSearchForm"]["min_valore_residuo"].value;
-    var max_valore_residuo = document.forms["advancedSearchForm"]["max_valore_residuo"].value;
+
+    var min_amm_iva_detr = document.forms["advancedSearchForm"]["min_amm_iva_detr"].value;
+    var max_amm_iva_detr = document.forms["advancedSearchForm"]["max_amm_iva_detr"].value;
+
+    var min_amm_iva_indetr = document.forms["advancedSearchForm"]["min_amm_iva_indetr"].value;
+    var max_amm_iva_indetr = document.forms["advancedSearchForm"]["max_amm_iva_indetr"].value;
+
+    var nome_tipo_dg = document.forms["advancedSearchForm"]["nome_tipo_dg"].value;
+
+    var min_num_doc_rif = document.forms["advancedSearchForm"]["min_num_doc_rif"].value;
+    var max_num_doc_rif = document.forms["advancedSearchForm"]["max_num_doc_rif"].value;
+
+    var min_num_registrazione = document.forms["advancedSearchForm"]["min_num_registrazione"].value;
+    var max_num_registrazione = document.forms["advancedSearchForm"]["max_num_registrazione"].value;
+
+    var denominazione = document.forms["advancedSearchForm"]["denominazione"].value;
 
     if((min_id != null && min_id != "") &&  (max_id != null && max_id != "")) 
       query += "min_id=" + min_id + "&max_id=" + max_id + "&";
@@ -69,8 +83,16 @@ function advancedSearch (argument) {
       query += "from_dt_ini_ammortamento=" + from_dt_ini_ammortamento + "&to_dt_ini_ammortamento=" + to_dt_ini_ammortamento + "&";
     if((min_valore_convenzionale != null && min_valore_convenzionale != "") &&  (max_valore_convenzionale != null && max_valore_convenzionale != "")) 
       query += "min_valore_convenzionale=" + min_valore_convenzionale + "&max_valore_convenzionale=" + max_valore_convenzionale + "&";
-    if((min_valore_residuo != null && min_valore_residuo != "") &&  (max_valore_residuo != null && max_valore_residuo != "")) 
-      query += "min_valore_residuo=" + min_valore_residuo + "&max_valore_residuo=" + max_valore_residuo + "&";
+    if((min_amm_iva_detr != null && min_amm_iva_detr != "") &&  (max_amm_iva_detr != null && max_amm_iva_detr != "")) 
+      query += "min_amm_iva_detr=" + min_amm_iva_detr + "&max_amm_iva_detr=" + max_amm_iva_detr + "&";
+    if((min_amm_iva_indetr != null && min_amm_iva_indetr != "") &&  (max_amm_iva_indetr != null && max_amm_iva_indetr != "")) 
+      query += "min_amm_iva_indetr=" + min_amm_iva_indetr + "&max_amm_iva_indetr=" + max_amm_iva_indetr + "&";
+    if(nome_tipo_dg != null && nome_tipo_dg != "") query += "nome_tipo_dg=" + nome_tipo_dg + "&";
+    if((min_num_doc_rif != null && min_num_doc_rif != "") &&  (max_num_doc_rif != null && max_num_doc_rif != "")) 
+      query += "min_num_doc_rif=" + min_num_doc_rif + "&max_num_doc_rif=" + max_num_doc_rif + "&";
+    if((min_num_registrazione != null && min_num_registrazione != "") &&  (max_num_registrazione != null && max_num_registrazione != "")) 
+      query += "min_num_registrazione=" + min_num_registrazione + "&max_num_registrazione=" + max_num_registrazione + "&";
+    if(denominazione != null && denominazione != "") query += "denominazione=" + denominazione + "&";
     $('#table').bootstrapTable('refresh', {url: query});
     $('#advancedSearchModal').modal('hide')
 }

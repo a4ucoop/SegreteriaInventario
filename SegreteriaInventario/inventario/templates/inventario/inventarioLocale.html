@@ -15,8 +15,6 @@
 {% block javascripts %}
 
 <script type="text/javascript" src="{% static 'js/jquery.qrcode-0.12.0.min.js' %}"></script>
-<!-- <script type="text/javascript" src="{% static 'js/bootstrap/bootstrap-table/extensions/export/bootstrap-table-export.js' %}"></script>
-<script type="text/javascript" src="{% static 'js/bootstrap/bootstrap-table/extensions/export/tableExport.js' %}"></script> -->
 {% endblock %}
 
 
@@ -270,11 +268,40 @@
                                 <p>{{ asform.max_valore_convenzionale.errors }}</p>
                                 <div class="col-xs-12"><p><div class="col-xs-6">{{ asform.min_valore_convenzionale.label_tag }} {{ asform.min_valore_convenzionale.help_text }}{% render_field asform.min_valore_convenzionale class+="form-control" %}</div><div class="col-xs-6">
                                 {{ asform.max_valore_convenzionale.label_tag }} {{ asform.max_valore_convenzionale.help_text }}{% render_field asform.max_valore_convenzionale class+="form-control" %}</div></p></div>
+                                <!-- Valore ammortizzato -->
+                                <p>{{ asform.min_amm_iva_detr.errors }}</p>
+                                <p>{{ asform.max_amm_iva_detr.errors }}</p>
+                                <div class="col-xs-12"><p><div class="col-xs-6">{{ asform.min_amm_iva_detr.label_tag }} {{ asform.min_amm_iva_detr.help_text }}{% render_field asform.min_amm_iva_detr class+="form-control" %}</div><div class="col-xs-6">
+                                {{ asform.max_amm_iva_detr.label_tag }} {{ asform.max_amm_iva_detr.help_text }}{% render_field asform.max_amm_iva_detr class+="form-control" %}</div></p></div>
                                 <!-- Valore residuo -->
-                                <p>{{ asform.min_valore_residuo.errors }}</p>
-                                <p>{{ asform.max_valore_residuo.errors }}</p>
-                                <div class="col-xs-12"><p><div class="col-xs-6">{{ asform.min_valore_residuo.label_tag }} {{ asform.min_valore_residuo.help_text }}{% render_field asform.min_valore_residuo class+="form-control" %}</div><div class="col-xs-6">
-                                {{ asform.max_valore_residuo.label_tag }} {{ asform.max_valore_residuo.help_text }}{% render_field asform.max_valore_residuo class+="form-control" %}</div></p></div>
+                                <p>{{ asform.min_amm_iva_indetr.errors }}</p>
+                                <p>{{ asform.max_amm_iva_indetr.errors }}</p>
+                                <div class="col-xs-12"><p><div class="col-xs-6">{{ asform.min_amm_iva_indetr.label_tag }} {{ asform.min_amm_iva_indetr.help_text }}{% render_field asform.min_amm_iva_indetr class+="form-control" %}</div><div class="col-xs-6">
+                                {{ asform.max_amm_iva_indetr.label_tag }} {{ asform.max_amm_iva_indetr.help_text }}{% render_field asform.max_amm_iva_indetr class+="form-control" %}</div></p></div>
+                                <!-- tipo documento -->
+                                <div class="col-xs-12" style="padding-left:2.5%;padding-right:2.5%;">
+                                  <p>
+                                      <p>{{ asform.nome_tipo_dg.errors }}</p>
+                                      <p>{{ asform.nome_tipo_dg.label_tag }} {{ asform.nome_tipo_dg.help_text }} {% render_field asform.nome_tipo_dg class+="form-control" %}</p>
+                                  </p>
+                                </div>
+                                <!-- numero documento -->
+                                <p>{{ asform.min_num_doc_rif.errors }}</p>
+                                <p>{{ asform.max_num_doc_rif.errors }}</p>
+                                <div class="col-xs-12"><p><div class="col-xs-6">{{ asform.min_num_doc_rif.label_tag }} {{ asform.min_num_doc_rif.help_text }}{% render_field asform.min_num_doc_rif class+="form-control" %}</div><div class="col-xs-6">
+                                {{ asform.max_num_doc_rif.label_tag }} {{ asform.max_num_doc_rif.help_text }}{% render_field asform.max_num_doc_rif class+="form-control" %}</div></p></div>
+                                <!-- numero registrazione -->
+                                <p>{{ asform.min_num_registrazione.errors }}</p>
+                                <p>{{ asform.max_num_registrazione.errors }}</p>
+                                <div class="col-xs-12"><p><div class="col-xs-6">{{ asform.min_num_registrazione.label_tag }} {{ asform.min_num_registrazione.help_text }}{% render_field asform.min_num_registrazione class+="form-control" %}</div><div class="col-xs-6">
+                                {{ asform.max_num_registrazione.label_tag }} {{ asform.max_num_registrazione.help_text }}{% render_field asform.max_num_registrazione class+="form-control" %}</div></p></div>
+                                <!-- fornitore -->
+                                <div class="col-xs-12" style="padding-left:2.5%;padding-right:2.5%;">
+                                  <p>
+                                      <p>{{ asform.denominazione.errors }}</p>
+                                      <p>{{ asform.denominazione.label_tag }} {{ asform.denominazione.help_text }} {% render_field asform.denominazione class+="form-control" %}</p>
+                                  </p>
+                                </div>
                             </form>
                         </div>
                     </div>
@@ -401,10 +428,40 @@
                     class: 'valore_convenzionale',
                     sortable: true,
                     align: 'center'
-                }, {
-                    field: 'valore_residuo',
+                },{
+                    field: 'amm_iva_detr',
+                    title: 'valore amortizzato',
+                    class: 'amm_iva_detr',
+                    sortable: true,
+                    align: 'center'
+                },{
+                    field: 'amm_iva_indetr',
                     title: 'valore residuo',
-                    class: 'valore_residuo',
+                    class: 'amm_iva_indetr',
+                    sortable: true,
+                    align: 'center'
+                },{
+                    field: 'nome_tipo_dg',
+                    title: 'tipo documento',
+                    class: 'nome_tipo_dg',
+                    sortable: true,
+                    align: 'center'
+                },{
+                    field: 'num_doc_rif',
+                    title: 'numero documento',
+                    class: 'num_doc_rif',
+                    sortable: true,
+                    align: 'center'
+                },{
+                    field: 'num_registrazione',
+                    title: 'numero registrazione',
+                    class: 'num_registrazione',
+                    sortable: true,
+                    align: 'center'
+                },{
+                    field: 'denominazione',
+                    title: 'fornitore',
+                    class: 'denominazione',
                     sortable: true,
                     align: 'center'
                 },
@@ -655,7 +712,6 @@
 <script type="text/javascript">
 $( document ).ready(function() {
     $( "#inventarioLocaleLink" ).addClass( "active" );
-    $( document ).find('.export').title = "esporta";
 });
 </script>
 {% endblock %}

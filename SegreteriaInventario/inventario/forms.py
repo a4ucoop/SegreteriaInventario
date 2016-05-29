@@ -111,15 +111,55 @@ class AdvancedSearchForm(forms.Form):
 		label='prezzo massimo', 
 		min_value=0
 	)	
-	min_valore_residuo = forms.IntegerField(		
+	min_amm_iva_detr = forms.IntegerField(		
+		required=False,
+		label='valore ammortato minimo', 
+		min_value=0
+	)
+	max_amm_iva_detr = forms.IntegerField(		
+		required=False,
+		label='valore ammortato massimo', 
+		min_value=0
+	)
+	min_amm_iva_indetr = forms.IntegerField(		
 		required=False,
 		label='valore residuo minimo', 
 		min_value=0
 	)
-	max_valore_residuo = forms.IntegerField(		
+	max_amm_iva_indetr = forms.IntegerField(		
 		required=False,
 		label='valore residuo massimo', 
 		min_value=0
+	)
+	nome_tipo_dg = forms.CharField(		
+		required=False,
+		label='tipo documento', 
+		max_length=None
+	)
+	min_num_doc_rif = forms.IntegerField(		
+		required=False,
+		label='numero documento minimo', 
+		min_value=0
+	)
+	max_num_doc_rif = forms.IntegerField(		
+		required=False,
+		label='numero documento massmo', 
+		min_value=0
+	)
+	min_num_registrazione = forms.IntegerField(		
+		required=False,
+		label='numero registrazione minimo', 
+		min_value=0
+	)
+	max_num_registrazione = forms.IntegerField(		
+		required=False,
+		label='numero registrazione massmo', 
+		min_value=0
+	)
+	denominazione = forms.CharField(		
+		required=False,
+		label='fornitore', 
+		max_length=None
 	)
 
 class RicognizioneInventarialeForm(forms.ModelForm):
