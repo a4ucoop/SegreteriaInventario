@@ -22,7 +22,7 @@ class Bene(models.Model):
     amm_iva_detr = models.DecimalField(max_digits=15, decimal_places=2,default=None)
     amm_iva_indetr = models.DecimalField(max_digits=15, decimal_places=2,default=None)
     nome_tipo_dg = models.CharField(max_length=128,default=None)
-    num_doc_rif = models.IntegerField(default=None)
+    num_doc_rif = models.CharField(max_length=128,default=None)
     num_registrazione = models.IntegerField(default=None)
     denominazione = models.CharField(max_length=256,default=None)
     immagine = models.FileField(upload_to='pictures/%Y/%m/%d', null=True)

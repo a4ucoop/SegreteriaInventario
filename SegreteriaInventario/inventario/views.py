@@ -113,22 +113,25 @@ def updateLocalDB(request):
                 INV.VALORE_CONVENZIONALE,\
                 MOV.AMM_IVA_DETR,\
                 MOV.AMM_IVA_INDETR,\
-                MOV.AMM_IVA_DETR,\
+                DG02.NOME_TIPO_DG,\
+                DG02.NUM_DOC_RIF,\
+                DG02.NUM_REGISTRAZIONE,\
+                ACAB.DENOMINAZIONE\
         FROM\
-                SIACO_UNICAM_PROD.V_IE_CO_INVENTARIO_BENI INV\
+                ((((((SIACO_UNICAM_PROD.V_IE_CO_INVENTARIO_BENI INV\
                 INNER JOIN SIACO_UNICAM_PROD.V_IE_CO_MOVIMENTI_BENE MOV\
-                ON INV.ID_INVENTARIO_BENI = MOV.ID_INVENTARIO_BENI\
+                ON INV.ID_INVENTARIO_BENI = MOV.ID_INVENTARIO_BENI)\
                 INNER JOIN V_IE_AC_NODI_AB NODI\
-                on MOV.uo_numerante=NODI.cd_nodo\
+                on MOV.uo_numerante=NODI.cd_nodo)\
                 INNER JOIN V_IE_DG02_DG DG02\
                 on MOV.num_registrazione_dg = DG02.num_registrazione and NODI.id_ab=DG02.id_uo_origine\
-                and MOV.tipo_dg=DG02.nome_tipo_dg and extract(year from MOV.dt_registrazione_buono) = DG02.anno_rif\
+                and MOV.tipo_dg=DG02.nome_tipo_dg and extract(year from MOV.dt_registrazione_buono) = DG02.anno_rif)\
                 INNER JOIN SIACO_UNICAM_PROD.V_IE_CO_CATEG_GRP_INVENT GRP\
-                ON INV.CD_CATEG_GRUPPO = GRP.CD_CATEG_GRUPPO\
+                ON INV.CD_CATEG_GRUPPO = GRP.CD_CATEG_GRUPPO)\
                 INNER JOIN SIACO_UNICAM_PROD.V_IE_AC_SPAZI SPA\
-                ON INV.CD_UBICAZIONE = SPA.CD_SPAZIO\
+                ON INV.CD_UBICAZIONE = SPA.CD_SPAZIO)\
                 INNER JOIN V_IE_AC_AB_ALL ACAB\
-                ON INV.ID_FORNITORE = ACAB.ID_AB\
+                ON INV.ID_FORNITORE = ACAB.ID_AB)\
         ORDER BY\
                 INV.ID_INVENTARIO_BENI ASC"
         )
@@ -140,7 +143,7 @@ def updateLocalDB(request):
         # Per ogni riga vede se l'oggetto esiste gia' nel database
         try:
             #print "obj ",row['ID_INVENTARIO_BENI'],"val res: ",row['VALORE_RESIDUO']
-            bene = Bene.objects.get(cd_invent=row['CD_INVENT'], pg_bene=row['PG_BENE'], pg_bene_sub=row['PG_BENE_SUB'])
+            bene = Bene.objects.get(id_bene=row['ID_INVENTARIO_BENI'])
 
             # Se l'oggetto esiste i dati vengono aggiornati
             
@@ -158,7 +161,7 @@ def updateLocalDB(request):
             bene.amm_iva_detr = row['AMM_IVA_DETR'] if row['AMM_IVA_DETR'] is not None else -1
             bene.amm_iva_indetr = row['AMM_IVA_INDETR'] if row['AMM_IVA_DETR'] is not None else -1
             bene.nome_tipo_dg = row['NOME_TIPO_DG'] if row['NOME_TIPO_DG'] is not None else ''
-            bene.num_doc_rif = row['NUM_DOC_RIF'] if row['NUMERO_DOC_RIF'] is not None else -1
+            bene.num_doc_rif = row['NUM_DOC_RIF'] if row['NUM_DOC_RIF'] is not None else ''
             bene.num_registrazione = row['NUM_REGISTRAZIONE'] if row['NUM_REGISTRAZIONE'] is not None else -1
             bene.denominazione = row['DENOMINAZIONE'] if row['DENOMINAZIONE'] is not None else ''
 
@@ -180,7 +183,7 @@ def updateLocalDB(request):
             amm_iva_detr = row['AMM_IVA_DETR'] if row['AMM_IVA_DETR'] is not None else -1
             amm_iva_indetr = row['AMM_IVA_INDETR'] if row['AMM_IVA_DETR'] is not None else -1
             nome_tipo_dg = row['NOME_TIPO_DG'] if row['NOME_TIPO_DG'] is not None else ''
-            num_doc_rif = row['NUM_DOC_RIF'] if row['NUMERO_DOC_RIF'] is not None else -1
+            num_doc_rif = row['NUM_DOC_RIF'] if row['NUM_DOC_RIF'] is not None else ''
             num_registrazione = row['NUM_REGISTRAZIONE'] if row['NUM_REGISTRAZIONE'] is not None else -1
             denominazione = row['DENOMINAZIONE'] if row['DENOMINAZIONE'] is not None else ''
 
@@ -199,7 +202,7 @@ def updateLocalDB(request):
                         amm_iva_indetr = amm_iva_indetr,
                         nome_tipo_dg = nome_tipo_dg,
                         num_doc_rif = num_doc_rif,
-                        num_registrazioneone = num_registrazioneone,
+                        num_registrazione = num_registrazione,
                         denominazione = denominazione) 
             bene.save()
 
@@ -246,22 +249,25 @@ def checkUpdate(request):
                 INV.VALORE_CONVENZIONALE,\
                 MOV.AMM_IVA_DETR,\
                 MOV.AMM_IVA_INDETR,\
-                MOV.AMM_IVA_DETR,\
+                DG02.NOME_TIPO_DG,\
+                DG02.NUM_DOC_RIF,\
+                DG02.NUM_REGISTRAZIONE,\
+                ACAB.DENOMINAZIONE\
         FROM\
-                SIACO_UNICAM_PROD.V_IE_CO_INVENTARIO_BENI INV\
+                ((((((SIACO_UNICAM_PROD.V_IE_CO_INVENTARIO_BENI INV\
                 INNER JOIN SIACO_UNICAM_PROD.V_IE_CO_MOVIMENTI_BENE MOV\
-                ON INV.ID_INVENTARIO_BENI = MOV.ID_INVENTARIO_BENI\
+                ON INV.ID_INVENTARIO_BENI = MOV.ID_INVENTARIO_BENI)\
                 INNER JOIN V_IE_AC_NODI_AB NODI\
-                on MOV.uo_numerante=NODI.cd_nodo\
+                on MOV.uo_numerante=NODI.cd_nodo)\
                 INNER JOIN V_IE_DG02_DG DG02\
                 on MOV.num_registrazione_dg = DG02.num_registrazione and NODI.id_ab=DG02.id_uo_origine\
-                and MOV.tipo_dg=DG02.nome_tipo_dg and extract(year from MOV.dt_registrazione_buono) = DG02.anno_rif\
+                and MOV.tipo_dg=DG02.nome_tipo_dg and extract(year from MOV.dt_registrazione_buono) = DG02.anno_rif)\
                 INNER JOIN SIACO_UNICAM_PROD.V_IE_CO_CATEG_GRP_INVENT GRP\
-                ON INV.CD_CATEG_GRUPPO = GRP.CD_CATEG_GRUPPO\
+                ON INV.CD_CATEG_GRUPPO = GRP.CD_CATEG_GRUPPO)\
                 INNER JOIN SIACO_UNICAM_PROD.V_IE_AC_SPAZI SPA\
-                ON INV.CD_UBICAZIONE = SPA.CD_SPAZIO\
+                ON INV.CD_UBICAZIONE = SPA.CD_SPAZIO)\
                 INNER JOIN V_IE_AC_AB_ALL ACAB\
-                ON INV.ID_FORNITORE = ACAB.ID_AB\
+                ON INV.ID_FORNITORE = ACAB.ID_AB)\
             WHERE\
                 INV.ID_INVENTARIO_BENI > %s\
             ORDER BY\
@@ -292,7 +298,7 @@ def checkUpdate(request):
             amm_iva_detr = row['AMM_IVA_DETR'] if row['AMM_IVA_DETR'] is not None else -1
             amm_iva_indetr = row['AMM_IVA_INDETR'] if row['AMM_IVA_DETR'] is not None else -1
             nome_tipo_dg = row['NOME_TIPO_DG'] if row['NOME_TIPO_DG'] is not None else ''
-            num_doc_rif = row['NUM_DOC_RIF'] if row['NUMERO_DOC_RIF'] is not None else -1
+            num_doc_rif = row['NUM_DOC_RIF'] if row['NUM_DOC_RIF'] is not None else ''
             num_registrazione = row['NUM_REGISTRAZIONE'] if row['NUM_REGISTRAZIONE'] is not None else -1
             denominazione = row['DENOMINAZIONE'] if row['DENOMINAZIONE'] is not None else ''
 
@@ -311,7 +317,7 @@ def checkUpdate(request):
                         amm_iva_indetr = amm_iva_indetr,
                         nome_tipo_dg = nome_tipo_dg,
                         num_doc_rif = num_doc_rif,
-                        num_registrazioneone = num_registrazioneone,
+                        num_registrazione = num_registrazione,
                         denominazione = denominazione) 
             bene.save()
         return redirect('showLocalDB')
@@ -347,7 +353,7 @@ def showSingleItem(request, local_id):
         'amm_iva_indetr' : amm_iva_indetr,
         'nome_tipo_dg' : nome_tipo_dg,
         'num_doc_rif' : num_doc_rif,
-        'num_registrazioneone' : num_registrazioneone,
+        'num_registrazione' : num_registrazione,
         'denominazione' : denominazione, 
         'immagine': bene.immagine,
     }
@@ -398,7 +404,7 @@ def getData(request):
             Q(amm_iva_indetr__icontains= search) | \
             Q(nome_tipo_dg__icontains= search) | \
             Q(num_doc_rif__icontains= search) | \
-            Q(num_registrazioneone__icontains= search) | \
+            Q(num_registrazione__icontains= search) | \
             Q(denominazione_icontains= search) \
             ).count()
 
@@ -420,7 +426,7 @@ def getData(request):
             Q(amm_iva_indetr__icontains= search) | \
             Q(nome_tipo_dg__icontains= search) | \
             Q(num_doc_rif__icontains= search) | \
-            Q(num_registrazioneone__icontains= search) | \
+            Q(num_registrazione__icontains= search) | \
             Q(denominazione_icontains= search) \
             ).order_by(order)[offset:offset + limit]
 
@@ -454,7 +460,7 @@ def getData(request):
         "amm_iva_indetr" : ' + json.dumps(str(row.amm_iva_indetr)) + ', \
         "nome_tipo_dg" : ' + json.dumps(str(row.nome_tipo_dg)) + ', \
         "num_doc_rif" : ' + json.dumps(str(row.num_doc_rif)) + ', \
-        "num_registrazioneone" : ' + json.dumps(str(row.num_registrazioneone)) + ', \
+        "num_registrazione" : ' + json.dumps(str(row.num_registrazione)) + ', \
         "denominazione" : ' + json.dumps(str(row.denominazione)) + ', \
         "immagine": ' + json.dumps(str(row.immagine)) + \
         ' }, '
@@ -546,8 +552,7 @@ def advancedSearch(request):
         min_amm_iva_indetr = int(request.GET.get('min_amm_iva_indetr')) if (request.GET.get('min_amm_iva_indetr') is not None) else None
         max_amm_iva_indetr = int(request.GET.get('max_amm_iva_indetr')) if (request.GET.get('max_amm_iva_indetr') is not None) else None
         nome_tipo_dg = request.GET.get('max_amm_iva_detr') 
-        min_num_doc_rif = int(request.GET.get('min_num_doc_rif')) if (request.GET.get('min_num_doc_rif') is not None) else None
-        max_num_doc_rif = int(request.GET.get('max_num_doc_rif')) if (request.GET.get('max_num_doc_rif') is not None) else None
+        num_doc_rif = request.GET.get('num_doc_rif')
         min_num_registrazione = int(request.GET.get('min_num_registrazione')) if (request.GET.get('min_num_registrazione') is not None) else None
         max_num_registrazione = int(request.GET.get('max_num_registrazione')) if (request.GET.get('max_num_registrazione') is not None) else None
         denominazione = request.GET.get('denominazione')
@@ -620,12 +625,12 @@ def advancedSearch(request):
             rows = rows.filter(amm_iva_indetr__range=(min_amm_iva_indetr, max_amm_iva_indetr))
         if (nome_tipo_dg is not None):
             rows = rows.filter(nome_tipo_dg__icontains=nome_tipo_dg)
-        if (min_num_doc_rif is not None and max_num_doc_rif is not None):
-            rows = rows.filter(num_doc_rif__range=(min_num_doc_rif, max_num_doc_rif))
+        if (num_doc_rif is not None):
+            rows = rows.filter(num_doc_rif__icontains=num_doc_rif)
         if (min_num_registrazione is not None and max_num_registrazione is not None):
             rows = rows.filter(num_registrazione__range=(min_num_registrazione, max_num_registrazione))
         if (denominazione is not None):
-            rows = rows.filter(nome_dominazione__icontains=denominazione)
+            rows = rows.filter(denominazione__icontains=denominazione)
 
         total = rows.count();
         rows = rows.order_by(order)[offset:offset + limit]
@@ -654,7 +659,7 @@ def advancedSearch(request):
             "amm_iva_indetr" : ' + json.dumps(str(row.amm_iva_indetr)) + ', \
             "nome_tipo_dg" : ' + json.dumps(str(row.nome_tipo_dg)) + ', \
             "num_doc_rif" : ' + json.dumps(str(row.num_doc_rif)) + ', \
-            "num_registrazioneone" : ' + json.dumps(str(row.num_registrazioneone)) + ', \
+            "num_registrazione" : ' + json.dumps(str(row.num_registrazione)) + ', \
             "denominazione" : ' + json.dumps(str(row.denominazione)) + ', \
             "immagine": ' + json.dumps(str(row.immagine)) + \
             ' }, '
