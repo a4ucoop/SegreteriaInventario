@@ -57,12 +57,12 @@ class AdvancedSearchForm(forms.Form):
     )
 	min_pg_bene = forms.IntegerField(		
 		required=False,
-		label='pg minimo', 
+		label='numero inventario minimo', 
 		min_value=0
 	)
 	max_pg_bene = forms.IntegerField(		
 		required=False,
-		label='pg massimo', 
+		label='numero inventario massimo', 
 		min_value=0
 	)
 	ds_bene = forms.CharField(		
@@ -149,12 +149,12 @@ class AdvancedSearchRicognizioneInventarialeForm(forms.Form):
     )
 	min_pg_bene = forms.IntegerField(		
 		required=False,
-		label='pg minimo', 
+		label='numero inventario minimo', 
 		min_value=0
 	)
 	max_pg_bene = forms.IntegerField(		
 		required=False,
-		label='pg massimo', 
+		label='numero inventario massimo', 
 		min_value=0
 	)
 	ds_bene = forms.CharField(		

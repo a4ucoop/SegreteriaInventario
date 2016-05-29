@@ -48,8 +48,8 @@
             </button>
             <a class="navbar-brand" href="{% url 'inventario.views.index' %}">
                 <!-- <img alt="Brand" style="height:30px; width:30px" src="{% static 'logo_unicam.png' %}"> -->
-                <img class="hidden-xs" src="http://placehold.it/150x50&text=Logo" alt="">
-                <img class="visible-xs" src="http://placehold.it/120x40&text=Logo" alt=""> 
+                <img class="hidden-xs" src="{% static 'logo_visible.png' %}" alt="">
+                <img class="visible-xs" src="{% static 'logo_hidden.png' %}" alt=""> 
             </a>
         </div>
         <div id="navbar" class="collapse navbar-collapse">

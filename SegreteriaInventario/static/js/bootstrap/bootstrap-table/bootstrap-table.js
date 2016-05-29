@@ -442,6 +442,42 @@
         }
     };
 
+    BootstrapTable.LOCALES['it-IT'] = BootstrapTable.LOCALES['it'] = {
+        formatLoadingMessage: function () {
+            return 'Caricamento, attendere prego...';
+        },
+        formatRecordsPerPage: function (pageNumber) {
+            return sprintf('%s risultati per pagina', pageNumber);
+        },
+        formatShowingRows: function (pageFrom, pageTo, totalRows) {
+            return sprintf('Risultati da %s a %s di %s righe', pageFrom, pageTo, totalRows);
+        },
+        formatDetailPagination: function (totalRows) {
+            return sprintf('Vengono mostrate %s righe', totalRows);
+        },
+        formatSearch: function () {
+            return 'Cerca';
+        },
+        formatNoMatches: function () {
+            return 'Nessun risultato';
+        },
+        formatPaginationSwitch: function () {
+            return 'Mostra/Nascondi Paginazione';
+        },
+        formatRefresh: function () {
+            return 'Ricarica';
+        },
+        formatToggle: function () {
+            return 'Scambia';
+        },
+        formatColumns: function () {
+            return 'Colonne';
+        },
+        formatAllRows: function () {
+            return 'Tutto';
+        }
+    };
+
     $.extend(BootstrapTable.DEFAULTS, BootstrapTable.LOCALES['en-US']);
 
     BootstrapTable.COLUMN_DEFAULTS = {

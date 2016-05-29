@@ -84,8 +84,9 @@ def showLocalDB(request):
     locations = Bene.objects.using('default').values_list('ds_spazio', flat=True).distinct()
     locations = filter(None, locations)
     locations = [l.split('-')[0].lower() for l in locations]
+    locations = sorted(locations)
     # prende le accurateLocation dal DB per popolare il menu della quicksearch
-    accurateLocations = UbicazionePrecisa.objects.using('default').all()
+    accurateLocations = UbicazionePrecisa.objects.using('default').all().order_by('ubicazione')
     context ={'locations': locations, 'accurateLocations': accurateLocations, 'picform': picform, 'asform': asform}
     return render (request,'inventario/inventarioLocale.html',context)
 
@@ -626,8 +627,9 @@ def showRicognizioniInventariali(request):
     locations = Bene.objects.using('default').values_list('ds_spazio', flat=True).distinct()
     locations = filter(None, locations)
     locations = [l.split('-')[0].lower() for l in locations]
+    locations = sorted(locations)
     # prende le accurateLocation dal DB per popolare il menu della quicksearch
-    accurateLocations = UbicazionePrecisa.objects.using('default').all()
+    accurateLocations = UbicazionePrecisa.objects.using('default').all().order_by('ubicazione')
     context ={'form' : ricinv_form,'asform' : asform, 'locations' : locations,'accurateLocations': accurateLocations}
     return render (request,'inventario/ricognizioniInventariali.html',context)
 
