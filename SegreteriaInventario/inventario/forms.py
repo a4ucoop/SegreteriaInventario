@@ -13,7 +13,7 @@ class PictureForm(forms.Form):
         label='Select a file'
     )
     # id dell'item a cui appartiene la foto
-    id = forms.IntegerField(widget=forms.HiddenInput())
+    id_bene = forms.IntegerField(widget=forms.HiddenInput())
 
 # ricavo tutti i codici degli inventari
 codici_inventario = Bene.objects.using('default').values_list('cd_invent', flat=True).distinct()
@@ -40,12 +40,12 @@ for ci in categorie_inventariali:
 categorie_inventariali = tuple(lista_categorie)
 
 class AdvancedSearchForm(forms.Form):
-	min_id = forms.IntegerField(		
+	min_id_bene = forms.IntegerField(		
 		required=False,
 		label='id minimo', 
 		min_value=0,
 	)
-	max_id = forms.IntegerField(		
+	max_id_bene = forms.IntegerField(		
 		required=False,
 		label='id massimo', 
 		min_value=0,
@@ -136,15 +136,10 @@ class AdvancedSearchForm(forms.Form):
 		label='tipo documento', 
 		max_length=None
 	)
-	min_num_doc_rif = forms.IntegerField(		
+	num_doc_rif = forms.CharField(		
 		required=False,
-		label='numero documento minimo', 
-		min_value=0
-	)
-	max_num_doc_rif = forms.IntegerField(		
-		required=False,
-		label='numero documento massmo', 
-		min_value=0
+		label='numero documento', 
+		max_length=None
 	)
 	min_num_registrazione = forms.IntegerField(		
 		required=False,

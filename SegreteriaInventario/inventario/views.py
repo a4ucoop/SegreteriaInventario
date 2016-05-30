@@ -334,8 +334,8 @@ def checkUpdate(request):
 
 
 @login_required
-def showSingleItem(request, local_id):
-    bene = Bene.objects.get(id=local_id)
+def showSingleItem(request, remote_id):
+    bene = Bene.objects.get(id_bene=remote_id)
     context ={
         'id': bene.id,
         'cd_invent': bene.cd_invent,
@@ -349,12 +349,12 @@ def showSingleItem(request, local_id):
         'ubicazione_precisa': bene.ubicazione_precisa,
         'dt_ini_ammortamento': bene.dt_ini_ammortamento,
         'valore_convenzionale': bene.valore_convenzionale,
-        'amm_iva_detr' : amm_iva_detr,
-        'amm_iva_indetr' : amm_iva_indetr,
-        'nome_tipo_dg' : nome_tipo_dg,
-        'num_doc_rif' : num_doc_rif,
-        'num_registrazione' : num_registrazione,
-        'denominazione' : denominazione, 
+        'amm_iva_detr' : bene.amm_iva_detr,
+        'amm_iva_indetr' : bene.amm_iva_indetr,
+        'nome_tipo_dg' : bene.nome_tipo_dg,
+        'num_doc_rif' : bene.num_doc_rif,
+        'num_registrazione' : bene.num_registrazione,
+        'denominazione' : bene.denominazione, 
         'immagine': bene.immagine,
     }
     return render (request, 'inventario/beneSingolo.html', context)
@@ -388,7 +388,7 @@ def getData(request):
 
         # counts the number of objects that match the query
         total = Bene.objects.using('default').filter(\
-            Q(id__icontains= search) | \
+            Q(id_bene__icontains= search) | \
             Q(cd_invent__icontains= search) | \
             Q(pg_bene__icontains= search) | \
             Q(pg_bene_sub__icontains= search) | \
@@ -405,12 +405,12 @@ def getData(request):
             Q(nome_tipo_dg__icontains= search) | \
             Q(num_doc_rif__icontains= search) | \
             Q(num_registrazione__icontains= search) | \
-            Q(denominazione_icontains= search) \
+            Q(denominazione__icontains= search) \
             ).count()
 
         # retrieve the objects that match the query
         rows = Bene.objects.using('default').filter(\
-            Q(id__icontains= search) | \
+            Q(id_bene__icontains= search) | \
             Q(cd_invent__icontains= search) | \
             Q(pg_bene__icontains= search) | \
             Q(pg_bene_sub__icontains= search) | \
@@ -427,7 +427,7 @@ def getData(request):
             Q(nome_tipo_dg__icontains= search) | \
             Q(num_doc_rif__icontains= search) | \
             Q(num_registrazione__icontains= search) | \
-            Q(denominazione_icontains= search) \
+            Q(denominazione__icontains= search) \
             ).order_by(order)[offset:offset + limit]
 
     else:
@@ -444,7 +444,7 @@ def getData(request):
         # we get the id of the ubicazione_precisa because we need to display it instead of the text value (that will be matched with the list in the view)
         ubicazione_precisa = row.ubicazione_precisa.id if (row.ubicazione_precisa is not None) else None
         html = html + '{ \
-        "id": ' + json.dumps(str(row.id)) + ', \
+        "id_bene": ' + json.dumps(str(row.id_bene)) + ', \
         "cd_invent": ' + json.dumps(row.cd_invent) + ', \
         "pg_bene": ' + json.dumps(str(row.pg_bene)) + ', \
         "pg_bene_sub": ' + json.dumps(str(row.pg_bene_sub)) + ', \
@@ -477,9 +477,9 @@ def uploadPicture(request):
     if request.method == 'POST':
         form = PictureForm(request.POST, request.FILES)
         if form.is_valid():
-            id = int(form.cleaned_data['id'])
+            id_bene = int(form.cleaned_data['id_bene'])
             try:
-                bene = Bene.objects.get(id=id)          # ricava l'item di cui fare l'upload della foto dall'ID
+                bene = Bene.objects.get(id_bene=id_bene)          # ricava l'item di cui fare l'upload della foto dall'ID
                 print request.FILES['picture']
                 bene.immagine = request.FILES['picture'] # valorizza l'immagine con il path dove e' contenuta
                 bene.save()
@@ -496,7 +496,7 @@ def editAccurateLocation(request):
 
     try:
         # we retrieve the item which must be edited
-        bene = Bene.objects.get(id=postID)
+        bene = Bene.objects.get(id_bene=postID)
         # we get the corrisponding accurateLocation obj, according to the id we received
         up = UbicazionePrecisa.objects.get(id=value)
         bene.ubicazione_precisa = up # we edit the location
@@ -530,8 +530,8 @@ def addAccurateLocation(request):
 @login_required
 def advancedSearch(request):
     if request.method == 'GET':
-        min_id = int(request.GET.get('min_id')) if (request.GET.get('min_id') is not None) else None
-        max_id = int(request.GET.get('max_id')) if (request.GET.get('max_id') is not None) else None
+        min_id_bene = int(request.GET.get('min_id_bene')) if (request.GET.get('min_id_bene') is not None) else None
+        max_id_bene = int(request.GET.get('max_id_bene')) if (request.GET.get('max_id_bene') is not None) else None
         cods = request.GET.getlist('cods')
         min_pg_bene = int(request.GET.get('min_pg_bene')) if (request.GET.get('min_pg_bene') is not None) else None
         max_pg_bene = int(request.GET.get('max_pg_bene')) if (request.GET.get('max_pg_bene') is not None) else None
@@ -596,8 +596,8 @@ def advancedSearch(request):
         
         rows = Bene.objects.using('default').all()
         # filter id range
-        if (min_id is not None and max_id is not None):
-            rows = rows.filter(id__range=(min_id, max_id))
+        if (min_id_bene is not None and max_id_bene is not None):
+            rows = rows.filter(id_bene__range=(min_id_bene, max_id_bene))
         # filter inventory code in selection list
         if (cods is not None and cods):
             rows = rows.filter(cd_invent__in=cods)
@@ -643,7 +643,7 @@ def advancedSearch(request):
             # we get the id of the ubicazione_precisa because we need to display it instead of the text value (that will be matched with the list in the view)
             ubicazione_precisa = row.ubicazione_precisa.id if (row.ubicazione_precisa is not None) else None
             html = html + '{ \
-            "id": ' + json.dumps(str(row.id)) + ', \
+            "id_bene": ' + json.dumps(str(row.id_bene)) + ', \
             "cd_invent": ' + json.dumps(row.cd_invent) + ', \
             "pg_bene": ' + json.dumps(str(row.pg_bene)) + ', \
             "pg_bene_sub": ' + json.dumps(str(row.pg_bene_sub)) + ', \

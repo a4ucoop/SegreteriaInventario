@@ -20,8 +20,8 @@ $(function() {
 
 function advancedSearch (argument) {
     var query = "/inventario/table/advancedSearch?";
-    var min_id = document.forms["advancedSearchForm"]["min_id"].value;
-    var max_id = document.forms["advancedSearchForm"]["max_id"].value;
+    var min_id_bene = document.forms["advancedSearchForm"]["min_id_bene"].value;
+    var max_id_bene = document.forms["advancedSearchForm"]["max_id_bene"].value;
     var codici_inventario_selezionati = [];
     $("input:checkbox[name=codice_inventario]:checked").each(function(){
         codici_inventario_selezionati.push($(this).val());
@@ -50,16 +50,15 @@ function advancedSearch (argument) {
 
     var nome_tipo_dg = document.forms["advancedSearchForm"]["nome_tipo_dg"].value;
 
-    var min_num_doc_rif = document.forms["advancedSearchForm"]["min_num_doc_rif"].value;
-    var max_num_doc_rif = document.forms["advancedSearchForm"]["max_num_doc_rif"].value;
+    var num_doc_rif = document.forms["advancedSearchForm"]["num_doc_rif"].value;
 
     var min_num_registrazione = document.forms["advancedSearchForm"]["min_num_registrazione"].value;
     var max_num_registrazione = document.forms["advancedSearchForm"]["max_num_registrazione"].value;
 
     var denominazione = document.forms["advancedSearchForm"]["denominazione"].value;
 
-    if((min_id != null && min_id != "") &&  (max_id != null && max_id != "")) 
-      query += "min_id=" + min_id + "&max_id=" + max_id + "&";
+    if((min_id_bene != null && min_id_bene != "") &&  (max_id_bene != null && max_id_bene != "")) 
+      query += "min_id_bene=" + min_id_bene + "&max_id_bene=" + max_id_bene + "&";
     if(codici_inventario_selezionati != null && codici_inventario_selezionati.length > 0){
       // cis = codici inventario selezionati
       for (var i = 0; i < codici_inventario_selezionati.length; i++) {
@@ -88,8 +87,7 @@ function advancedSearch (argument) {
     if((min_amm_iva_indetr != null && min_amm_iva_indetr != "") &&  (max_amm_iva_indetr != null && max_amm_iva_indetr != "")) 
       query += "min_amm_iva_indetr=" + min_amm_iva_indetr + "&max_amm_iva_indetr=" + max_amm_iva_indetr + "&";
     if(nome_tipo_dg != null && nome_tipo_dg != "") query += "nome_tipo_dg=" + nome_tipo_dg + "&";
-    if((min_num_doc_rif != null && min_num_doc_rif != "") &&  (max_num_doc_rif != null && max_num_doc_rif != "")) 
-      query += "min_num_doc_rif=" + min_num_doc_rif + "&max_num_doc_rif=" + max_num_doc_rif + "&";
+    if(num_doc_rif != null && num_doc_rif != "") query += "num_doc_rif=" + num_doc_rif + "&";
     if((min_num_registrazione != null && min_num_registrazione != "") &&  (max_num_registrazione != null && max_num_registrazione != "")) 
       query += "min_num_registrazione=" + min_num_registrazione + "&max_num_registrazione=" + max_num_registrazione + "&";
     if(denominazione != null && denominazione != "") query += "denominazione=" + denominazione + "&";

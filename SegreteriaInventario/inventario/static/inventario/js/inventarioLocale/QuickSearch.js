@@ -27,6 +27,7 @@ function accurateLocationSearch(keyword, el) {
 function clearFilters() {
     searchUrl = "/inventario/table/getData";
     $('#table').bootstrapTable('refresh', {url: searchUrl});
+    $('#advancedSearchForm').trigger("reset");
 }
 function ricognizioneInventarialeLocationSearch(keyword) {
   searchUrl = "/inventario/table/advancedRicognizioneInventarialeSearch?ubicazione=" + keyword;

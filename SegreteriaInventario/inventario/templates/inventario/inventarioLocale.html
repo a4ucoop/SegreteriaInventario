@@ -142,7 +142,7 @@
                data-minimum-count-columns="2"
                data-show-pagination-switch="false"
                data-pagination="true"
-               data-id-field="id"
+               data-id-field="id_bene"
                data-page-size="25"  
                data-page-list="[1, 10, 25, 50, 100, Tutto]"
                data-show-footer="false"
@@ -176,7 +176,7 @@
                                 <span class="btn btn-primary btn-file">
                                     Scegli un Immagine... {{ picform.picture }}
                                 </span>
-                                {{ picform.id }}
+                                {{ picform.id_bene }}
                             </p>
                             <button type="submit" class="btn btn-default">Invia</button>
                         </form>
@@ -202,15 +202,15 @@
                     </div>
                     <div class="modal-body">
                         <div class="form-group">
-                            <form name="advancedSearchForm" action="{% url "inventario.views.advancedSearch" %}" method="post">
+                            <form id="advancedSearchForm" name="advancedSearchForm" action="{% url "inventario.views.advancedSearch" %}" method="post">
                                 {% csrf_token %}
                                 <p>{{ asform.non_field_errors }}</p>
 
                                 <!-- ID -->
-                                <p>{{ asform.min_id.errors }}</p>
-                                <p>{{ asform.max_id.errors }}</p>
-                                <div class="col-xs-12"><p><div class="col-xs-6">{{ asform.min_id.label_tag }} {{ asform.min_id.help_text }}{% render_field asform.min_id class+="form-control" %}</div><div class="col-xs-6">
-                                {{ asform.max_id.label_tag }} {{ asform.max_id.help_text }}{% render_field asform.max_id class+="form-control" %}</div></p></div>
+                                <p>{{ asform.min_id_bene.errors }}</p>
+                                <p>{{ asform.max_id_bene.errors }}</p>
+                                <div class="col-xs-12"><p><div class="col-xs-6">{{ asform.min_id_bene.label_tag }} {{ asform.min_id_bene.help_text }}{% render_field asform.min_id_bene class+="form-control" %}</div><div class="col-xs-6">
+                                {{ asform.max_id_bene.label_tag }} {{ asform.max_id_bene.help_text }}{% render_field asform.max_id_bene class+="form-control" %}</div></p></div>
                                 <!-- codice inventario -->
                                 <div class="col-xs-12" style="margin-top:20px;padding-left:2.5%;padding-right:2.5%"><p>{{ asform.codice_inventario.label_tag }} {{ asform.codice_inventario.help_text }}{{ asform.codice_inventario.errors }}</p>
                                 <div class="col-xs-12" style="padding-left:1%;padding-right:1%">
@@ -286,10 +286,12 @@
                                   </p>
                                 </div>
                                 <!-- numero documento -->
-                                <p>{{ asform.min_num_doc_rif.errors }}</p>
-                                <p>{{ asform.max_num_doc_rif.errors }}</p>
-                                <div class="col-xs-12"><p><div class="col-xs-6">{{ asform.min_num_doc_rif.label_tag }} {{ asform.min_num_doc_rif.help_text }}{% render_field asform.min_num_doc_rif class+="form-control" %}</div><div class="col-xs-6">
-                                {{ asform.max_num_doc_rif.label_tag }} {{ asform.max_num_doc_rif.help_text }}{% render_field asform.max_num_doc_rif class+="form-control" %}</div></p></div>
+                                <div class="col-xs-12" style="padding-left:2.5%;padding-right:2.5%;">
+                                  <p>
+                                      <p>{{ asform.num_doc_rif.errors }}</p>
+                                      <p>{{ asform.num_doc_rif.label_tag }} {{ asform.num_doc_rif.help_text }} {% render_field asform.num_doc_rif class+="form-control" %}</p>
+                                  </p>
+                                </div>
                                 <!-- numero registrazione -->
                                 <p>{{ asform.min_num_registrazione.errors }}</p>
                                 <p>{{ asform.max_num_registrazione.errors }}</p>
@@ -355,9 +357,9 @@
                         formatter: operateFormatter
                     }, 
                 {
-                    field: 'id',
+                    field: 'id_bene',
                     title: 'ID',
-                    class: 'id',
+                    class: 'id_bene',
                     formatter: 'showSingleItem',
                     sortable: true,
                     align: 'center'
@@ -497,14 +499,14 @@
     // which rows are selected
     function getIdSelections() {
         return $.map($table.bootstrapTable('getSelections'), function (row) {
-            return row.id
+            return row.id_bene
         });
     }
 
     // put the data in the table
     function responseHandler(res) {
         $.each(res.rows, function (i, row) {
-            row.state = $.inArray(row.id, selections) !== -1;
+            row.state = $.inArray(row.id_bene, selections) !== -1;
         });
         return res;
     }
@@ -550,13 +552,13 @@
 
     window.operateEvents = {
         'click .Picture': function (e, value, row, index) {
-            $('#id_id').val(row.id);
+            $('#id_id_bene').val(row.id_bene);
             $('#uploadPictureModal').modal();
         },
         'click .QRcode': function (e, value, row, index) {
             // alert('You click like action, row: ' + JSON.stringify(row));
             // makeQR(row.id);
-            printSingleQrCode(row.id)
+            printSingleQrCode(row.id_bene)
             // alert("makeQR " + row.id);
         }
     };
@@ -566,7 +568,7 @@
     }
 
     function showSingleItem(value, row) {
-        return "<a href='/inventario/show/" + row.id + "'>" + value + "</a>";
+        return "<a href='/inventario/show/" + row.id_bene + "'>" + value + "</a>";
     }
 
     function numeroInventarioFormatter(value, row) {

@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 {% block body %}
-<div class="container">
+<div class="container" style="margin-top: 100px">
 	<p class="text-left"><b>ID: </b>{{ id }}</p>
 	<p class="text-left"><b>codice inventario: </b>{{ cd_invent }}</p>
 	<p class="text-left"><b>numero inventario: </b>{{ pg_bene }}-{{ pg_bene_sub }}</p>
@@ -11,7 +11,12 @@
 	<p class="text-left"><b>ubicazione precisa: </b>{{ ubicazione_precisa }}</p>
 	<p class="text-left"><b>data inizio ammortamento: </b>{{ dt_ini_ammortamento }}</p>
 	<p class="text-left"><b>valore convenzionale: </b>{{ valore_convenzionale }}</p>
-	<p class="text-left"><b>valore residuo: </b>{{ valore_residuo }}</p>
+	<p class="text-left"><b>valore valore ammortato: </b>{{ amm_iva_detr }}</p>
+	<p class="text-left"><b>valore residuo: </b>{{ amm_iva_indetr }}</p>
+	<p class="text-left"><b>tipo documento: </b>{{ nome_tipo_dg }}</p>
+	<p class="text-left"><b>documento di riferimento: </b>{{ num_doc_rif }}</p>
+	<p class="text-left"><b>muero di registrazione: </b>{{ num_registrazione }}</p>
+	<p class="text-left"><b>fornitore: </b>{{ denominazione }}</p>
 	<p class="text-left"><b>immagine: </b></p><p class="text-left">
 	{% if immagine %}
 		<img style="max-width:20%;" src="/inventario{{ immagine.url }}" ></p>
