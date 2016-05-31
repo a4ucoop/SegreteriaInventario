@@ -19,8 +19,6 @@ class Bene(models.Model):
     ubicazione_precisa = models.ForeignKey(UbicazionePrecisa, null=True, on_delete=models.SET_NULL)
     dt_ini_ammortamento = models.DateTimeField('data inizio ammortamento')
     valore_convenzionale = models.DecimalField(max_digits=15, decimal_places=2)
-    amm_iva_detr = models.DecimalField(max_digits=15, decimal_places=2,default=None)
-    amm_iva_indetr = models.DecimalField(max_digits=15, decimal_places=2,default=None)
     nome_tipo_dg = models.CharField(max_length=128,default=None)
     num_doc_rif = models.CharField(max_length=128,default=None)
     num_registrazione = models.IntegerField(default=None)

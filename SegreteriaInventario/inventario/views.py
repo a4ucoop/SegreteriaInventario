@@ -158,8 +158,6 @@ def updateLocalDB(request):
             bene.ds_spazio = row['DS_SPAZIO'] if row['DS_SPAZIO'] is not None else ''
             bene.dt_ini_ammortamento = row['DT_INI_AMMORTAMENTO'] if row['DT_INI_AMMORTAMENTO'] is not None else '0001-01-01 00:00'
             bene.valore_convenzionale = row['VALORE_CONVENZIONALE'] if row['VALORE_CONVENZIONALE'] is not None else ''
-            bene.amm_iva_detr = row['AMM_IVA_DETR'] if row['AMM_IVA_DETR'] is not None else -1
-            bene.amm_iva_indetr = row['AMM_IVA_INDETR'] if row['AMM_IVA_DETR'] is not None else -1
             bene.nome_tipo_dg = row['NOME_TIPO_DG'] if row['NOME_TIPO_DG'] is not None else ''
             bene.num_doc_rif = row['NUM_DOC_RIF'] if row['NUM_DOC_RIF'] is not None else ''
             bene.num_registrazione = row['NUM_REGISTRAZIONE'] if row['NUM_REGISTRAZIONE'] is not None else -1
@@ -180,8 +178,6 @@ def updateLocalDB(request):
             ds_spazio = row['DS_SPAZIO'] if row['DS_SPAZIO'] is not None else ''
             dt_ini_ammortamento = row['DT_INI_AMMORTAMENTO'] if row['DT_INI_AMMORTAMENTO'] is not None else '0001-01-01 00:00'
             valore_convenzionale = row['VALORE_CONVENZIONALE'] if row['VALORE_CONVENZIONALE'] is not None else ''
-            amm_iva_detr = row['AMM_IVA_DETR'] if row['AMM_IVA_DETR'] is not None else -1
-            amm_iva_indetr = row['AMM_IVA_INDETR'] if row['AMM_IVA_DETR'] is not None else -1
             nome_tipo_dg = row['NOME_TIPO_DG'] if row['NOME_TIPO_DG'] is not None else ''
             num_doc_rif = row['NUM_DOC_RIF'] if row['NUM_DOC_RIF'] is not None else ''
             num_registrazione = row['NUM_REGISTRAZIONE'] if row['NUM_REGISTRAZIONE'] is not None else -1
@@ -198,8 +194,6 @@ def updateLocalDB(request):
                         ds_spazio = ds_spazio,
                         dt_ini_ammortamento = dt_ini_ammortamento,
                         valore_convenzionale = valore_convenzionale,
-                        amm_iva_detr = amm_iva_detr,
-                        amm_iva_indetr = amm_iva_indetr,
                         nome_tipo_dg = nome_tipo_dg,
                         num_doc_rif = num_doc_rif,
                         num_registrazione = num_registrazione,
@@ -295,8 +289,6 @@ def checkUpdate(request):
             ds_spazio = row['DS_SPAZIO'] if row['DS_SPAZIO'] is not None else ''
             dt_ini_ammortamento = row['DT_INI_AMMORTAMENTO'] if row['DT_INI_AMMORTAMENTO'] is not None else '0001-01-01 00:00'
             valore_convenzionale = row['VALORE_CONVENZIONALE'] if row['VALORE_CONVENZIONALE'] is not None else ''
-            amm_iva_detr = row['AMM_IVA_DETR'] if row['AMM_IVA_DETR'] is not None else -1
-            amm_iva_indetr = row['AMM_IVA_INDETR'] if row['AMM_IVA_DETR'] is not None else -1
             nome_tipo_dg = row['NOME_TIPO_DG'] if row['NOME_TIPO_DG'] is not None else ''
             num_doc_rif = row['NUM_DOC_RIF'] if row['NUM_DOC_RIF'] is not None else ''
             num_registrazione = row['NUM_REGISTRAZIONE'] if row['NUM_REGISTRAZIONE'] is not None else -1
@@ -313,8 +305,6 @@ def checkUpdate(request):
                         ds_spazio = ds_spazio,
                         dt_ini_ammortamento = dt_ini_ammortamento,
                         valore_convenzionale = valore_convenzionale,
-                        amm_iva_detr = amm_iva_detr,
-                        amm_iva_indetr = amm_iva_indetr,
                         nome_tipo_dg = nome_tipo_dg,
                         num_doc_rif = num_doc_rif,
                         num_registrazione = num_registrazione,
@@ -349,8 +339,6 @@ def showSingleItem(request, remote_id):
         'ubicazione_precisa': bene.ubicazione_precisa,
         'dt_ini_ammortamento': bene.dt_ini_ammortamento,
         'valore_convenzionale': bene.valore_convenzionale,
-        'amm_iva_detr' : bene.amm_iva_detr,
-        'amm_iva_indetr' : bene.amm_iva_indetr,
         'nome_tipo_dg' : bene.nome_tipo_dg,
         'num_doc_rif' : bene.num_doc_rif,
         'num_registrazione' : bene.num_registrazione,
@@ -400,8 +388,6 @@ def getData(request):
             Q(ubicazione_precisa__ubicazione__icontains= search) | \
             Q(dt_ini_ammortamento__icontains= search) | \
             Q(valore_convenzionale__icontains= search) | \
-            Q(amm_iva_detr__icontains= search) | \
-            Q(amm_iva_indetr__icontains= search) | \
             Q(nome_tipo_dg__icontains= search) | \
             Q(num_doc_rif__icontains= search) | \
             Q(num_registrazione__icontains= search) | \
@@ -422,8 +408,6 @@ def getData(request):
             Q(ubicazione_precisa__ubicazione__icontains= search) | \
             Q(dt_ini_ammortamento__icontains= search) | \
             Q(valore_convenzionale__icontains= search) | \
-            Q(amm_iva_detr__icontains= search) | \
-            Q(amm_iva_indetr__icontains= search) | \
             Q(nome_tipo_dg__icontains= search) | \
             Q(num_doc_rif__icontains= search) | \
             Q(num_registrazione__icontains= search) | \
@@ -456,8 +440,6 @@ def getData(request):
         "ubicazione_precisa": ' + json.dumps(str(row.ubicazione_precisa_id)) + ', \
         "dt_ini_ammortamento": ' + json.dumps(str(row.dt_ini_ammortamento.date()) if row.dt_ini_ammortamento is not None else "") + ', \
         "valore_convenzionale": ' + json.dumps(str(row.valore_convenzionale)) + ', \
-        "amm_iva_detr" : ' + json.dumps(str(row.amm_iva_detr)) + ', \
-        "amm_iva_indetr" : ' + json.dumps(str(row.amm_iva_indetr)) + ', \
         "nome_tipo_dg" : ' + json.dumps(str(row.nome_tipo_dg)) + ', \
         "num_doc_rif" : ' + json.dumps(str(row.num_doc_rif)) + ', \
         "num_registrazione" : ' + json.dumps(str(row.num_registrazione)) + ', \
@@ -547,11 +529,7 @@ def advancedSearch(request):
         to_dt_ini_ammortamento = datetime.datetime.strptime(request.GET.get('to_dt_ini_ammortamento'), "%d/%m/%Y") if (request.GET.get('to_dt_ini_ammortamento') is not None) else None
         min_valore_convenzionale = int(request.GET.get('min_valore_convenzionale')) if (request.GET.get('min_valore_convenzionale') is not None) else None
         max_valore_convenzionale = int(request.GET.get('max_valore_convenzionale')) if (request.GET.get('max_valore_convenzionale') is not None) else None
-        min_amm_iva_detr = int(request.GET.get('min_amm_iva_detr')) if (request.GET.get('min_amm_iva_detr') is not None) else None
-        max_amm_iva_detr = int(request.GET.get('max_amm_iva_detr')) if (request.GET.get('max_amm_iva_detr') is not None) else None
-        min_amm_iva_indetr = int(request.GET.get('min_amm_iva_indetr')) if (request.GET.get('min_amm_iva_indetr') is not None) else None
-        max_amm_iva_indetr = int(request.GET.get('max_amm_iva_indetr')) if (request.GET.get('max_amm_iva_indetr') is not None) else None
-        nome_tipo_dg = request.GET.get('max_amm_iva_detr') 
+        nome_tipo_dg = request.GET.get('nome_tipo_dg') 
         num_doc_rif = request.GET.get('num_doc_rif')
         min_num_registrazione = int(request.GET.get('min_num_registrazione')) if (request.GET.get('min_num_registrazione') is not None) else None
         max_num_registrazione = int(request.GET.get('max_num_registrazione')) if (request.GET.get('max_num_registrazione') is not None) else None
@@ -619,10 +597,6 @@ def advancedSearch(request):
             rows = rows.filter(dt_ini_ammortamento__range=(from_dt_ini_ammortamento, to_dt_ini_ammortamento))
         if (min_valore_convenzionale is not None and max_valore_convenzionale is not None):
             rows = rows.filter(valore_convenzionale__range=(min_valore_convenzionale, max_valore_convenzionale))
-        if (min_amm_iva_detr is not None and max_amm_iva_detr is not None):
-            rows = rows.filter(amm_iva_detr__range=(min_amm_iva_detr, max_amm_iva_detr))
-        if (min_amm_iva_indetr is not None and max_amm_iva_indetr is not None):
-            rows = rows.filter(amm_iva_indetr__range=(min_amm_iva_indetr, max_amm_iva_indetr))
         if (nome_tipo_dg is not None):
             rows = rows.filter(nome_tipo_dg__icontains=nome_tipo_dg)
         if (num_doc_rif is not None):
@@ -655,8 +629,6 @@ def advancedSearch(request):
             "ubicazione_precisa": ' + json.dumps(str(row.ubicazione_precisa_id)) + ', \
             "dt_ini_ammortamento": ' + json.dumps(str(row.dt_ini_ammortamento.date()) if row.dt_ini_ammortamento is not None else "") + ', \
             "valore_convenzionale": ' + json.dumps(str(row.valore_convenzionale)) + ', \
-            "amm_iva_detr" : ' + json.dumps(str(row.amm_iva_detr)) + ', \
-            "amm_iva_indetr" : ' + json.dumps(str(row.amm_iva_indetr)) + ', \
             "nome_tipo_dg" : ' + json.dumps(str(row.nome_tipo_dg)) + ', \
             "num_doc_rif" : ' + json.dumps(str(row.num_doc_rif)) + ', \
             "num_registrazione" : ' + json.dumps(str(row.num_registrazione)) + ', \

@@ -268,16 +268,6 @@
                                 <p>{{ asform.max_valore_convenzionale.errors }}</p>
                                 <div class="col-xs-12"><p><div class="col-xs-6">{{ asform.min_valore_convenzionale.label_tag }} {{ asform.min_valore_convenzionale.help_text }}{% render_field asform.min_valore_convenzionale class+="form-control" %}</div><div class="col-xs-6">
                                 {{ asform.max_valore_convenzionale.label_tag }} {{ asform.max_valore_convenzionale.help_text }}{% render_field asform.max_valore_convenzionale class+="form-control" %}</div></p></div>
-                                <!-- Valore ammortizzato -->
-                                <p>{{ asform.min_amm_iva_detr.errors }}</p>
-                                <p>{{ asform.max_amm_iva_detr.errors }}</p>
-                                <div class="col-xs-12"><p><div class="col-xs-6">{{ asform.min_amm_iva_detr.label_tag }} {{ asform.min_amm_iva_detr.help_text }}{% render_field asform.min_amm_iva_detr class+="form-control" %}</div><div class="col-xs-6">
-                                {{ asform.max_amm_iva_detr.label_tag }} {{ asform.max_amm_iva_detr.help_text }}{% render_field asform.max_amm_iva_detr class+="form-control" %}</div></p></div>
-                                <!-- Valore residuo -->
-                                <p>{{ asform.min_amm_iva_indetr.errors }}</p>
-                                <p>{{ asform.max_amm_iva_indetr.errors }}</p>
-                                <div class="col-xs-12"><p><div class="col-xs-6">{{ asform.min_amm_iva_indetr.label_tag }} {{ asform.min_amm_iva_indetr.help_text }}{% render_field asform.min_amm_iva_indetr class+="form-control" %}</div><div class="col-xs-6">
-                                {{ asform.max_amm_iva_indetr.label_tag }} {{ asform.max_amm_iva_indetr.help_text }}{% render_field asform.max_amm_iva_indetr class+="form-control" %}</div></p></div>
                                 <!-- tipo documento -->
                                 <div class="col-xs-12" style="padding-left:2.5%;padding-right:2.5%;">
                                   <p>
@@ -428,18 +418,6 @@
                     field: 'valore_convenzionale',
                     title: 'valore convenzionale',
                     class: 'valore_convenzionale',
-                    sortable: true,
-                    align: 'center'
-                },{
-                    field: 'amm_iva_detr',
-                    title: 'valore amortizzato',
-                    class: 'amm_iva_detr',
-                    sortable: true,
-                    align: 'center'
-                },{
-                    field: 'amm_iva_indetr',
-                    title: 'valore residuo',
-                    class: 'amm_iva_indetr',
                     sortable: true,
                     align: 'center'
                 },{

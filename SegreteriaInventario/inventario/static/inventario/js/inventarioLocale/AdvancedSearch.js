@@ -42,12 +42,6 @@ function advancedSearch (argument) {
     var min_valore_convenzionale = document.forms["advancedSearchForm"]["min_valore_convenzionale"].value;
     var max_valore_convenzionale = document.forms["advancedSearchForm"]["max_valore_convenzionale"].value;
 
-    var min_amm_iva_detr = document.forms["advancedSearchForm"]["min_amm_iva_detr"].value;
-    var max_amm_iva_detr = document.forms["advancedSearchForm"]["max_amm_iva_detr"].value;
-
-    var min_amm_iva_indetr = document.forms["advancedSearchForm"]["min_amm_iva_indetr"].value;
-    var max_amm_iva_indetr = document.forms["advancedSearchForm"]["max_amm_iva_indetr"].value;
-
     var nome_tipo_dg = document.forms["advancedSearchForm"]["nome_tipo_dg"].value;
 
     var num_doc_rif = document.forms["advancedSearchForm"]["num_doc_rif"].value;
@@ -82,10 +76,6 @@ function advancedSearch (argument) {
       query += "from_dt_ini_ammortamento=" + from_dt_ini_ammortamento + "&to_dt_ini_ammortamento=" + to_dt_ini_ammortamento + "&";
     if((min_valore_convenzionale != null && min_valore_convenzionale != "") &&  (max_valore_convenzionale != null && max_valore_convenzionale != "")) 
       query += "min_valore_convenzionale=" + min_valore_convenzionale + "&max_valore_convenzionale=" + max_valore_convenzionale + "&";
-    if((min_amm_iva_detr != null && min_amm_iva_detr != "") &&  (max_amm_iva_detr != null && max_amm_iva_detr != "")) 
-      query += "min_amm_iva_detr=" + min_amm_iva_detr + "&max_amm_iva_detr=" + max_amm_iva_detr + "&";
-    if((min_amm_iva_indetr != null && min_amm_iva_indetr != "") &&  (max_amm_iva_indetr != null && max_amm_iva_indetr != "")) 
-      query += "min_amm_iva_indetr=" + min_amm_iva_indetr + "&max_amm_iva_indetr=" + max_amm_iva_indetr + "&";
     if(nome_tipo_dg != null && nome_tipo_dg != "") query += "nome_tipo_dg=" + nome_tipo_dg + "&";
     if(num_doc_rif != null && num_doc_rif != "") query += "num_doc_rif=" + num_doc_rif + "&";
     if((min_num_registrazione != null && min_num_registrazione != "") &&  (max_num_registrazione != null && max_num_registrazione != "")) 

@@ -111,26 +111,6 @@ class AdvancedSearchForm(forms.Form):
 		label='prezzo massimo', 
 		min_value=0
 	)	
-	min_amm_iva_detr = forms.IntegerField(		
-		required=False,
-		label='valore ammortato minimo', 
-		min_value=0
-	)
-	max_amm_iva_detr = forms.IntegerField(		
-		required=False,
-		label='valore ammortato massimo', 
-		min_value=0
-	)
-	min_amm_iva_indetr = forms.IntegerField(		
-		required=False,
-		label='valore residuo minimo', 
-		min_value=0
-	)
-	max_amm_iva_indetr = forms.IntegerField(		
-		required=False,
-		label='valore residuo massimo', 
-		min_value=0
-	)
 	nome_tipo_dg = forms.CharField(		
 		required=False,
 		label='tipo documento', 
