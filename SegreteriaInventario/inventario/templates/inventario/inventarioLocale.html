@@ -294,6 +294,20 @@
                                       <p>{{ asform.denominazione.label_tag }} {{ asform.denominazione.help_text }} {% render_field asform.denominazione class+="form-control" %}</p>
                                   </p>
                                 </div>
+                                <!-- nome -->
+                                <div class="col-xs-12" style="padding-left:2.5%;padding-right:2.5%;">
+                                  <p>
+                                      <p>{{ asform.nome.errors }}</p>
+                                      <p>{{ asform.nome.label_tag }} {{ asform.nome.help_text }} {% render_field asform.nome class+="form-control" %}</p>
+                                  </p>
+                                </div>
+                                <!-- cognome -->
+                                <div class="col-xs-12" style="padding-left:2.5%;padding-right:2.5%;">
+                                  <p>
+                                      <p>{{ asform.cognome.errors }}</p>
+                                      <p>{{ asform.cognome.label_tag }} {{ asform.cognome.help_text }} {% render_field asform.cognome class+="form-control" %}</p>
+                                  </p>
+                                </div>
                             </form>
                         </div>
                     </div>
@@ -442,6 +456,18 @@
                     field: 'denominazione',
                     title: 'fornitore',
                     class: 'denominazione',
+                    sortable: true,
+                    align: 'center'
+                },{
+                    field: 'nome',
+                    title: 'nome',
+                    class: 'nome',
+                    sortable: true,
+                    align: 'center'
+                },{
+                    field: 'cognome',
+                    title: 'cognome',
+                    class: 'cognome',
                     sortable: true,
                     align: 'center'
                 },

@@ -28,7 +28,6 @@ def ricinv(request):
 
 @never_cache
 def login(request, *args, **kw):
-    print request, args, kw
     return django_auth_login(request, *args, **kw)
 
 # prende il cursore che ha eseguito la query, estrae i risultati sotto
@@ -90,8 +89,6 @@ def showLocalDB(request):
     context ={'locations': locations, 'accurateLocations': accurateLocations, 'picform': picform, 'asform': asform}
     return render (request,'inventario/inventarioLocale.html',context)
 
-
-
 @login_required
 def updateLocalDB(request):
     cursor = connections['cineca'].cursor()         # Cursor connessione Cineca
@@ -116,9 +113,11 @@ def updateLocalDB(request):
                 DG02.NOME_TIPO_DG,\
                 DG02.NUM_DOC_RIF,\
                 DG02.NUM_REGISTRAZIONE,\
-                ACAB.DENOMINAZIONE\
+                ACAB.DENOMINAZIONE,\
+                ACAB2.NOME,\
+                ACAB2.COGNOME\
         FROM\
-                ((((((SIACO_UNICAM_PROD.V_IE_CO_INVENTARIO_BENI INV\
+                (((((((((SIACO_UNICAM_PROD.V_IE_CO_INVENTARIO_BENI INV\
                 INNER JOIN SIACO_UNICAM_PROD.V_IE_CO_MOVIMENTI_BENE MOV\
                 ON INV.ID_INVENTARIO_BENI = MOV.ID_INVENTARIO_BENI)\
                 INNER JOIN V_IE_AC_NODI_AB NODI\
@@ -132,11 +131,32 @@ def updateLocalDB(request):
                 ON INV.CD_UBICAZIONE = SPA.CD_SPAZIO)\
                 INNER JOIN V_IE_AC_AB_ALL ACAB\
                 ON INV.ID_FORNITORE = ACAB.ID_AB)\
+                INNER JOIN V_IE_DG02_DG_DETT DG02_DETT\
+                ON DG02.ID_DG = DG02_DETT.ID_DG)\
+                INNER JOIN V_IE_DG24_X_INVE DG24\
+                ON DG24.NR_RIGA=DG02_DETT.NR_RIGA AND DG02_DETT.ID_DG_DETT=DG24.ID_DG_DETT)\
+                LEFT JOIN V_IE_AC_AB_ALL ACAB2\
+                ON DG24.ID_AB_POSSESSORE = ACAB2.ID_AB)\
         ORDER BY\
                 INV.ID_INVENTARIO_BENI ASC"
         )
 
     rows = rows_to_dict_list(cursor)
+   
+    ids = set()
+    to_remove = set()
+    for row in rows:
+        if row['ID_INVENTARIO_BENI'] in ids:
+            to_remove.add(row['ID_INVENTARIO_BENI'])
+        ids.add(row['ID_INVENTARIO_BENI'])
+
+    print("len1: %s" % len(rows))
+
+    for row in rows:
+        if row['ID_INVENTARIO_BENI'] in to_remove:
+            rows.remove(row)
+
+    print("len2: %s" % len(rows))
 
     # Scorre tutti i dati riga per riga
     for row in rows:
@@ -147,21 +167,8 @@ def updateLocalDB(request):
 
             # Se l'oggetto esiste i dati vengono aggiornati
             
-            bene.id_bene = row['ID_INVENTARIO_BENI'] if row['ID_INVENTARIO_BENI'] is not None else -1
-            bene.cd_invent = row['CD_INVENT'] if row['CD_INVENT'] is not None else -1
-            bene.pg_bene = row['PG_BENE'] if row['PG_BENE'] is not None else -1
-            bene.pg_bene_sub = row['PG_BENE_SUB'] if row['PG_BENE_SUB'] is not None else -1
-            bene.ds_bene = row['DS_BENE'] if row['DS_BENE'] is not None else ''
-            bene.dt_registrazione_buono = row['DT_REGISTRAZIONE_BUONO'] if row['DT_REGISTRAZIONE_BUONO'] is not None else '0001-01-01 00:00'
-            bene.cd_categ_gruppo = row['CD_CATEG_GRUPPO'] if row['CD_CATEG_GRUPPO'] is not None else ''
-            bene.ds_categ_gruppo = row['DS_CATEG_GRUPPO'] if row['DS_CATEG_GRUPPO'] is not None else ''
-            bene.ds_spazio = row['DS_SPAZIO'] if row['DS_SPAZIO'] is not None else ''
-            bene.dt_ini_ammortamento = row['DT_INI_AMMORTAMENTO'] if row['DT_INI_AMMORTAMENTO'] is not None else '0001-01-01 00:00'
-            bene.valore_convenzionale = row['VALORE_CONVENZIONALE'] if row['VALORE_CONVENZIONALE'] is not None else ''
-            bene.nome_tipo_dg = row['NOME_TIPO_DG'] if row['NOME_TIPO_DG'] is not None else ''
-            bene.num_doc_rif = row['NUM_DOC_RIF'] if row['NUM_DOC_RIF'] is not None else ''
-            bene.num_registrazione = row['NUM_REGISTRAZIONE'] if row['NUM_REGISTRAZIONE'] is not None else -1
-            bene.denominazione = row['DENOMINAZIONE'] if row['DENOMINAZIONE'] is not None else ''
+            bene.nome = row['NOME'] if row['NOME'] is not None else ''
+            bene.cognome = row['COGNOME'] if row['COGNOME'] is not None else ''
 
             # item = Item(None,item_id,description,purchase_date,price,location,depreciation_starting_date)
             bene.save()
@@ -182,6 +189,8 @@ def updateLocalDB(request):
             num_doc_rif = row['NUM_DOC_RIF'] if row['NUM_DOC_RIF'] is not None else ''
             num_registrazione = row['NUM_REGISTRAZIONE'] if row['NUM_REGISTRAZIONE'] is not None else -1
             denominazione = row['DENOMINAZIONE'] if row['DENOMINAZIONE'] is not None else ''
+            nome  = row['NOME'] if row['NOME'] is not None else ''
+            cognome = row['COGNOME'] if row['COGNOME'] is not None else ''
 
             bene = Bene(id_bene = id_bene, 
                         cd_invent = cd_invent, 
@@ -197,12 +206,12 @@ def updateLocalDB(request):
                         nome_tipo_dg = nome_tipo_dg,
                         num_doc_rif = num_doc_rif,
                         num_registrazione = num_registrazione,
-                        denominazione = denominazione) 
+                        denominazione = denominazione,
+                        nome = nome,
+                        cognome = cognome) 
             bene.save()
 
     return redirect ('showLocalDB')
-
-
 
 @login_required
 def checkUpdate(request):
@@ -246,9 +255,11 @@ def checkUpdate(request):
                 DG02.NOME_TIPO_DG,\
                 DG02.NUM_DOC_RIF,\
                 DG02.NUM_REGISTRAZIONE,\
-                ACAB.DENOMINAZIONE\
+                ACAB.DENOMINAZIONE,\
+                ACAB2.NOME,\
+                ACAB2.COGNOME\
         FROM\
-                ((((((SIACO_UNICAM_PROD.V_IE_CO_INVENTARIO_BENI INV\
+                (((((((((SIACO_UNICAM_PROD.V_IE_CO_INVENTARIO_BENI INV\
                 INNER JOIN SIACO_UNICAM_PROD.V_IE_CO_MOVIMENTI_BENE MOV\
                 ON INV.ID_INVENTARIO_BENI = MOV.ID_INVENTARIO_BENI)\
                 INNER JOIN V_IE_AC_NODI_AB NODI\
@@ -262,6 +273,12 @@ def checkUpdate(request):
                 ON INV.CD_UBICAZIONE = SPA.CD_SPAZIO)\
                 INNER JOIN V_IE_AC_AB_ALL ACAB\
                 ON INV.ID_FORNITORE = ACAB.ID_AB)\
+                INNER JOIN V_IE_DG02_DG_DETT DG02_DETT\
+                ON DG02.ID_DG = DG02_DETT.ID_DG)\
+                INNER JOIN V_IE_DG24_X_INVE DG24\
+                ON DG24.NR_RIGA=DG02_DETT.NR_RIGA AND DG02_DETT.ID_DG_DETT=DG24.ID_DG_DETT)\
+                LEFT JOIN V_IE_AC_AB_ALL ACAB2\
+                ON DG24.ID_AB_POSSESSORE = ACAB2.ID_AB)\
             WHERE\
                 INV.ID_INVENTARIO_BENI > %s\
             ORDER BY\
@@ -270,8 +287,6 @@ def checkUpdate(request):
                     maxLocalID[0]
                 ]
             )
-
-
 
         rows = rows_to_dict_list(cursor)
 
@@ -293,6 +308,8 @@ def checkUpdate(request):
             num_doc_rif = row['NUM_DOC_RIF'] if row['NUM_DOC_RIF'] is not None else ''
             num_registrazione = row['NUM_REGISTRAZIONE'] if row['NUM_REGISTRAZIONE'] is not None else -1
             denominazione = row['DENOMINAZIONE'] if row['DENOMINAZIONE'] is not None else ''
+            nome  = row['NOME'] if row['NOME'] is not None else ''
+            cognome = row['COGNOME'] if row['COGNOME'] is not None else ''
 
             bene = Bene(id_bene = id_bene, 
                         cd_invent = cd_invent, 
@@ -308,7 +325,9 @@ def checkUpdate(request):
                         nome_tipo_dg = nome_tipo_dg,
                         num_doc_rif = num_doc_rif,
                         num_registrazione = num_registrazione,
-                        denominazione = denominazione) 
+                        denominazione = denominazione,
+                        nome = nome,
+                        cognome = cognome) 
             bene.save()
         return redirect('showLocalDB')
 
@@ -391,7 +410,9 @@ def getData(request):
             Q(nome_tipo_dg__icontains= search) | \
             Q(num_doc_rif__icontains= search) | \
             Q(num_registrazione__icontains= search) | \
-            Q(denominazione__icontains= search) \
+            Q(denominazione__icontains= search) |\
+            Q(nome__icontains= search) | \
+            Q(cognome__icontains= search) \
             ).count()
 
         # retrieve the objects that match the query
@@ -411,7 +432,9 @@ def getData(request):
             Q(nome_tipo_dg__icontains= search) | \
             Q(num_doc_rif__icontains= search) | \
             Q(num_registrazione__icontains= search) | \
-            Q(denominazione__icontains= search) \
+            Q(denominazione__icontains= search) |\
+            Q(nome__icontains= search) | \
+            Q(cognome__icontains= search) \
             ).order_by(order)[offset:offset + limit]
 
     else:
@@ -444,6 +467,8 @@ def getData(request):
         "num_doc_rif" : ' + json.dumps(str(row.num_doc_rif)) + ', \
         "num_registrazione" : ' + json.dumps(str(row.num_registrazione)) + ', \
         "denominazione" : ' + json.dumps(str(row.denominazione)) + ', \
+        "nome" : ' + json.dumps(str(row.nome)) + ', \
+        "cognome" : ' + json.dumps(str(row.cognome)) + ', \
         "immagine": ' + json.dumps(str(row.immagine)) + \
         ' }, '
 
@@ -462,7 +487,6 @@ def uploadPicture(request):
             id_bene = int(form.cleaned_data['id_bene'])
             try:
                 bene = Bene.objects.get(id_bene=id_bene)          # ricava l'item di cui fare l'upload della foto dall'ID
-                print request.FILES['picture']
                 bene.immagine = request.FILES['picture'] # valorizza l'immagine con il path dove e' contenuta
                 bene.save()
             except Bene.DoesNotExist:
@@ -789,7 +813,6 @@ def advancedRicognizioneInventarialeSearch(request):
         ds_bene = request.GET.get('ds_bene')
         ubicazione = request.GET.get('ubicazione')
         ubicazione_precisa = request.GET.get('ubicazione_precisa')
-        print request.GET, ubicazione_precisa
 
         requestOrder = request.GET.get('order', None)
         sort = request.GET.get('sort', None)
@@ -822,9 +845,7 @@ def advancedRicognizioneInventarialeSearch(request):
         if (ubicazione is not None):
             rows = rows.filter(ds_spazio__icontains=ubicazione)
         if (ubicazione_precisa is not None):
-            print rows, ubicazione_precisa
             rows = rows.filter(ubicazione_precisa__ubicazione__icontains=ubicazione_precisa)
-            print rows
 
         total = rows.count();
         rows = rows.order_by(order)[offset:offset + limit]
