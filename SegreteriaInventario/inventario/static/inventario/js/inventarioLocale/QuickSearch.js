@@ -24,6 +24,11 @@ function accurateLocationSearch(keyword, el) {
   $('#table').bootstrapTable('refresh', {url: searchUrl});
   $(el).parent().addClass('active');
 }
+function possessoriSearch(keyword1, keyword2, el) {
+  searchUrl = "/inventario/table/advancedSearch?nome=" + keyword1 + "&cognome=" + keyword2;
+  $('#table').bootstrapTable('refresh', {url: searchUrl});
+  $(el).parent().addClass('active');
+}
 function clearFilters() {
     searchUrl = "/inventario/table/getData";
     $('#table').bootstrapTable('refresh', {url: searchUrl});

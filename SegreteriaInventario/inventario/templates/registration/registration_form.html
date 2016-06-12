@@ -64,7 +64,15 @@
         <!-- username -->
         <label for="inputUsername" class="sr-only">{% render_field form.username.label %}</label>
         <p class="help-block">{% render_field form.username.help_text %}</p>
-        {% render_field form.username required+="true" autofocus+="true" type+="username" id+="inputUsername" class+="form-control" placeholder+="nome utente" %}
+        {% render_field form.username required+="true" autofocus+="true" type+="username" id+="inputUsername" class+="form-control" placeholder+="Username" %}
+        <!-- user first name -->
+        <label for="inputUsername" class="sr-only">{% render_field form.first_name.label %}</label>
+        <p class="help-block">{% render_field form.first_name.help_text %}</p>
+        {% render_field form.first_name required+="true" autofocus+="true" type+="username" id+="inputFirstName" class+="form-control" placeholder+="nome utente" %}
+        <!-- user last name -->
+        <label for="inputUsername" class="sr-only">{% render_field form.last_name.label %}</label>
+        <p class="help-block">{% render_field form.last_name.help_text %}</p>
+        {% render_field form.last_name required+="true" autofocus+="true" type+="username" id+="inputLastName" class+="form-control" placeholder+="cognome utente" %}
         <!-- email -->
         <label for="inputEmail" class="sr-only">{% render_field form.email.label %}</label>
         <p class="help-block">{% render_field form.email.help_text %}</p>

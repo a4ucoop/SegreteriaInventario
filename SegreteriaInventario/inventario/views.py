@@ -77,6 +77,7 @@ def showRemoteDB(request):
 
 @login_required
 def showLocalDB(request):
+
     picform = PictureForm()  # costruisce una form per l'upload dell'immagine
     asform = AdvancedSearchForm()  # costruisce una form per l'upload dell'immagine
     # prende le location dal DB per popolare il menu della quicksearch
@@ -86,13 +87,24 @@ def showLocalDB(request):
     locations = sorted(locations)
     # prende le accurateLocation dal DB per popolare il menu della quicksearch
     accurateLocations = UbicazionePrecisa.objects.using('default').all().order_by('ubicazione')
-    context ={'locations': locations, 'accurateLocations': accurateLocations, 'picform': picform, 'asform': asform}
+    possessori = Bene.objects.using('default').exclude(nome=None).values_list('nome','cognome').distinct()
+    possessori = filter(None, possessori)
+    possessori = sorted(possessori)
+    context = {
+        'locations': locations, 
+        'accurateLocations': accurateLocations, 
+        'picform': picform, 
+        'asform': asform, 
+        'possessori': possessori
+    }
     return render (request,'inventario/inventarioLocale.html',context)
 
 @login_required
 def updateLocalDB(request):
     cursor = connections['cineca'].cursor()         # Cursor connessione Cineca
     cursorLocal = connections['default'].cursor()   # Cursor DB locale
+    
+
 
     # Seleziona tutti i dati necessari dal DB remoto
     cursor.execute(
@@ -368,7 +380,18 @@ def showSingleItem(request, remote_id):
 
 @login_required
 def getData(request):
+
+    user = request.user
+    #id_ab = None
+
+    #try:
+    if (not user.is_authenticated):
+        html = '{ "total": 0, "rows": [] }'
+        return HttpResponse(html)
     
+    user_first_name = user.first_name 
+    user_last_name = user.last_name
+        
     # get string parameters from the url
     requestOrder = request.GET.get('order', None)
     sort = request.GET.get('sort', None)
@@ -440,10 +463,20 @@ def getData(request):
     else:
 
         # counts the number of objects
-        total = Bene.objects.using('default').all().count()
+        if(user_first_name and user_last_name and not user.is_superuser):
+            total = Bene.objects.using('default').filter(
+                nome=user_first_name.lower(),cognome=user_last_name.lower()
+                ).count()
+        else:
+            total = Bene.objects.using('default').all().count()
 
         # retrieve the objects
-        rows = Bene.objects.using('default').all().order_by(order)[offset:offset + limit]
+        if(user_first_name and user_last_name and not user.is_superuser):
+            rows = Bene.objects.using('default').filter(
+                nome=user_first_name.lower(),cognome=user_last_name.lower()
+                ).order_by(order)[offset:offset + limit]
+        else:
+            rows = Bene.objects.using('default').all().order_by(order)[offset:offset + limit]
     
     # we construct the JSON response, we use json.dumps() to excape undesired characters
     html = '{ "total": ' + json.dumps(str(total)) + ', "rows": [ '
@@ -536,6 +569,13 @@ def addAccurateLocation(request):
 @login_required
 def advancedSearch(request):
     if request.method == 'GET':
+        user = request.user
+        #id_ab = None
+
+        #try:
+        if (not user.is_authenticated):
+            return redirect('showLocalDB')
+
         min_id_bene = int(request.GET.get('min_id_bene')) if (request.GET.get('min_id_bene') is not None) else None
         max_id_bene = int(request.GET.get('max_id_bene')) if (request.GET.get('max_id_bene') is not None) else None
         cods = request.GET.getlist('cods')
@@ -558,6 +598,8 @@ def advancedSearch(request):
         min_num_registrazione = int(request.GET.get('min_num_registrazione')) if (request.GET.get('min_num_registrazione') is not None) else None
         max_num_registrazione = int(request.GET.get('max_num_registrazione')) if (request.GET.get('max_num_registrazione') is not None) else None
         denominazione = request.GET.get('denominazione')
+        nome = request.GET.get('nome')
+        cognome = request.GET.get('cognome')
 
         # # stampe debug
         # print("min_id", min_id);
@@ -595,8 +637,17 @@ def advancedSearch(request):
         else:
             # default is order by bene_id asc
             order = '-id_bene'
+
+        user_first_name = user.first_name
+        user_last_name = user.last_name
+        # counts the number of objects
+        if(user_first_name and user_last_name and not user.is_superuser):
+            rows = Bene.objects.using('default').filter(
+                nome=user_first_name.lower(),cognome=user_last_name.lower())
+        else:
+            rows = Bene.objects.using('default').all()
         
-        rows = Bene.objects.using('default').all()
+        #WAS: rows = Bene.objects.using('default').all()
         # filter id range
         if (min_id_bene is not None and max_id_bene is not None):
             rows = rows.filter(id_bene__range=(min_id_bene, max_id_bene))
@@ -629,6 +680,10 @@ def advancedSearch(request):
             rows = rows.filter(num_registrazione__range=(min_num_registrazione, max_num_registrazione))
         if (denominazione is not None):
             rows = rows.filter(denominazione__icontains=denominazione)
+        if (nome is not None):
+            rows = rows.filter(nome__icontains=nome)
+        if (cognome is not None):
+            rows = rows.filter(cognome__icontains=cognome)
 
         total = rows.count();
         rows = rows.order_by(order)[offset:offset + limit]
@@ -657,6 +712,8 @@ def advancedSearch(request):
             "num_doc_rif" : ' + json.dumps(str(row.num_doc_rif)) + ', \
             "num_registrazione" : ' + json.dumps(str(row.num_registrazione)) + ', \
             "denominazione" : ' + json.dumps(str(row.denominazione)) + ', \
+            "nome" : ' + json.dumps(str(row.nome)) + ', \
+            "cognome" : ' + json.dumps(str(row.cognome)) + ', \
             "immagine": ' + json.dumps(str(row.immagine)) + \
             ' }, '
 

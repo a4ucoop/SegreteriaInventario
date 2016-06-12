@@ -51,6 +51,10 @@ function advancedSearch (argument) {
 
     var denominazione = document.forms["advancedSearchForm"]["denominazione"].value;
 
+    var nome = document.forms["advancedSearchForm"]["nome"].value;
+
+    var cognome = document.forms["advancedSearchForm"]["cognome"].value;
+
     if((min_id_bene != null && min_id_bene != "") &&  (max_id_bene != null && max_id_bene != "")) 
       query += "min_id_bene=" + min_id_bene + "&max_id_bene=" + max_id_bene + "&";
     if(codici_inventario_selezionati != null && codici_inventario_selezionati.length > 0){
@@ -81,6 +85,8 @@ function advancedSearch (argument) {
     if((min_num_registrazione != null && min_num_registrazione != "") &&  (max_num_registrazione != null && max_num_registrazione != "")) 
       query += "min_num_registrazione=" + min_num_registrazione + "&max_num_registrazione=" + max_num_registrazione + "&";
     if(denominazione != null && denominazione != "") query += "denominazione=" + denominazione + "&";
+    if(nome != null && nome != "") query += "nome=" + nome + "&";
+    if(cognome != null && cognome != "") query += "cognome=" + cognome + "&";
     $('#table').bootstrapTable('refresh', {url: query});
     $('#advancedSearchModal').modal('hide')
 }

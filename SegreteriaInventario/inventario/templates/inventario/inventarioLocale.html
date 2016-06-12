@@ -21,6 +21,9 @@
 {% block toggle_sidebar %}
 
 <li id="showRapidSearch"><a href="#" ><b>Ricerca Rapida</b></a></li>
+{% if user.is_authenticated %}
+<li><a><b> Benvenuto {% if user.first_name and user.last_name %} {{ user.first_name}} {{ user.last_name }} {% else %} {{user.username}} {% endif %}</b></a></li>
+{% endif %}
 
 {% endblock %}
 
@@ -54,6 +57,17 @@
                 {%endfor%}
                 </ul>    
             </li>
+            <!--  Possessori  -->
+            {% if user.is_authenticated and user.is_superuser %}
+            <li>
+                <a href="#" id="btn-3" data-toggle="collapse" data-target="#submenu3" aria-expanded="false">Possessori</a>
+                <ul class="nav collapse" id="submenu3" role="menu" aria-labelledby="btn-3">
+                {% for al in possessori %}
+                    <li ><a style="line-height:10px" href="#" title="{{al.0}} {{ al.1}}" onClick="possessoriSearch('{{al.0}}','{{al.1}}', this)">{{al.0}} {{ al.1}}</a></li>
+                {%endfor%}
+                </ul>    
+            </li>
+            {% endif %}
         </ul>
     </div>
     <!-- /#sidebar-wrapper -->

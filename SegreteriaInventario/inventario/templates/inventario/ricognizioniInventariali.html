@@ -23,6 +23,9 @@
 {% block toggle_sidebar %}
 
 <li id="showRapidSearch"><a href="#" ><b>Ricerca Rapida</b></a></li>
+{% if user.is_authenticated %}
+<li><a><b> Benvenuto {% if user.first_name and user.last_name %} {{ user.first_name}} {{ user.last_name }} {% else %} {{user.username}} {% endif %}</b></a></li>
+{% endif %}
 
 {% endblock %}
 

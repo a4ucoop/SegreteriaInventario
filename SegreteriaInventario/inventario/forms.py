@@ -136,6 +136,16 @@ class AdvancedSearchForm(forms.Form):
 		label='fornitore', 
 		max_length=None
 	)
+	nome = forms.CharField(		
+		required=False,
+		label='nome', 
+		max_length=None
+	)
+	cognome = forms.CharField(		
+		required=False,
+		label='cognome', 
+		max_length=None
+	)
 
 class RicognizioneInventarialeForm(forms.ModelForm):
     class Meta:
