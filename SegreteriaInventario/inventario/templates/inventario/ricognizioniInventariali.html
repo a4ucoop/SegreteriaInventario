@@ -145,7 +145,22 @@
         <div id="createRicInvModal" class="modal fade" role="dialog">
                         {% include "inventario/RicognizioneInventariale/create.html" %}
         </div>
-        <!-- Create RecInv -->
+        <!-- Edit RecInv -->
+        <div id="editRicInvModal" class="modal fade" role="dialog">
+            <div class="modal-dialog">
+
+                <!-- Modal content-->
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal">&times;</button>
+                        <h4 class="modal-title">Modifica Ricognizione Inventariale</h4>
+                    </div>
+                    <div class="modal-body">
+                        <button type="button" class="btn btn-default" data-dismiss="modal">Chiudi</button>
+                    </div>
+                </div>
+            </div>
+        </div>
 
         <!-- Advanced Search -->
         <div id="advancedSearchModal" class="modal modal-wide fade" role="dialog">
@@ -246,14 +261,14 @@
                 //        align: 'center',
                 //        valign: 'middle'
                 //    },
-                //{
-                //        field: 'operate',
-                //        title: 'azioni',
-                //        class: 'actions',
-                //        align: 'center',
-                //        events: operateEvents,
-                //        formatter: operateFormatter
-                //    }, 
+                {
+                        field: 'operate',
+                        title: 'azioni',
+                        class: 'actions',
+                        align: 'center',
+                        events: operateEvents,
+                        formatter: operateFormatter
+                    }, 
                 {
                     field: 'cd_invent',
                     title: 'codice inventario',
@@ -371,28 +386,39 @@
 
     function operateFormatter(value, row, index) {
         return [
-            '<a class="Picture" href="javascript:void(0)" title="Carica una foto">',
-            '<i class="glyphicon glyphicon-picture"></i>',
+            '<a class="Modify" href="javascript:void(0)" title="Modifica">',
+            '<i class="glyphicon glyphicon glyphicon-edit"></i>',
             '</a>  ',
 
-            '<a class="QRcode" href="javascript:void(0)" title="Stampa il QRcode di questo bene">',
-            '<i class="glyphicon glyphicon-qrcode"></i>',
+            '<a class="Delete" href="javascript:void(0)" title="Cancella">',
+            '<i class="glyphicon glyphicon glyphicon-trash"></i>',
             '</a>'
         ].join('');
     }
 
     window.operateEvents = {
-        'click .Picture': function (e, value, row, index) {
-            $('#id_id').val(row.id);
-            $('#uploadPictureModal').modal();
+        'click .Modify': function (e, value, row, index) {
+            alert(row.id);
+            //$('#id_id').val(row.id);
+            //editRicinv(row);
+            //$('#editRicInvModal').modal();
         },
-        'click .QRcode': function (e, value, row, index) {
-            // alert('You click like action, row: ' + JSON.stringify(row));
-            // makeQR(row.id);
-            printSingleQrCode(row.id)
-            // alert("makeQR " + row.id);
+        'click .Delete': function (e, value, row, index) {
         }
     };
+
+    function editRicinv(id) {
+        url = '/ricinv/edit/' + id;
+        items = [];
+        $.ajax({ 
+            type: 'GET', 
+            url: url, 
+            dataType: 'html',
+            success: function (data) { 
+                $('#editRicInvModal').html(data);
+            }
+        });
+    }
 
     function getHeight() {
         return $(window).height() - $('#navbar1').outerHeight(true);

@@ -768,6 +768,49 @@ def ricognizioneInventarialeCreateView(request):
     return redirect ('ricinv')
 
 
+def ricognizioneInventarialeEditView(request,bene_id):
+    """ """
+    if request.method == 'GET':
+        ric_inv = RicognizioneInventariale.objects.get(id_bene=bene_id)
+        
+        ric_inv_id = ric_inv.id
+        cd_invent = ric_inv.cd_invent
+        pg_bene = ric_inv.pg_bene
+        pg_bene_sub = ric_inv.pg_bene_sub
+        ds_spazio = ric_inv.ds_spazio
+        ubicazione_precisa = ric_inv.ubicazione_precisa
+        ds_bene = ric_inv.ds_bene
+        immagine = ric_inv.immagine
+        ubicazione_precisa = ric_inv.ubicazione_precisa
+        
+    if request.method == 'POST':
+        cd_invent = request.POST.get('cd_invent',None)
+        pg_bene = int(request.POST.get('pg_bene')) if (request.POST.get('pg_bene_sub') is not None) else None
+        pg_bene_sub = int(request.POST.get('pg_bene_sub')) if (request.POST.get('pg_bene_sub') is not None) else None
+        ds_spazio = request.POST.get('ds_spazio',None)
+        ubicazione_precisa = int(request.POST.get('ubicazione_precisa')) if(request.POST.get('ubicazione_precisa') is not None) else None
+        ds_bene = request.POST.get('ds_bene',None)
+        immagine = request.POST.get('immagine',None)
+        
+        if ubicazione_precisa:
+            ubicazione_precisa = UbicazionePrecisa.objects.using('default').get(pk=ubicazione_precisa)
+
+        if ((cd_invent is not None) and (pg_bene is not None) and (pg_bene_sub is not None)):
+            RicognizioneInventariale.objects.using('default').create(
+                cd_invent = cd_invent,
+                pg_bene = pg_bene,
+                pg_bene_sub = pg_bene_sub,
+                ds_spazio = ds_spazio,
+                ubicazione_precisa = ubicazione_precisa,
+                ds_bene = ds_bene,
+                immagine = immagine
+            )
+        else:
+            return HttpResponse("Not created")
+    
+
+    return redirect ('ricinv')
+
 @login_required
 def showRicognizioniInventariali(request):
     #picform = PictureForm()  # costruisce una form per l'upload dell'immagine
