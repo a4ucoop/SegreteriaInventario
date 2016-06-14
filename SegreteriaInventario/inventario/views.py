@@ -737,6 +737,7 @@ def advancedSearch(request):
 #        form.save()
 #        success_url = ""
 #        return HttpResponse("OK")
+@login_required
 def ricognizioneInventarialeCreateView(request):
     """ """
     if request.method == 'POST':
@@ -767,23 +768,31 @@ def ricognizioneInventarialeCreateView(request):
 
     return redirect ('ricinv')
 
-
-def ricognizioneInventarialeEditView(request,bene_id):
+@login_required
+def ricognizioneInventarialeEditView(request):
     """ """
     if request.method == 'GET':
-        ric_inv = RicognizioneInventariale.objects.get(id_bene=bene_id)
+        bene_id = request.GET.get('id', '')
+        ric_inv = RicognizioneInventariale.objects.get(id=bene_id)
         
-        ric_inv_id = ric_inv.id
-        cd_invent = ric_inv.cd_invent
-        pg_bene = ric_inv.pg_bene
-        pg_bene_sub = ric_inv.pg_bene_sub
-        ds_spazio = ric_inv.ds_spazio
-        ubicazione_precisa = ric_inv.ubicazione_precisa
-        ds_bene = ric_inv.ds_bene
-        immagine = ric_inv.immagine
-        ubicazione_precisa = ric_inv.ubicazione_precisa
+        data = {
+                'id': ric_inv.id,
+                'cd_invent' : ric_inv.cd_invent,
+                'pg_bene' : ric_inv.pg_bene,
+                'pg_bene_sub' : ric_inv.pg_bene_sub,
+                'ds_spazio' : ric_inv.ds_spazio,
+                'ubicazione_precisa' : ric_inv.ubicazione_precisa,
+                'ds_bene' : ric_inv.ds_bene,
+                'immagine' : ric_inv.immagine
+        }
+
+        form = RicognizioneInventarialeForm(initial=data)
+
+        return render (request,'inventario/RicognizioneInventariale/edit.html',{'form': form})
+
         
     if request.method == 'POST':
+        id = int(request.GET.get('id')) if (request.GET.get('id') is not None) else None
         cd_invent = request.POST.get('cd_invent',None)
         pg_bene = int(request.POST.get('pg_bene')) if (request.POST.get('pg_bene_sub') is not None) else None
         pg_bene_sub = int(request.POST.get('pg_bene_sub')) if (request.POST.get('pg_bene_sub') is not None) else None
@@ -795,21 +804,40 @@ def ricognizioneInventarialeEditView(request,bene_id):
         if ubicazione_precisa:
             ubicazione_precisa = UbicazionePrecisa.objects.using('default').get(pk=ubicazione_precisa)
 
-        if ((cd_invent is not None) and (pg_bene is not None) and (pg_bene_sub is not None)):
-            RicognizioneInventariale.objects.using('default').create(
-                cd_invent = cd_invent,
-                pg_bene = pg_bene,
-                pg_bene_sub = pg_bene_sub,
-                ds_spazio = ds_spazio,
-                ubicazione_precisa = ubicazione_precisa,
-                ds_bene = ds_bene,
-                immagine = immagine
-            )
+        if (id is not None):
+            ri_bene = RicognizioneInventariale.objects.get(id=id)
+            ri_bene.cd_invent = cd_invent
+            ri_bene.pg_bene = pg_bene
+            ri_bene.pg_bene_sub = pg_bene_sub
+            ri_bene.ds_spazio = ds_spazio
+            ri_bene.ubicazione_precisa = ubicazione_precisa
+            ri_bene.ds_bene = ds_bene
+            ri_bene.immagine = immagine
+
+            ri_bene.save()
+
         else:
-            return HttpResponse("Not created")
+            return HttpResponse("Not Modified")
     
 
     return redirect ('ricinv')
+
+
+@login_required
+def ricognizioneInventarialeDeleteView(request):
+    if request.method == 'GET':
+        return render (request,'inventario/RicognizioneInventariale/delete.html')
+    if request.method == 'POST':
+        id = int(request.GET.get('id')) if (request.GET.get('id') is not None) else None
+        if (id is not None):
+            ri_bene = RicognizioneInventariale.objects.get(id=id)
+            ri_bene.delete();
+        else:
+            return HttpResponse("Not Deleted")
+        
+        return redirect ('ricinv')
+
+
 
 @login_required
 def showRicognizioniInventariali(request):
@@ -855,6 +883,7 @@ def getRicognizioniData(request):
 
         # counts the number of objects that match the query
         total = RicognizioneInventariale.objects.using('default').filter(\
+            Q(id__icontains= search) | \
             Q(cd_invent__icontains= search) | \
             Q(pg_bene__icontains= search) | \
             Q(pg_bene_sub__icontains= search) | \
@@ -865,6 +894,7 @@ def getRicognizioniData(request):
 
         # retrieve the objects that match the query
         rows = RicognizioneInventariale.objects.using('default').filter(\
+            Q(id__icontains= search) | \
             Q(cd_invent__icontains= search) | \
             Q(pg_bene__icontains= search) | \
             Q(pg_bene_sub__icontains= search) | \
@@ -887,6 +917,7 @@ def getRicognizioniData(request):
         # we get the id of the ubicazione_precisa because we need to display it instead of the text value (that will be matched with the list in the view)
         ubicazione_precisa = row.ubicazione_precisa.id if (row.ubicazione_precisa is not None) else None
         html = html + '{ \
+        "id": ' + json.dumps(row.id) + ', \
         "cd_invent": ' + json.dumps(row.cd_invent) + ', \
         "pg_bene": ' + json.dumps(str(row.pg_bene)) + ', \
         "pg_bene_sub": ' + json.dumps(str(row.pg_bene_sub)) + ', \

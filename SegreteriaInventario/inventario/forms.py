@@ -150,7 +150,7 @@ class AdvancedSearchForm(forms.Form):
 class RicognizioneInventarialeForm(forms.ModelForm):
     class Meta:
         model = RicognizioneInventariale
-        fields = ['cd_invent','pg_bene','pg_bene_sub','ds_spazio','ubicazione_precisa','ds_bene','immagine']
+        fields = ['id','cd_invent','pg_bene','pg_bene_sub','ds_spazio','ubicazione_precisa','ds_bene','immagine']
         widgets = {
             'ds_spazio' : Select(choices=[('','---------')] + [(item,item) for item in Bene.objects.using('default').values_list('ds_spazio', flat=True).distinct()]),
         }

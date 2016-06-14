@@ -120,6 +120,7 @@
 
         <div class="table-responsive">
                 <table id="table"
+                       data-locale="it-IT"
                        data-toolbar="#toolbar"
                        data-search="true"
                        data-show-refresh="false"
@@ -133,7 +134,7 @@
                        data-pagination="true"
                        data-id-field="id"
                        data-page-size="25"  
-                       data-page-list="[1, 10, 25, 50, 100, ALL]"
+                       data-page-list="[1, 10, 25, 50, 100, Tutto]"
                        data-show-footer="false"
                        data-side-pagination="server"
                        data-url="/inventario/table/getRicognizioniData"
@@ -143,23 +144,17 @@
         
         <!-- Create RecInv -->
         <div id="createRicInvModal" class="modal fade" role="dialog">
-                        {% include "inventario/RicognizioneInventariale/create.html" %}
+          {% include "inventario/RicognizioneInventariale/create.html" %}
         </div>
         <!-- Edit RecInv -->
         <div id="editRicInvModal" class="modal fade" role="dialog">
             <div class="modal-dialog">
-
-                <!-- Modal content-->
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <button type="button" class="close" data-dismiss="modal">&times;</button>
-                        <h4 class="modal-title">Modifica Ricognizione Inventariale</h4>
-                    </div>
-                    <div class="modal-body">
-                        <button type="button" class="btn btn-default" data-dismiss="modal">Chiudi</button>
-                    </div>
-                </div>
             </div>
+        </div>
+
+        <!-- Delete RecInv -->
+        <div id="deleteRicInvModal" class="modal fade" role="dialog">
+          {% include "inventario/RicognizioneInventariale/delete.html" %}
         </div>
 
         <!-- Advanced Search -->
@@ -268,8 +263,15 @@
                         align: 'center',
                         events: operateEvents,
                         formatter: operateFormatter
-                    }, 
+                    },                 
+
                 {
+                    field: 'id',
+                    title: 'ID',
+                    class: 'id',
+                    sortable: true,
+                    align: 'center'
+                }, {
                     field: 'cd_invent',
                     title: 'codice inventario',
                     class: 'cd_invent',
@@ -398,26 +400,66 @@
 
     window.operateEvents = {
         'click .Modify': function (e, value, row, index) {
-            alert(row.id);
-            //$('#id_id').val(row.id);
-            //editRicinv(row);
-            //$('#editRicInvModal').modal();
+            // get a populated form
+            editRicinv(row.id);
         },
         'click .Delete': function (e, value, row, index) {
+            deleteRicinv(row.id);
+            $('#deleteRicInvModal').modal();
         }
     };
 
     function editRicinv(id) {
-        url = '/ricinv/edit/' + id;
-        items = [];
+        url = '{% url "inventario.views.ricognizioneInventarialeEditView" %}' + "?id=" + id;
         $.ajax({ 
             type: 'GET', 
             url: url, 
             dataType: 'html',
             success: function (data) { 
                 $('#editRicInvModal').html(data);
+
+                // append the id to the form action
+                action = $('#ricinv_edit_form_id').attr('action');
+                action = action + "?id=" + id;
+                $('#ricinv_edit_form_id').attr('action', action);
+
+                // bind the click event of the button
+                var form = document.getElementById("ricinv_edit_form_id");
+
+                document.getElementById("edit_submit_btn_id").addEventListener("click", function () {
+                  form.submit();
+                });
+
+                // shows the form
+                $('#editRicInvModal').modal();
             }
         });
+    }
+
+    function deleteRicinv(id) {
+
+        url = '{% url "inventario.views.ricognizioneInventarialeDeleteView" %}' + "?id=" + id;
+        $.ajax({ 
+            type: 'GET', 
+            url: url, 
+            dataType: 'html',
+            success: function (data) { 
+                $('#deleteRicInvModal').html(data);
+
+                // append the id to the form action
+                action = $('#ricinv_delete_form_id').attr('action');
+                action = action + "?id=" + id;
+                $('#ricinv_delete_form_id').attr('action', action);
+
+                // bind the click event of the button
+                var form = document.getElementById("ricinv_delete_form_id");
+
+                document.getElementById("delete_submit_btn_id").addEventListener("click", function () {
+                  form.submit();
+                });
+            }
+        });
+
     }
 
     function getHeight() {
@@ -570,9 +612,9 @@
 
 <script type="text/javascript">
 window.addEventListener("DOMContentLoaded", function () {
-  var form = document.getElementById("ricinv_form_id");
+  var form = document.getElementById("ricinv_create_form_id");
 
-  document.getElementById("submit_btn_id").addEventListener("click", function () {
+  document.getElementById("create_submit_btn_id").addEventListener("click", function () {
     form.submit();
   });
 });
