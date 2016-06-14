@@ -368,7 +368,7 @@
                     },
                 {
                         field: 'operate',
-                        title: 'azioni',
+                        title: 'Azioni',
                         class: 'actions',
                         align: 'center',
                         events: operateEvents,
@@ -383,44 +383,44 @@
                     align: 'center'
                 }, {
                     field: 'cd_invent',
-                    title: 'codice inventario',
+                    title: 'Codice Inventario',
                     class: 'cd_invent',
                     sortable: true,
                     align: 'center'
                 }, {
                     field: 'pg_bene',
-                    title: 'numero inventario',
+                    title: 'Numero Inventario',
                     formatter: 'numeroInventarioFormatter',
                     sortable: true,
                     align: 'center'
                 }, {
                     field: 'ds_bene',
-                    title: 'descrizione bene',
+                    title: 'Descrizione Bene',
                     class: 'ds_bene',
                     sortable: true,
                     align: 'center'
                 }, {
                     field: 'cd_categ_gruppo',
-                    title: 'categoria',
+                    title: 'Categoria',
                     class: 'cd_categ_gruppo',
                     formatter: 'categoriaFormatter',
                     sortable: true,
                     align: 'center'
                 }, {
                     field: 'dt_registrazione_buono',
-                    title: 'data acquisto',
+                    title: 'Data Acquisto',
                     class: 'dt_registrazione_buono',
                     sortable: true,
                     align: 'center'
                 }, {
                     field: 'ds_spazio',
-                    title: 'ubicazione',
+                    title: 'Ubicazione',
                     class: 'ds_spazio',
                     sortable: true,
                     align: 'center'
                 }, {
                     field: 'ubicazione_precisa',
-                    title: 'Ubicazione precisa',
+                    title: 'Ubicazione Precisa',
                     class: 'ubicazione_precisa',
                     editable: {
                         type: 'select',
@@ -438,52 +438,54 @@
                     align: 'center'
                 }, {
                     field: 'dt_ini_ammortamento',
-                    title: 'data inizio ammortamento',
+                    title: 'Data Inizio Ammortamento',
                     class: 'dt_ini_ammortamento',
                     sortable: true,
                     align: 'center'
                 }, {
                     field: 'valore_convenzionale',
-                    title: 'valore convenzionale',
+                    title: 'Valore Convenzionale',
                     class: 'valore_convenzionale',
                     sortable: true,
                     align: 'center'
                 },{
                     field: 'nome_tipo_dg',
-                    title: 'tipo documento',
+                    title: 'Tipo Documento',
                     class: 'nome_tipo_dg',
                     sortable: true,
                     align: 'center'
                 },{
                     field: 'num_doc_rif',
-                    title: 'numero documento',
+                    title: 'Numero Documento',
                     class: 'num_doc_rif',
                     sortable: true,
                     align: 'center'
                 },{
                     field: 'num_registrazione',
-                    title: 'numero registrazione',
+                    title: 'Numero Registrazione',
                     class: 'num_registrazione',
                     sortable: true,
                     align: 'center'
                 },{
                     field: 'denominazione',
-                    title: 'fornitore',
+                    title: 'Fornitore',
                     class: 'denominazione',
                     sortable: true,
                     align: 'center'
                 },{
                     field: 'nome',
-                    title: 'nome',
+                    title: 'Nome',
                     class: 'nome',
                     sortable: true,
-                    align: 'center'
+                    align: 'center',
+                    formatter: possNameFormatter
                 },{
                     field: 'cognome',
-                    title: 'cognome',
+                    title: 'Cognome',
                     class: 'cognome',
                     sortable: true,
-                    align: 'center'
+                    align: 'center',
+                    formatter: possSurnameFormatter
                 },
                 ]
             ]
@@ -533,6 +535,7 @@
     function detailFormatter(index, row) {
         var html = [];
         $.each(row, function (key, value) {
+            console.log(key.title);
             // if we're displaying the accurate location we must match the id with the actual text value
             if (key == 'accurate_location') 
             {
@@ -547,6 +550,9 @@
                     html.push('<p><b>' + key + ':</b></p><p><img style="max-width:100px;max-height:100px" src="/inventario/media/' + value + '"></p>');
                 else
                     html.push('<p><b>' + key + ': </b><b class="text-left text-danger">Foto non disponibile</b></p>');
+            else if (key == 'nome' || key == 'cognome'){
+              html.push('<p><b>' + key + ':</b> ' + possNameFormatter(value, row, index) + '</p>');
+            }
             // we hide the state 
             else if (key == 'state'){}
             else
@@ -566,6 +572,16 @@
             '<i class="glyphicon glyphicon-qrcode"></i>',
             '</a>'
         ].join('');
+    }
+
+    function possNameFormatter(value, row, index) {
+      // console.log(value);
+      return value == "None" ? "Vuoto" : value;
+    }
+
+    function possSurnameFormatter(value, row, index) {
+      // console.log(value);
+      return value == "None" ? "Vuoto" : value;
     }
 
     window.operateEvents = {
