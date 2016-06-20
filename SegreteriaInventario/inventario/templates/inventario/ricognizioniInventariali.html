@@ -80,14 +80,14 @@
               <button type="button"
                       class="btn btn-default"
                       onClick="showNewAccLocationDiv()"
-                      title="Nuova posizione"
+                      title="Nuovo locale"
                       >
                 <span class="glyphicon glyphicon-map-marker" aria-hidden="true"></span>
               </button>
             </div>
             <div id="newAccLocationDiv" class="btn-group" role="group" style="display:none">
                 <div class="btn-group" role="group">
-                    <input type="text" class="form-control" id="newAccLocationText" placeholder="Nuova posizione...">
+                    <input type="text" class="form-control" id="newAccLocationText" placeholder="Nuovo locale...">
                 </div>
                 <div class="btn-group" role="group">
                   <button type="button"
@@ -305,7 +305,7 @@
                         type: 'select',
                         inputclass: 'accurate-location-select',
                         source: AccurateLocationsList,
-                        title: 'Posizione Precisa',
+                        title: 'Nuovo Locale',
                         validate: function (value) {
                             value = $.trim(value);
                             if (!value) return 'This field is required';
@@ -581,7 +581,7 @@
             url: '/inventario/table/editable/addAccurateLocation',
             data: ({ nuovaUbicazione : nuovaUbicazione, csrfmiddlewaretoken:'{{csrf_token}}' }),
             success: function(result) {
-                // alert('Nuova posizione aggiunta');
+                // alert('Nuovo locale aggiunto');
                 location.reload();
                 // $('#table').bootstrapTable('refresh');
             },

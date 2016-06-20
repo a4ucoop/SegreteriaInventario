@@ -104,14 +104,14 @@
               <button type="button"
                       class="btn btn-default"
                       onClick="showNewAccLocationDiv()"
-                      title="Nuova posizione"
+                      title="Nuovo locale"
                       >
                 <span class="glyphicon glyphicon-map-marker" aria-hidden="true"></span>
               </button>
             </div>
             <div id="newAccLocationDiv" class="btn-group" role="group" style="display:none">
                 <div class="btn-group" role="group">
-                    <input type="text" class="form-control" id="newAccLocationText" placeholder="Nuova posizione...">
+                    <input type="text" class="form-control" id="newAccLocationText" placeholder="Nuovo locale...">
                 </div>
                 <div class="btn-group" role="group">
                   <button type="button"
@@ -416,19 +416,19 @@
                     align: 'center'
                 }, {
                     field: 'ds_spazio',
-                    title: 'ubicazione',
+                    title: 'edificio',
                     class: 'ds_spazio',
                     sortable: true,
                     align: 'center'
                 }, {
                     field: 'ubicazione_precisa',
-                    title: 'Ubicazione precisa',
+                    title: 'locale',
                     class: 'ubicazione_precisa',
                     editable: {
                         type: 'select',
                         inputclass: 'accurate-location-select',
                         source: AccurateLocationsList,
-                        title: 'Posizione Precisa',
+                        title: 'Nuovo Locale',
                         validate: function (value) {
                             value = $.trim(value);
                             if (!value) return 'This field is required';
