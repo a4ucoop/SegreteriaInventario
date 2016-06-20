@@ -2,6 +2,7 @@
 {% load staticfiles %}
 {% load widget_tweaks %}
 {% load i18n %}
+{% load custom_filters %}
 
 {% block stylesheets %}
 
@@ -183,7 +184,7 @@
                                 <div class="col-xs-12" style="padding-left:1%;padding-right:1%">
                                 <ul class="list-group row">
                                 {% for c in asform.codice_inventario %}
-                                <li class="list-group-item col-xs-3">{{ c }}</li>
+                                <li class="list-group-item col-xs-3" title="{{lista_codici | get_item:c.choice_label}}">{{ c }}</li>
                                 {% endfor %}
                                 </ul></div></div>
                                 <!-- numero inventario -->

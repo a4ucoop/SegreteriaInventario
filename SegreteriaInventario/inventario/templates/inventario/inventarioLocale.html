@@ -2,6 +2,7 @@
 {% load staticfiles %}
 {% load widget_tweaks %}
 {% load i18n %}
+{% load custom_filters %}
 
 {% block stylesheets %}
 
@@ -230,7 +231,7 @@
                                 <div class="col-xs-12" style="padding-left:1%;padding-right:1%">
                                 <ul class="list-group row">
                                 {% for c in asform.codice_inventario %}
-                                <li class="list-group-item col-xs-3" title="prova">{{ c }}</li>
+                                <li class="list-group-item col-xs-3" title="{{lista_codici | get_item:c.choice_label}}">{{ c }}</li>
                                 {% endfor %}
                                 </ul></div></div>
                                 <!-- numero inventario -->
@@ -385,6 +386,7 @@
                     field: 'cd_invent',
                     title: 'codice inventario',
                     class: 'cd_invent',
+                    formatter: 'cdinventFormatter',
                     sortable: true,
                     align: 'center'
                 }, {
@@ -597,6 +599,11 @@
     function categoriaFormatter(value, row) {
         // return "<a href='/inventario/show/" + row.id + "'>" + value + "</a>";
         return row.cd_categ_gruppo + " - " + row.ds_categ_gruppo;
+    }
+
+    function cdinventFormatter(value, row) {
+        // return "<a href='/inventario/show/" + row.id + "'>" + value + "</a>";
+        return row.cd_invent + " - " + row.ds_invent;
     }
 
     $(function () {

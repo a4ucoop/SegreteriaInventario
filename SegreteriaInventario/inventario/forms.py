@@ -16,16 +16,16 @@ class PictureForm(forms.Form):
     id_bene = forms.IntegerField(widget=forms.HiddenInput())
 
 # ricavo tutti i codici degli inventari
-codici_inventario = Bene.objects.using('default').values_list('cd_invent', flat=True).distinct()
+codici_inventario = Bene.objects.using('default').values_list('cd_invent', 'ds_invent').distinct()
 codici_inventario = filter(None, codici_inventario)
 lista_codici = []
 # metto i codici in una lista
 for c in codici_inventario:
 	lista_codici.append(
-		(c, c)
+		(c[0],c[0])
 	)
 # li converto in tupla per passarli alla form
-codici_inventario = tuple(lista_codici)
+codici_inventario = lista_codici
 
 # ricavo tutte le categorie inventariali
 categorie_inventariali = Bene.objects.using('default').values_list('ds_categ_gruppo', flat=True).distinct()
@@ -153,6 +153,7 @@ class RicognizioneInventarialeForm(forms.ModelForm):
         fields = ['id','cd_invent','pg_bene','pg_bene_sub','ds_spazio','ubicazione_precisa','ds_bene','immagine']
         widgets = {
             'ds_spazio' : Select(choices=[('','---------')] + [(item,item) for item in Bene.objects.using('default').values_list('ds_spazio', flat=True).distinct()]),
+            'cd_invent' : Select(choices=[('','---------')] + [(item[0], item[0] + " - " + item[1] ) for item in Bene.objects.using('default').values_list('cd_invent', 'ds_invent').distinct()]),
         }
 
 
