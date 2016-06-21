@@ -1,0 +1,29 @@
+{% load widget_tweaks %}
+<div class="modal-dialog">
+
+    <!-- Modal content-->
+    <div class="modal-content">
+        <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal">&times;</button>
+            <h4 class="modal-title">
+                {% block modal-title %}
+                Rimuovi Ricognizione Inventariale
+                {% endblock %}
+            </h4>
+        </div>
+        <div class="modal-body">
+            {% block form-header %}
+            <form name="ricinv_form" id="ricinv_delete_form_id" method="POST" action="{% url "inventario.views.ricognizioneInventarialeDeleteView" %}">    
+                {% endblock %}                        
+                {% csrf_token %}
+                Sei sicuro di voler continuare?
+            </form>
+        </div>
+        <div class="modal-footer">
+            {% block submit-button %}
+            <input id="delete_submit_btn_id" type="submit" class="btn btn-danger" value="Elimina"/>
+            {% endblock %}
+            <button type="button" class="btn btn-default" data-dismiss="modal">Annulla</button>
+        </div>
+    </div>
+</div>
