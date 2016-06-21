@@ -1,10 +1,10 @@
-Hai richiestodi registrare un account per il sito {{ site.name }}.  
+Cariss.mo/a {{user_first_name|capfirst}} {{user_last_name|capfirst}},
 
-Se non hai fatto nessuna richiesta di registrazione, semplicemente ignora questo 
-messaggio e il tuo indirizzo verrà rimosso dai nostri _____.
+hai richiesto di registrare un account per il sito {{ site.name }}.  
 
-Per attivare il tuo account, clicca sul seguente link entro {{ expiration_days }} giorni
-dalla ricezione di questa email:
+Se non hai fatto nessuna richiesta di registrazione, semplicemente ignora questo messaggio e il tuo indirizzo verrà rimosso dalle nostre banche dati.
+
+Per attivare il tuo account, clicca sul seguente link entro {{ expiration_days }} giorni dalla ricezione di questa email:
 
 http://{{site.domain}}/accounts/activate/{{ activation_key }}
 
