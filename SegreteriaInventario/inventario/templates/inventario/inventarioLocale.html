@@ -474,21 +474,30 @@
                     class: 'denominazione',
                     sortable: true,
                     align: 'center'
-                },{
-                    field: 'nome',
-                    title: 'Nome',
-                    class: 'nome',
+                }, {
+                    field: 'possessore',
+                    title: 'Possessore',
+                    class: 'possessore',
+                    formatter: 'possessoreFormatter',
                     sortable: true,
-                    align: 'center',
-                    formatter: possNameFormatter
-                },{
-                    field: 'cognome',
-                    title: 'Cognome',
-                    class: 'cognome',
-                    sortable: true,
-                    align: 'center',
-                    formatter: possSurnameFormatter
-                },
+                    align: 'center'
+                }
+
+                // ,{
+                //     field: 'nome',
+                //     title: 'Nome',
+                //     class: 'nome',
+                //     sortable: true,
+                //     align: 'center',
+                //     formatter: possNameFormatter
+                // },{
+                //     field: 'cognome',
+                //     title: 'Cognome',
+                //     class: 'cognome',
+                //     sortable: true,
+                //     align: 'center',
+                //     formatter: possSurnameFormatter
+                // },
                 ]
             ]
         });
@@ -576,16 +585,6 @@
         ].join('');
     }
 
-    function possNameFormatter(value, row, index) {
-      // console.log(value);
-      return value == "None" ? "Vuoto" : value;
-    }
-
-    function possSurnameFormatter(value, row, index) {
-      // console.log(value);
-      return value == "None" ? "Vuoto" : value;
-    }
-
     window.operateEvents = {
         'click .Picture': function (e, value, row, index) {
             $('#id_id_bene').val(row.id_bene);
@@ -620,6 +619,14 @@
     function cdinventFormatter(value, row) {
         // return "<a href='/inventario/show/" + row.id + "'>" + value + "</a>";
         return row.cd_invent + " - " + row.ds_invent;
+    }
+
+    function possessoreFormatter(value, row) {
+        // return "<a href='/inventario/show/" + row.id + "'>" + value + "</a>";
+        if (row.nome == "" && row.cognome == "")
+          return "Vuoto";
+        else
+          return row.nome + " " + row.cognome;
     }
 
     $(function () {

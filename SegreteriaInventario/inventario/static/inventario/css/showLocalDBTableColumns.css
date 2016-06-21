@@ -12,6 +12,11 @@
     word-wrap: break-word !important;
 }
 
+.cd_invent {
+    min-width:500px !important;
+    word-wrap: break-word !important;
+}
+
 .ds_bene {
     min-width:500px !important;
     word-wrap: break-word !important;
@@ -24,6 +29,21 @@
 
 .ds_spazio{
     min-width:500px !important;
+    word-wrap: break-word !important;
+}
+
+.ubicazione_precisa{
+    min-width:300px !important;
+    word-wrap: break-word !important;
+}
+
+.denominazione {
+    min-width:300px !important;
+    word-wrap: break-word !important;
+}
+
+.possessore {
+    min-width:300px !important;
     word-wrap: break-word !important;
 }
 
