@@ -73,31 +73,26 @@
                     }
                 });
 
-                $menu.find('li').click(function () {
-                    var type = $(this).data('type'),
-                        doExport = function () {
-                            that.$el.tableExport($.extend({}, that.options.exportOptions, {
-                                type: type,
-                                escape: false
-                            }));
-                        };
-
-                    if (that.options.exportDataType === 'all' && that.options.pagination) {
-                        that.$el.one('load-success.bs.table page-change.bs.table', function () {
-                            doExport();
-                            that.togglePagination();
-                        });
-                        that.togglePagination();
-                    } else if (that.options.exportDataType === 'selected') {
-                        var data = that.getData(),
-                            selectedData = that.getAllSelections();
-
-                        that.load(selectedData);
+                $menu.find('li').click(function( event ) {
+                    // turn off the pagination in order to export all the items
+                    $('#table').bootstrapTable('togglePagination');
+                    // waits for the results to be loaded in the table
+                    $('#table').on('load-success.bs.table', function() {
+                        var type = $(this).data('type'),
+                            doExport = function () {
+                                that.$el.tableExport($.extend({}, that.options.exportOptions, {
+                                    type: type,
+                                    escape: false
+                                }));
+                            };
+                        // exports the table contents
                         doExport();
-                        that.load(data);
-                    } else {
-                        doExport();
-                    }
+                        // unbind the load events in order to prevent the pagination 
+                        // toggle to re-trigger a new export
+                        $('#table').unbind( 'load-success.bs.table' );
+                        // reset the pagination
+                        $('#table').bootstrapTable('togglePagination');
+                    });
                 });
             }
         }

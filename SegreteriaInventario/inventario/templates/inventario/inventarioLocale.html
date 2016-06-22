@@ -748,16 +748,6 @@
 <!-- script to manage the advanced search -->
 <script type="text/javascript" src="{% static 'inventario/js/inventarioLocale/AdvancedSearch.js'%}"></script>
 <!-- script to manage the table export -->
-<script>
-    var $table = $('#table');
-    $(function () {
-        $('#toolbar').find('select').change(function () {
-            $table.bootstrapTable('destroy').bootstrapTable({
-                exportDataType: $(this).val()
-            });
-        });
-    })
-</script>
 
 <script type="text/javascript">
 $( document ).ready(function() {

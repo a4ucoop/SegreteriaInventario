@@ -535,12 +535,12 @@ def getData(request):
         "ubicazione_precisa": ' + json.dumps(str(row.ubicazione_precisa_id)) + ', \
         "dt_ini_ammortamento": ' + json.dumps(str(row.dt_ini_ammortamento.date()) if row.dt_ini_ammortamento is not None else "") + ', \
         "valore_convenzionale": ' + json.dumps(str(row.valore_convenzionale)) + ', \
-        "nome_tipo_dg" : ' + json.dumps(str(row.nome_tipo_dg)) + ', \
-        "num_doc_rif" : ' + json.dumps(str(row.num_doc_rif)) + ', \
+        "nome_tipo_dg" : ' + json.dumps(row.nome_tipo_dg) + ', \
+        "num_doc_rif" : ' + json.dumps(row.num_doc_rif) + ', \
         "num_registrazione" : ' + json.dumps(str(row.num_registrazione)) + ', \
-        "denominazione" : ' + json.dumps(str(row.denominazione)) + ', \
-        "nome" : ' + json.dumps(str(row.nome)) + ', \
-        "cognome" : ' + json.dumps(str(row.cognome)) + ', \
+        "denominazione" : ' + json.dumps(row.denominazione) + ', \
+        "nome" : ' + json.dumps(row.nome) + ', \
+        "cognome" : ' + json.dumps(row.cognome) + ', \
         "immagine": ' + json.dumps(str(row.immagine)) + \
         ' }, '
 
@@ -748,12 +748,12 @@ def advancedSearch(request):
             "ubicazione_precisa": ' + json.dumps(str(row.ubicazione_precisa_id)) + ', \
             "dt_ini_ammortamento": ' + json.dumps(str(row.dt_ini_ammortamento.date()) if row.dt_ini_ammortamento is not None else "") + ', \
             "valore_convenzionale": ' + json.dumps(str(row.valore_convenzionale)) + ', \
-            "nome_tipo_dg" : ' + json.dumps(str(row.nome_tipo_dg)) + ', \
-            "num_doc_rif" : ' + json.dumps(str(row.num_doc_rif)) + ', \
+            "nome_tipo_dg" : ' + json.dumps(row.nome_tipo_dg) + ', \
+            "num_doc_rif" : ' + json.dumps(row.num_doc_rif) + ', \
             "num_registrazione" : ' + json.dumps(str(row.num_registrazione)) + ', \
-            "denominazione" : ' + json.dumps(str(row.denominazione)) + ', \
-            "nome" : ' + json.dumps(str(row.nome)) + ', \
-            "cognome" : ' + json.dumps(str(row.cognome)) + ', \
+            "denominazione" : ' + json.dumps(row.denominazione) + ', \
+            "nome" : ' + json.dumps(row.nome) + ', \
+            "cognome" : ' + json.dumps(row.cognome) + ', \
             "immagine": ' + json.dumps(str(row.immagine)) + \
             ' }, '
 
