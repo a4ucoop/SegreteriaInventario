@@ -36,8 +36,10 @@ function advancedSearchRicInv(argument) {
     var ubicazione = document.forms["advancedRicognizioneInventarialeSearchForm"]["ubicazione"].value;
     var ubicazione_precisa = document.forms["advancedRicognizioneInventarialeSearchForm"]["ubicazione_precisa"].value;
 
-    if((min_id != null && min_id != "") &&  (max_id != null && max_id != "")) 
-      query += "min_id=" + min_id + "&max_id=" + max_id + "&";
+    if(min_id != null && min_id != "")
+      query += "min_id=" + min_id + "&";
+     if(max_id != null && max_id != "")
+      query += "max_id=" + max_id + "&";
     if(codici_inventario_selezionati != null && codici_inventario_selezionati.length > 0){
       // cis = codici inventario selezionati
       for (var i = 0; i < codici_inventario_selezionati.length; i++) {
@@ -45,8 +47,10 @@ function advancedSearchRicInv(argument) {
       }
     } 
 
-    if((min_pg_bene != null && min_pg_bene != "") && (max_pg_bene != null && max_pg_bene != ""))
-      query += "min_pg_bene=" + min_pg_bene + "&max_pg_bene=" + max_pg_bene + "&";
+    if(min_pg_bene != null && min_pg_bene != "") 
+      query += "min_pg_bene=" + min_pg_bene + "&";
+    if(max_pg_bene != null && max_pg_bene != "")
+      query += "max_pg_bene=" + max_pg_bene + "&";
     if(ds_bene != null && ds_bene != "") query += "ds_bene=" + ds_bene + "&";
     if(categorie_inventariali_selezionate != null && categorie_inventariali_selezionate.length > 0){
       for (var i = 0; i < categorie_inventariali_selezionate.length; i++) {

@@ -627,27 +627,29 @@ def advancedSearch(request):
         if (not user.is_authenticated):
             return redirect('showLocalDB')
 
-        min_id_bene = int(request.GET.get('min_id_bene')) if (request.GET.get('min_id_bene') is not None) else None
-        max_id_bene = int(request.GET.get('max_id_bene')) if (request.GET.get('max_id_bene') is not None) else None
+        beni = Bene.objects.using('default')
+
+        min_id_bene = int(request.GET.get('min_id_bene')) if (request.GET.get('min_id_bene') is not None) else beni.order_by("id").first().id_bene 
+        max_id_bene = int(request.GET.get('max_id_bene')) if (request.GET.get('max_id_bene') is not None) else beni.order_by("-id").first().id_bene
         cods = request.GET.getlist('cods')
-        min_pg_bene = int(request.GET.get('min_pg_bene')) if (request.GET.get('min_pg_bene') is not None) else None
-        max_pg_bene = int(request.GET.get('max_pg_bene')) if (request.GET.get('max_pg_bene') is not None) else None
+        min_pg_bene = int(request.GET.get('min_pg_bene')) if (request.GET.get('min_pg_bene') is not None) else beni.order_by("pg_bene").first().pg_bene
+        max_pg_bene = int(request.GET.get('max_pg_bene')) if (request.GET.get('max_pg_bene') is not None) else beni.order_by("-pg_bene").first().pg_bene
         ds_bene = request.GET.get('ds_bene')
         # da controllare il formato della data!
-        from_dt_acquisto = datetime.datetime.strptime(request.GET.get('from_dt_acquisto'), "%d/%m/%Y") if (request.GET.get('from_dt_acquisto') is not None) else None
-        to_dt_acquisto = datetime.datetime.strptime(request.GET.get('to_dt_acquisto'), "%d/%m/%Y") if (request.GET.get('to_dt_acquisto') is not None) else None
+        from_dt_acquisto = datetime.datetime.strptime(request.GET.get('from_dt_acquisto'), "%d/%m/%Y") if (request.GET.get('from_dt_acquisto') is not None) else beni.order_by("dt_registrazione_buono").first().dt_registrazione_buono
+        to_dt_acquisto = datetime.datetime.strptime(request.GET.get('to_dt_acquisto'), "%d/%m/%Y") if (request.GET.get('to_dt_acquisto') is not None) else beni.order_by("-dt_registrazione_buono").first().dt_registrazione_buono
         categ = request.GET.getlist('categ')
         ubicazione = request.GET.get('ubicazione')
         ubicazione_precisa = request.GET.get('ubicazione_precisa')
         # da controllare il formato della data!
-        from_dt_ini_ammortamento = datetime.datetime.strptime(request.GET.get('from_dt_ini_ammortamento'), "%d/%m/%Y") if (request.GET.get('from_dt_ini_ammortamento') is not None) else None
-        to_dt_ini_ammortamento = datetime.datetime.strptime(request.GET.get('to_dt_ini_ammortamento'), "%d/%m/%Y") if (request.GET.get('to_dt_ini_ammortamento') is not None) else None
-        min_valore_convenzionale = int(request.GET.get('min_valore_convenzionale')) if (request.GET.get('min_valore_convenzionale') is not None) else None
-        max_valore_convenzionale = int(request.GET.get('max_valore_convenzionale')) if (request.GET.get('max_valore_convenzionale') is not None) else None
+        from_dt_ini_ammortamento = datetime.datetime.strptime(request.GET.get('from_dt_ini_ammortamento'), "%d/%m/%Y") if (request.GET.get('from_dt_ini_ammortamento') is not None) else beni.order_by("dt_ini_ammortamento").first().dt_ini_ammortamento
+        to_dt_ini_ammortamento = datetime.datetime.strptime(request.GET.get('to_dt_ini_ammortamento'), "%d/%m/%Y") if (request.GET.get('to_dt_ini_ammortamento') is not None) else beni.order_by("-dt_ini_ammortamento").first().dt_ini_ammortamento
+        min_valore_convenzionale = int(request.GET.get('min_valore_convenzionale')) if (request.GET.get('min_valore_convenzionale') is not None) else beni.order_by("valore_convenzionale").first().valore_convenzionale
+        max_valore_convenzionale = int(request.GET.get('max_valore_convenzionale')) if (request.GET.get('max_valore_convenzionale') is not None) else beni.order_by("-valore_convenzionale").first().valore_convenzionale
         nome_tipo_dg = request.GET.get('nome_tipo_dg') 
         num_doc_rif = request.GET.get('num_doc_rif')
-        min_num_registrazione = int(request.GET.get('min_num_registrazione')) if (request.GET.get('min_num_registrazione') is not None) else None
-        max_num_registrazione = int(request.GET.get('max_num_registrazione')) if (request.GET.get('max_num_registrazione') is not None) else None
+        min_num_registrazione = int(request.GET.get('min_num_registrazione')) if (request.GET.get('min_num_registrazione') is not None) else beni.order_by("num_registrazione").first().num_registrazione
+        max_num_registrazione = int(request.GET.get('max_num_registrazione')) if (request.GET.get('max_num_registrazione') is not None) else beni.order_by("-num_registrazione").first().num_registrazione
         denominazione = request.GET.get('denominazione')
         nome = request.GET.get('nome')
         cognome = request.GET.get('cognome')
@@ -700,17 +702,17 @@ def advancedSearch(request):
         
         #WAS: rows = Bene.objects.using('default').all()
         # filter id range
-        if (min_id_bene is not None and max_id_bene is not None):
-            rows = rows.filter(id_bene__range=(min_id_bene, max_id_bene))
+        #WAS: if (min_id_bene is not None and max_id_bene is not None):
+        rows = rows.filter(id_bene__range=(min_id_bene, max_id_bene))
         # filter inventory code in selection list
         if (cods is not None and cods):
             rows = rows.filter(cd_invent__in=cods)
-        if (min_pg_bene is not None and max_pg_bene is not None):
-            rows = rows.filter(pg_bene__range=(min_pg_bene, max_pg_bene))
+        #WAS: if (min_pg_bene is not None and max_pg_bene is not None):
+        rows = rows.filter(pg_bene__range=(min_pg_bene, max_pg_bene))
         if (ds_bene is not None):
             rows = rows.filter(ds_bene__icontains=ds_bene)
-        if (from_dt_acquisto is not None and to_dt_acquisto is not None):
-            rows = rows.filter(dt_registrazione_buono__range=(from_dt_acquisto, to_dt_acquisto))
+        #WAS: if (from_dt_acquisto is not None and to_dt_acquisto is not None):
+        rows = rows.filter(dt_registrazione_buono__range=(from_dt_acquisto, to_dt_acquisto))
         if (categ is not None and categ):
             rows = rows.filter(ds_categ_gruppo__in=categ)
         if (ubicazione is not None):
@@ -719,16 +721,16 @@ def advancedSearch(request):
             rows = rows.filter(ds_spazio__icontains=ubicazione)
         if (ubicazione_precisa is not None):
             rows = rows.filter(ubicazione_precisa__ubicazione__icontains=ubicazione_precisa)
-        if (from_dt_ini_ammortamento is not None and to_dt_ini_ammortamento is not None):
-            rows = rows.filter(dt_ini_ammortamento__range=(from_dt_ini_ammortamento, to_dt_ini_ammortamento))
-        if (min_valore_convenzionale is not None and max_valore_convenzionale is not None):
-            rows = rows.filter(valore_convenzionale__range=(min_valore_convenzionale, max_valore_convenzionale))
+        #WAS: if (from_dt_ini_ammortamento is not None and to_dt_ini_ammortamento is not None):
+        rows = rows.filter(dt_ini_ammortamento__range=(from_dt_ini_ammortamento, to_dt_ini_ammortamento))
+        #WAS: if (min_valore_convenzionale is not None and max_valore_convenzionale is not None):
+        rows = rows.filter(valore_convenzionale__range=(min_valore_convenzionale, max_valore_convenzionale))
         if (nome_tipo_dg is not None):
             rows = rows.filter(nome_tipo_dg__icontains=nome_tipo_dg)
         if (num_doc_rif is not None):
             rows = rows.filter(num_doc_rif__icontains=num_doc_rif)
-        if (min_num_registrazione is not None and max_num_registrazione is not None):
-            rows = rows.filter(num_registrazione__range=(min_num_registrazione, max_num_registrazione))
+        #WAS: if (min_num_registrazione is not None and max_num_registrazione is not None):
+        rows = rows.filter(num_registrazione__range=(min_num_registrazione, max_num_registrazione))
         if (denominazione is not None):
             rows = rows.filter(denominazione__icontains=denominazione)
         if (nome is not None):
@@ -737,8 +739,14 @@ def advancedSearch(request):
             rows = rows.filter(cognome__icontains=cognome)
 
         total = rows.count();
-        rows = rows.order_by(order)[offset:offset + limit]
+        #WAS: rows = rows.order_by(order)[offset:offset + limit]
 
+        if order == 'possessore':
+            rows = rows.order_by(*sorts('nome','cognome'))[offset:offset + limit]
+        elif order == '-possessore':
+            rows = rows.order_by(*sorts('-nome','-cognome'))[offset:offset + limit]
+        else:
+            rows = rows.order_by(order)[offset:offset + limit]
 
 
         # we construct the JSON response, we use json.dumps() to excape undesired characters
@@ -1009,11 +1017,14 @@ def getRicognizioniData(request):
 @login_required
 def advancedRicognizioneInventarialeSearch(request):
     if request.method == 'GET':
-        min_id = int(request.GET.get('min_id')) if (request.GET.get('min_id') is not None) else None
-        max_id = int(request.GET.get('max_id')) if (request.GET.get('max_id') is not None) else None
+
+        ricinv = RicognizioneInventariale.objects.using('default')
+
+        min_id = int(request.GET.get('min_id')) if (request.GET.get('min_id') is not None) else ricinv.order_by("id").first().id
+        max_id = int(request.GET.get('max_id')) if (request.GET.get('max_id') is not None) else ricinv.order_by("-id").first().id 
         cods = request.GET.getlist('cods')
-        min_pg_bene = int(request.GET.get('min_pg_bene')) if (request.GET.get('min_pg_bene') is not None) else None
-        max_pg_bene = int(request.GET.get('max_pg_bene')) if (request.GET.get('max_pg_bene') is not None) else None
+        min_pg_bene = int(request.GET.get('min_pg_bene')) if (request.GET.get('min_pg_bene') is not None) else ricinv.order_by("pg_bene").first().pg_bene 
+        max_pg_bene = int(request.GET.get('max_pg_bene')) if (request.GET.get('max_pg_bene') is not None) else ricinv.order_by("-pg_bene").first().pg_bene 
         ds_bene = request.GET.get('ds_bene')
         ubicazione = request.GET.get('ubicazione')
         ubicazione_precisa = request.GET.get('ubicazione_precisa')
@@ -1038,12 +1049,12 @@ def advancedRicognizioneInventarialeSearch(request):
         
         rows = RicognizioneInventariale.objects.using('default').all()
         # filter id range
-        if (min_id is not None and max_id is not None):
-            rows = rows.filter(id__range=(min_id, max_id))
+        #WAS: if (min_id is not None and max_id is not None):
+        rows = rows.filter(id__range=(min_id, max_id))
         if (cods is not None and cods):
             rows = rows.filter(cd_invent__in=cods)
-        if (min_pg_bene is not None and max_pg_bene is not None):
-            rows = rows.filter(pg_bene__range=(min_pg_bene, max_pg_bene))
+        #WAS: if (min_pg_bene is not None and max_pg_bene is not None):
+        rows = rows.filter(pg_bene__range=(min_pg_bene, max_pg_bene))
         if (ds_bene is not None):
             rows = rows.filter(ds_bene__icontains=ds_bene)
         if (ubicazione is not None):
