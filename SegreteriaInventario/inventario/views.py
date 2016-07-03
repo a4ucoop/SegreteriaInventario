@@ -414,6 +414,13 @@ def showSingleItem(request, remote_id):
     }
     return render (request, 'inventario/beneSingolo.html', context)
 
+def sorts(*args):
+    if len(args):
+        sort = [args[0]]
+        for arg in args[1:]:
+            sort.append(arg)
+    return sort
+
 @login_required
 def getData(request):
 
@@ -496,25 +503,30 @@ def getData(request):
             Q(denominazione__icontains= search) |\
             Q(nome__icontains= search) | \
             Q(cognome__icontains= search) \
-            ).order_by(order)[offset:offset + limit]
+            )
+        if order == 'possessore':
+            rows = rows.order_by(*sorts('nome','cognome'))[offset:offset + limit]
+        elif order == '-possessore':
+            rows = rows.order_by(*sorts('-nome','-cognome'))[offset:offset + limit]
+        else:
+            rows = rows.order_by(order)[offset:offset + limit]
 
     else:
 
-        # counts the number of objects
+        #getting and counting the objects
         if(user_first_name and user_last_name and not user.is_superuser):
-            total = Bene.objects.using('default').filter(
-                nome=user_first_name.lower(),cognome=user_last_name.lower()
-                ).count()
+            rows = Bene.objects.using('default').filter(nome=user_first_name.lower(),cognome=user_last_name.lower())
         else:
-            total = Bene.objects.using('default').all().count()
+            rows = Bene.objects.using('default').all()
+        
+        total = rows.count()
 
-        # retrieve the objects
-        if(user_first_name and user_last_name and not user.is_superuser):
-            rows = Bene.objects.using('default').filter(
-                nome=user_first_name.lower(),cognome=user_last_name.lower()
-                ).order_by(order)[offset:offset + limit]
+        if order == 'possessore':
+            rows = rows.order_by(*sorts('nome','cognome'))[offset:offset + limit]
+        elif order == '-possessore':
+            rows = rows.order_by(*sorts('-nome','-cognome'))[offset:offset + limit]
         else:
-            rows = Bene.objects.using('default').all().order_by(order)[offset:offset + limit]
+            rows = rows.order_by(order)[offset:offset + limit]
     
     # we construct the JSON response, we use json.dumps() to excape undesired characters
     html = '{ "total": ' + json.dumps(str(total)) + ', "rows": [ '

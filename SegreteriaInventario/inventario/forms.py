@@ -85,12 +85,12 @@ class AdvancedSearchForm(forms.Form):
     )
 	ubicazione = forms.CharField(		
 		required=False,
-		label='ubicazione', 
+		label='edificio', 
 		max_length=None
 	)
 	ubicazione_precisa = forms.CharField(		
 		required=False,
-		label='ubicazione precisa', 
+		label='locale', 
 		max_length=None
 	)
 	from_dt_ini_ammortamento = forms.DateField(		
@@ -151,6 +151,14 @@ class RicognizioneInventarialeForm(forms.ModelForm):
     class Meta:
         model = RicognizioneInventariale
         fields = ['id','cd_invent','pg_bene','pg_bene_sub','ds_spazio','ubicazione_precisa','ds_bene','immagine']
+        labels = {
+            'cd_invent': 'Codice Inventario',
+            'pg_bene': 'Numero Inventario',
+            'pg_bene_sub': 'Numero Bene Collegato',
+            'ds_spazio': 'Edificio',
+            'ubicazione_precisa': 'Locale',
+            'ds_bene': 'Note',
+        }
         widgets = {
             'ds_spazio' : Select(choices=[('','---------')] + [(item,item) for item in Bene.objects.using('default').values_list('ds_spazio', flat=True).distinct()]),
             'cd_invent' : Select(choices=[('','---------')] + [(item[0], item[0] + " - " + item[1] ) for item in Bene.objects.using('default').values_list('cd_invent', 'ds_invent').distinct()]),
@@ -190,11 +198,11 @@ class AdvancedSearchRicognizioneInventarialeForm(forms.Form):
 	)
 	ubicazione = forms.CharField(		
 		required=False,
-		label='ubicazione', 
+		label='edificio', 
 		max_length=None
 	)
 	ubicazione_precisa = forms.CharField(		
 		required=False,
-		label='ubicazione precisa', 
+		label='locale', 
 		max_length=None
 	)
