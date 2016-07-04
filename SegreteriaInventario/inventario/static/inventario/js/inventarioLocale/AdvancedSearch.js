@@ -49,6 +49,8 @@ function advancedSearch (argument) {
     var min_num_registrazione = document.forms["advancedSearchForm"]["min_num_registrazione"].value;
     var max_num_registrazione = document.forms["advancedSearchForm"]["max_num_registrazione"].value;
 
+    var dt_registrazione_dg = document.forms["advancedSearchForm"]["dt_registrazione_dg"].value;
+
     var denominazione = document.forms["advancedSearchForm"]["denominazione"].value;
 
     var nome = document.forms["advancedSearchForm"]["nome"].value;
@@ -97,6 +99,8 @@ function advancedSearch (argument) {
     if(max_num_registrazione != null && max_num_registrazione != "")
       query += "max_num_registrazione=" + max_num_registrazione + "&";
     if(denominazione != null && denominazione != "") query += "denominazione=" + denominazione + "&";
+    if(dt_registrazione_dg != null && dt_registrazione_dg != "")
+      query += "dt_registrazione_dg=" + dt_registrazione_dg + "&";
     if(nome != null && nome != "") query += "nome=" + nome + "&";
     if(cognome != null && cognome != "") query += "cognome=" + cognome + "&";
     $('#table').bootstrapTable('refresh', {url: query});

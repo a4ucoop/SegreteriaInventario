@@ -131,6 +131,11 @@ class AdvancedSearchForm(forms.Form):
 		label='numero registrazione massmo', 
 		min_value=0
 	)
+	dt_registrazione_dg = forms.IntegerField(		
+		required=False,
+		label='Anno di registrazione del documento', 
+		min_value=0
+	)
 	denominazione = forms.CharField(		
 		required=False,
 		label='fornitore', 

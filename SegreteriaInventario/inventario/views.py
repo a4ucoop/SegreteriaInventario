@@ -135,6 +135,7 @@ def updateLocalDB(request):
                 DG02.NOME_TIPO_DG,\
                 DG02.NUM_DOC_RIF,\
                 DG02.NUM_REGISTRAZIONE,\
+                EXTRACT(year FROM DG02.DT_REGISTRAZIONE) DT_REGISTRAZIONE_YEAR,\
                 ACAB.DENOMINAZIONE,\
                 ACAB2.NOME,\
                 ACAB2.COGNOME\
@@ -206,6 +207,7 @@ def updateLocalDB(request):
             bene.nome_tipo_dg = row['NOME_TIPO_DG'] if row['NOME_TIPO_DG'] is not None else ''
             bene.num_doc_rif = row['NUM_DOC_RIF'] if row['NUM_DOC_RIF'] is not None else ''
             bene.num_registrazione = row['NUM_REGISTRAZIONE'] if row['NUM_REGISTRAZIONE'] is not None else -1
+            bene.dt_registrazione_dg = row['DT_REGISTRAZIONE_YEAR'] if row['DT_REGISTRAZIONE_YEAR'] is not None else 0
             bene.denominazione = row['DENOMINAZIONE'] if row['DENOMINAZIONE'] is not None else ''
             bene.nome = row['NOME'] if row['NOME'] is not None else ''
             bene.cognome = row['COGNOME'] if row['COGNOME'] is not None else ''
@@ -229,6 +231,7 @@ def updateLocalDB(request):
             nome_tipo_dg = row['NOME_TIPO_DG'] if row['NOME_TIPO_DG'] is not None else ''
             num_doc_rif = row['NUM_DOC_RIF'] if row['NUM_DOC_RIF'] is not None else ''
             num_registrazione = row['NUM_REGISTRAZIONE'] if row['NUM_REGISTRAZIONE'] is not None else -1
+            dt_registrazione_dg = row['DT_REGISTRAZIONE_YEAR'] if row['DT_REGISTRAZIONE_YEAR'] is not None else 0
             denominazione = row['DENOMINAZIONE'] if row['DENOMINAZIONE'] is not None else ''
             nome  = row['NOME'] if row['NOME'] is not None else ''
             cognome = row['COGNOME'] if row['COGNOME'] is not None else ''
@@ -248,6 +251,7 @@ def updateLocalDB(request):
                         nome_tipo_dg = nome_tipo_dg,
                         num_doc_rif = num_doc_rif,
                         num_registrazione = num_registrazione,
+                        dt_registrazione_dg = dt_registrazione_dg,
                         denominazione = denominazione,
                         nome = nome,
                         cognome = cognome) 
@@ -298,6 +302,7 @@ def checkUpdate(request):
                 DG02.NOME_TIPO_DG,\
                 DG02.NUM_DOC_RIF,\
                 DG02.NUM_REGISTRAZIONE,\
+                EXTRACT(year FROM DG02.DT_REGISTRAZIONE) DT_REGISTRAZIONE_YEAR,\
                 ACAB.DENOMINAZIONE,\
                 ACAB2.NOME,\
                 ACAB2.COGNOME\
@@ -353,6 +358,7 @@ def checkUpdate(request):
             nome_tipo_dg = row['NOME_TIPO_DG'] if row['NOME_TIPO_DG'] is not None else ''
             num_doc_rif = row['NUM_DOC_RIF'] if row['NUM_DOC_RIF'] is not None else ''
             num_registrazione = row['NUM_REGISTRAZIONE'] if row['NUM_REGISTRAZIONE'] is not None else -1
+            dt_registrazione_dg = row['DT_REGISTRAZIONE_YEAR'] if row['DT_REGISTRAZIONE_YEAR'] is not None else 0
             denominazione = row['DENOMINAZIONE'] if row['DENOMINAZIONE'] is not None else ''
             nome  = row['NOME'] if row['NOME'] is not None else ''
             cognome = row['COGNOME'] if row['COGNOME'] is not None else ''
@@ -372,6 +378,7 @@ def checkUpdate(request):
                         nome_tipo_dg = nome_tipo_dg,
                         num_doc_rif = num_doc_rif,
                         num_registrazione = num_registrazione,
+                        dt_registrazione_dg = dt_registrazione_dg,
                         denominazione = denominazione,
                         nome = nome,
                         cognome = cognome) 
@@ -409,6 +416,7 @@ def showSingleItem(request, remote_id):
         'nome_tipo_dg' : bene.nome_tipo_dg,
         'num_doc_rif' : bene.num_doc_rif,
         'num_registrazione' : bene.num_registrazione,
+        'dt_registrazione_dg' : bene.dt_registrazione_dg,
         'denominazione' : bene.denominazione, 
         'immagine': bene.immagine,
     }
@@ -477,6 +485,7 @@ def getData(request):
             Q(nome_tipo_dg__icontains= search) | \
             Q(num_doc_rif__icontains= search) | \
             Q(num_registrazione__icontains= search) | \
+            Q(dt_registrazione_dg__icontains= search) | \
             Q(denominazione__icontains= search) |\
             Q(nome__icontains= search) | \
             Q(cognome__icontains= search) \
@@ -500,6 +509,7 @@ def getData(request):
             Q(nome_tipo_dg__icontains= search) | \
             Q(num_doc_rif__icontains= search) | \
             Q(num_registrazione__icontains= search) | \
+            Q(dt_registrazione_dg__icontains= search) | \
             Q(denominazione__icontains= search) |\
             Q(nome__icontains= search) | \
             Q(cognome__icontains= search) \
@@ -550,6 +560,7 @@ def getData(request):
         "nome_tipo_dg" : ' + json.dumps(row.nome_tipo_dg) + ', \
         "num_doc_rif" : ' + json.dumps(row.num_doc_rif) + ', \
         "num_registrazione" : ' + json.dumps(str(row.num_registrazione)) + ', \
+        "dt_registrazione_dg": ' + json.dumps(str(row.dt_registrazione_dg)) + ', \
         "denominazione" : ' + json.dumps(row.denominazione) + ', \
         "nome" : ' + json.dumps(row.nome) + ', \
         "cognome" : ' + json.dumps(row.cognome) + ', \
@@ -650,6 +661,7 @@ def advancedSearch(request):
         num_doc_rif = request.GET.get('num_doc_rif')
         min_num_registrazione = int(request.GET.get('min_num_registrazione')) if (request.GET.get('min_num_registrazione') is not None) else beni.order_by("num_registrazione").first().num_registrazione
         max_num_registrazione = int(request.GET.get('max_num_registrazione')) if (request.GET.get('max_num_registrazione') is not None) else beni.order_by("-num_registrazione").first().num_registrazione
+        dt_registrazione_dg = int(request.GET.get('dt_registrazione_dg')) if (request.GET.get('dt_registrazione_dg') is not None) else -1
         denominazione = request.GET.get('denominazione')
         nome = request.GET.get('nome')
         cognome = request.GET.get('cognome')
@@ -731,6 +743,8 @@ def advancedSearch(request):
             rows = rows.filter(num_doc_rif__icontains=num_doc_rif)
         #WAS: if (min_num_registrazione is not None and max_num_registrazione is not None):
         rows = rows.filter(num_registrazione__range=(min_num_registrazione, max_num_registrazione))
+        if(dt_registrazione_dg is not None):
+            rows = rows.filter(dt_registrazione_dg__icontains=dt_registrazione_dg)
         if (denominazione is not None):
             rows = rows.filter(denominazione__icontains=denominazione)
         if (nome is not None):
@@ -771,6 +785,7 @@ def advancedSearch(request):
             "nome_tipo_dg" : ' + json.dumps(row.nome_tipo_dg) + ', \
             "num_doc_rif" : ' + json.dumps(row.num_doc_rif) + ', \
             "num_registrazione" : ' + json.dumps(str(row.num_registrazione)) + ', \
+            "dt_registrazione_dg": ' + json.dumps(str(row.dt_registrazione_dg)) + ', \
             "denominazione" : ' + json.dumps(row.denominazione) + ', \
             "nome" : ' + json.dumps(row.nome) + ', \
             "cognome" : ' + json.dumps(row.cognome) + ', \

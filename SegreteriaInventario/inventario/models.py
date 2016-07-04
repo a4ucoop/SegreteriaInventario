@@ -23,6 +23,7 @@ class Bene(models.Model):
     nome_tipo_dg = models.CharField(max_length=128,default=None)
     num_doc_rif = models.CharField(max_length=128,default=None)
     num_registrazione = models.IntegerField(default=None)
+    dt_registrazione_dg =models.IntegerField('anno di registrazione documento',default=None)
     denominazione = models.CharField(max_length=256,default=None)
     nome = models.CharField(max_length=128,default=None, null = True)
     cognome = models.CharField(max_length=128,default=None, null = True)

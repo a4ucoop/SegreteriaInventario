@@ -309,6 +309,10 @@
                                       <p>{{ asform.denominazione.label_tag }} {{ asform.denominazione.help_text }} {% render_field asform.denominazione class+="form-control" %}</p>
                                   </p>
                                 </div>
+                                <!-- anno registrazione -->
+                                <p>{{ asform.dt_registrazione_dg.errors }}</p>
+                                <p>{{ asform.dt_registrazione_dg.errors }}</p>
+                                <div class="col-xs-12"><p><div class="col-xs-6">{{ asform.dt_registrazione_dg.label_tag }} {{ asform.dt_registrazione_dg.help_text }}{% render_field asform.dt_registrazione_dg class+="form-control" %}</div></p></div>
                                 <!-- nome -->
                                 <div class="col-xs-12" style="padding-left:2.5%;padding-right:2.5%;">
                                   <p>
@@ -469,6 +473,12 @@
                     sortable: true,
                     align: 'center'
                 },{
+                    field: 'dt_registrazione_dg',
+                    title: 'Anno Registrazione',
+                    class: 'dt_registrazione_dg',
+                    sortable: true,
+                    align: 'center'
+                }, {
                     field: 'denominazione',
                     title: 'Fornitore',
                     class: 'denominazione',
