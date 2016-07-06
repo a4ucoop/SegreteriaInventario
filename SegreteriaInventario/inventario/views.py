@@ -661,7 +661,7 @@ def advancedSearch(request):
         num_doc_rif = request.GET.get('num_doc_rif')
         min_num_registrazione = int(request.GET.get('min_num_registrazione')) if (request.GET.get('min_num_registrazione') is not None) else beni.order_by("num_registrazione").first().num_registrazione
         max_num_registrazione = int(request.GET.get('max_num_registrazione')) if (request.GET.get('max_num_registrazione') is not None) else beni.order_by("-num_registrazione").first().num_registrazione
-        dt_registrazione_dg = int(request.GET.get('dt_registrazione_dg')) if (request.GET.get('dt_registrazione_dg') is not None) else -1
+        dt_registrazione_dg = int(request.GET.get('dt_registrazione_dg')) if (request.GET.get('dt_registrazione_dg') is not None) else beni.order_by("dt_registrazione_dg").first().dt_registrazione_dg
         denominazione = request.GET.get('denominazione')
         nome = request.GET.get('nome')
         cognome = request.GET.get('cognome')
@@ -744,7 +744,7 @@ def advancedSearch(request):
         #WAS: if (min_num_registrazione is not None and max_num_registrazione is not None):
         rows = rows.filter(num_registrazione__range=(min_num_registrazione, max_num_registrazione))
         if(dt_registrazione_dg is not None):
-            rows = rows.filter(dt_registrazione_dg__icontains=dt_registrazione_dg)
+            rows = rows.filter(dt_registrazione_dg=dt_registrazione_dg)
         if (denominazione is not None):
             rows = rows.filter(denominazione__icontains=denominazione)
         if (nome is not None):
