@@ -1,0 +1,59 @@
+/*#roba {
+    background-image: url(http://192.168.101.31:8889/static/unicam-background-05.jpg);
+    background-size: 100% auto;
+    background-position: center center;
+    background-repeat: no-repeat;
+}*/
+
+#background
+{
+/*    background-image: url(http://192.168.101.31:8889/static/unicam-background-05.jpg);    
+    */
+    width: 700px;
+    height: 500px;
+    /*background: url("http://192.168.101.31:8889/static/unicam-background-05.jpg") no-repeat;*/
+    border: 1px solid;
+    background-repeat: no-repeat;
+    background-size:contain;
+}
+
+#div-btns{
+    position: relative;
+    margin: 50px;
+}
+
+input#invent{
+    border: 1px solid black;
+    height:200px;
+    width:200px;
+    background-image : url(http://192.168.101.31:8889/static/inventario-btn-scalato.png);
+    background-position: center center;
+    background-size: 100%;
+    background-repeat: no-repeat;
+}
+
+input#invent:hover{
+    -webkit-transform:scale(1.1); /* Safari and Chrome */
+    -moz-transform:scale(1.1); /* Firefox */
+    -ms-transform:scale(1.1); /* IE 9 */
+    -o-transform:scale(1.1); /* Opera */
+     transform:scale(1.1);
+}
+
+input#ricinve{
+    border: 1px solid black;
+    height:200px;
+    width:200px;
+    background-image : url(http://192.168.101.31:8889/static/ricognizione-btn-scalato.jpg);
+    background-position: center center;
+    background-size: 100%;
+    background-repeat: no-repeat;
+}
+
+input#ricinve:hover{
+    -webkit-transform:scale(1.1); /* Safari and Chrome */
+    -moz-transform:scale(1.1); /* Firefox */
+    -ms-transform:scale(1.1); /* IE 9 */
+    -o-transform:scale(1.1); /* Opera */
+     transform:scale(1.1);
+}
