@@ -572,7 +572,7 @@
                 else
                     html.push('<p><b>' + key + ': </b><b class="text-left text-danger">Foto non disponibile</b></p>');
             else if (key == 'nome' || key == 'cognome'){
-              html.push('<p><b>' + key + ':</b> ' + possNameFormatter(value, row, index) + '</p>');
+              html.push('<p><b>' + key + ':</b> ' + possessoreFormatter(value, row, index) + '</p>');
             }
             // we hide the state 
             else if (key == 'state'){}

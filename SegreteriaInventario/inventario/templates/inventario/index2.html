@@ -1,0 +1,71 @@
+{% load staticfiles %}
+{% load i18n %}
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
+    <meta name="description" content="">
+    <meta name="author" content="">
+    <link rel="icon" href="../../favicon.ico">
+
+    {% block title %}
+    <title>Inventario Unicam</title>
+    {% endblock %}
+
+    <link href="{% static 'css/bootstrap/bootstrap/bootstrap.min.css'%}" rel="stylesheet">
+    <link rel="stylesheet" href="https://ajax.googleapis.com/ajax/libs/jqueryui/1.11.3/themes/smoothness/jquery-ui.css">
+    <link href="{% static 'css/starter-template.css' %}" rel="stylesheet">
+    <link href="{% static 'inventario/css/index.css'%}" rel="stylesheet">
+    {% block stylesheets %}
+    {% endblock %}
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.11.3/jquery-ui.min.js"></script>
+
+    <script src="{% static 'js/bootstrap/bootstrap/bootstrap.min.js' %}"></script>
+    <!-- put your locale files after bootstrap-table.js -->
+    <!-- script src="{% static 'locale/bootstrap/bootstrap-table/bootstrap-table-it-IT.js' %}"></script -->
+
+    {% block javascripts %}
+    {% endblock %}
+
+</head>
+
+<body>
+
+
+
+{% block body %}
+    <div class="container" style="height:100%" align="center" > 
+        <div id="background">
+            <table id="roba">
+                <tr>
+                    <td>
+                        <div id="div-btns">
+                            <p><b>Inventario</b></p>
+                            <input id="invent" onclick='location.href = "{% url 'inventario.views.showLocalDB' %}"' class="butt" type="button" value=""/>
+                        </div>
+                    </td>
+                    <td>
+                        <div id="div-btns">
+                            <p><b>Ricognizione</b></p>
+                            <input id="ricinve" onclick='location.href = "{% url 'inventario.views.ricinv' %}"'  class="butt" type="button" value=""/>
+                        </div>
+                    </td>
+                </tr>
+            </table>
+        </div>
+    </div>
+{% endblock %}
+
+{% block content %}
+{% endblock %}
+
+{% block scripts %}
+{% endblock %}
+
+</body>
+
+</html>

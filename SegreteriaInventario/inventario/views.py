@@ -20,8 +20,10 @@ from django.forms.widgets import Select
 import datetime
 import json
 
+@login_required
 def index(request):
-	return showLocalDB(request)
+	# return showLocalDB(request)
+    return render (request,'inventario/index.html')
 
 def ricinv(request):
 	return showRicognizioniInventariali(request)
@@ -775,12 +777,12 @@ def advancedSearch(request):
             "pg_bene": ' + json.dumps(str(row.pg_bene)) + ', \
             "pg_bene_sub": ' + json.dumps(str(row.pg_bene_sub)) + ', \
             "ds_bene": ' + json.dumps(row.ds_bene) + ', \
-            "dt_registrazione_buono": ' + json.dumps(str(row.dt_registrazione_buono.date()) if row.dt_registrazione_buono is not None else "") + ', \
+            "dt_registrazione_buono": ' + json.dumps('{:%d-%m-%Y}'.format(row.dt_registrazione_buono.date()) if row.dt_registrazione_buono is not None else "") + ', \
             "cd_categ_gruppo": ' + json.dumps(row.cd_categ_gruppo) + ', \
             "ds_categ_gruppo": ' + json.dumps(row.ds_categ_gruppo) + ', \
             "ds_spazio": ' + json.dumps(row.ds_spazio) + ', \
             "ubicazione_precisa": ' + json.dumps(str(row.ubicazione_precisa_id)) + ', \
-            "dt_ini_ammortamento": ' + json.dumps(str(row.dt_ini_ammortamento.date()) if row.dt_ini_ammortamento is not None else "") + ', \
+            "dt_ini_ammortamento": ' + json.dumps('{:%d-%m-%Y}'.format(row.dt_ini_ammortamento.date()) if row.dt_ini_ammortamento is not None else "") + ', \
             "valore_convenzionale": ' + json.dumps(str(row.valore_convenzionale)) + ', \
             "nome_tipo_dg" : ' + json.dumps(row.nome_tipo_dg) + ', \
             "num_doc_rif" : ' + json.dumps(row.num_doc_rif) + ', \
