@@ -861,7 +861,7 @@ def ricognizioneInventarialeCreateView(request):
         ds_spazio = request.POST.get('ds_spazio',None)
         ubicazione_precisa = int(request.POST.get('ubicazione_precisa')) if(request.POST.get('ubicazione_precisa') is not None and request.POST.get('ubicazione_precisa') != '') else None
         ds_bene = request.POST.get('ds_bene',None)
-        immagine = request.POST.get('immagine',None)
+        immagine = request.FILES['immagine']
         
         if ubicazione_precisa:
             ubicazione_precisa = UbicazionePrecisa.objects.using('default').get(pk=ubicazione_precisa)
@@ -910,12 +910,12 @@ def ricognizioneInventarialeEditView(request):
         id = int(request.GET.get('id')) if (request.GET.get('id') is not None) else None
         cd_invent = request.POST.get('cd_invent',None)
         ds_invent = request.POST.get('ds_invent',None)
-        pg_bene = int(request.POST.get('pg_bene')) if (request.POST.get('pg_bene_sub') is not None) else None
-        pg_bene_sub = int(request.POST.get('pg_bene_sub')) if (request.POST.get('pg_bene_sub') is not None) else None
+        pg_bene = int(request.POST.get('pg_bene')) if (request.POST.get('pg_bene_sub') is not None and request.POST.get('pg_bene_sub') != '') else None
+        pg_bene_sub = int(request.POST.get('pg_bene_sub')) if (request.POST.get('pg_bene_sub') is not None and request.POST.get('pg_bene_sub') != '') else None
         ds_spazio = request.POST.get('ds_spazio',None)
-        ubicazione_precisa = int(request.POST.get('ubicazione_precisa')) if(request.POST.get('ubicazione_precisa') is not None) else None
+        ubicazione_precisa = int(request.POST.get('ubicazione_precisa')) if(request.POST.get('ubicazione_precisa') is not None and request.POST.get('ubicazione_precisa') != '') else None
         ds_bene = request.POST.get('ds_bene',None)
-        immagine = request.POST.get('immagine',None)
+        immagine = request.FILES['immagine']
         
         if ubicazione_precisa:
             ubicazione_precisa = UbicazionePrecisa.objects.using('default').get(pk=ubicazione_precisa)

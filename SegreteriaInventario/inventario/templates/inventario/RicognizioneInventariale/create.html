@@ -13,7 +13,7 @@
         </div>
         <div class="modal-body">
             {% block form-header %}
-            <form name="ricinv_form" id="ricinv_create_form_id" method="POST" action="{% url "inventario.views.ricognizioneInventarialeCreateView" %}">    
+            <form name="ricinv_form" id="ricinv_create_form_id" method="POST" action="{% url "inventario.views.ricognizioneInventarialeCreateView" %}" enctype="multipart/form-data">    
                 {% endblock %}                        
                 {% csrf_token %}
 
