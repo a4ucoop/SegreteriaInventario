@@ -2,6 +2,30 @@ body {
   padding-top: 40px;
   padding-bottom: 40px;
   background-color: #eee;
+  background: url(http://192.168.101.31:8889/static/intro-bg.jpg) no-repeat center center;
+  background-size: cover;
+}
+
+body,
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+    font-family: "Lato","Helvetica Neue",Helvetica,Arial,sans-serif;
+    font-weight: 700;
+    color: #f8f8f8;
+    text-shadow: 2px 2px 3px rgba(0,0,0,0.6);
+
+}
+
+.help-block
+{
+    font-family: "Lato","Helvetica Neue",Helvetica,Arial,sans-serif;
+    font-weight: 700;
+    color: #f8f8f8;
+    text-shadow: 2px 2px 3px rgba(0,0,0,0.6);  
 }
 
 .form-signin {

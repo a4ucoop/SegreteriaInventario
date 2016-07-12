@@ -10,6 +10,12 @@ html {
     height: 100%;
 }
 
+body
+{
+    background: url(http://192.168.101.31:8889/static/intro-bg.jpg) no-repeat center center;
+    background-size: cover;
+}
+
 body,
 h1,
 h2,
@@ -35,8 +41,8 @@ h6 {
     padding-bottom: 50px;
     text-align: center;
     color: #f8f8f8;
-    background: url(http://192.168.101.31:8889/static/intro-bg.jpg) no-repeat center center;
-    background-size: cover;
+    /*background: url(http://192.168.101.31:8889/static/intro-bg.jpg) no-repeat center center;
+    background-size: cover;*/
 }
 
 .intro-message {
