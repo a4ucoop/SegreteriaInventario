@@ -43,40 +43,7 @@
 
 
 {% block body %}
-    <nav id="navbar1" class="navbar navbar-inverse navbar-fixed-top">
-        <div>
-            <div class="navbar-header">
-                <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar"
-                        aria-expanded="false" aria-controls="navbar">
-                    <span class="sr-only">Toggle navigation</span>
-                    <span class="icon-bar"></span>
-                    <span class="icon-bar"></span>
-                    <span class="icon-bar"></span>
-                </button>
-                <a class="navbar-brand" href="{% url 'inventario.views.index' %}">
-                    <!-- <img alt="Brand" style="height:30px; width:30px" src="{% static 'logo_unicam.png' %}"> -->
-                    <img class="hidden-xs" src="{% static 'logo_visible.png' %}" style="position: relative; top: -15px;" alt="">
-                    <img class="visible-xs" src="{% static 'logo_hidden.png' %}" style="position: relative; top: -10px;" alt=""> 
-                </a>
-            </div>
-            <div id="navbar" class="collapse navbar-collapse">
-                <ul class="nav navbar-nav navbar-left">
-                    <li id="inventarioLocaleLink"><a href="{% url 'inventario.views.showLocalDB' %}"><b>Inventario Unicam</b></a></li>
-                    <li id="ricInvLink"><a href="{% url 'inventario.views.ricinv' %}"><b>Ricognizione Inventariale</b></a></li>
-                </ul>
-                <ul class="nav navbar-nav navbar-right" style="margin-right:20px;">
-                    {% if user.is_authenticated %}
-                    <li><a><b> Benvenuto {% if user.first_name and user.last_name %} {{ user.first_name}} {{ user.last_name }} {% else %} {{user.username}} {% endif %}</b></a></li>
-                    {% endif %}
-                    {% if user.is_authenticated %}
-                    <li><a href="{% url 'logout' %}"><b>{% trans 'Logout' %}</b></a></li>
-                    {% else %}
-                    <li><a href="{% url 'login' %}"><b>{% trans 'Login' %}</b></a></li>
-                    {% endif %}
-                </ul>
-            </div>
-        </div>
-    </nav>
+
 
     <!-- Header -->
     <a name="about"></a>
