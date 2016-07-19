@@ -663,29 +663,36 @@ def advancedSearch(request):
         num_doc_rif = request.GET.get('num_doc_rif')
         min_num_registrazione = int(request.GET.get('min_num_registrazione')) if (request.GET.get('min_num_registrazione') is not None) else beni.order_by("num_registrazione").first().num_registrazione
         max_num_registrazione = int(request.GET.get('max_num_registrazione')) if (request.GET.get('max_num_registrazione') is not None) else beni.order_by("-num_registrazione").first().num_registrazione
-        dt_registrazione_dg = int(request.GET.get('dt_registrazione_dg')) if (request.GET.get('dt_registrazione_dg') is not None) else -1
+        dt_registrazione_dg = int(request.GET.get('dt_registrazione_dg')) if (request.GET.get('dt_registrazione_dg') is not None) else None
         denominazione = request.GET.get('denominazione')
         nome = request.GET.get('nome')
         cognome = request.GET.get('cognome')
 
-        # # stampe debug
-        # print("min_id", min_id);
-        # print("max_id", max_id);
-        # print("cods", cods);
-        # print("min_pg_bene", min_pg_bene);
-        # print("max_pg_bene", max_pg_bene);
-        # print("ds_bene", ds_bene);
-        # print("from_dt_acquisto", from_dt_acquisto);
-        # print("to_dt_acquisto", to_dt_acquisto);
-        # print("categ", categ)
-        # print("ubicazione", ubicazione);
-        # print("ubicazione_precisa", ubicazione_precisa);
-        # print("from_dt_ini_ammortamento", from_dt_ini_ammortamento);
-        # print("to_dt_ini_ammortamento", to_dt_ini_ammortamento);
-        # print("min_valore_convenzionale", min_valore_convenzionale);
-        # print("max_valore_convenzionale", max_valore_convenzionale);
-        # print("min_valore_residuo", min_valore_residuo);
-        # print("max_valore_residuo", max_valore_residuo);
+        #print("----------------------------");
+        #print("min_id_bene: " + str(min_id_bene));
+        #print("max_id_bene: " + str(max_id_bene));
+        #print("cods: " + str(cods));
+        #print("min_pg_bene: " + str(min_pg_bene));
+        #print("max_pg_bene: " + str(max_pg_bene));
+        #print("ds_bene: " + str(ds_bene));
+        #print("from_dt_acquisto: " + str(from_dt_acquisto));
+        #print("to_dt_acquisto: " + str(to_dt_acquisto));
+        #print("categ: " + str(categ));
+        #print("ubicazione: " + str(ubicazione));
+        #print("ubicazione_precisa: " + str(ubicazione_precisa));
+        #print("from_dt_ini_ammortamento: " + str(from_dt_ini_ammortamento));
+        #print("to_dt_ini_ammortamento: " + str(to_dt_ini_ammortamento));
+        #print("min_valore_convenzionale: " + str(min_valore_convenzionale));
+        #print("max_valore_convenzionale: " + str(max_valore_convenzionale));
+        #print("nome_tipo_dg: " + str(nome_tipo_dg));
+        #print("num_doc_rif: " + str(num_doc_rif));
+        #print("min_num_registrazione: " + str(min_num_registrazione));
+        #print("max_num_registrazione: " + str(max_num_registrazione));
+        #print("dt_registrazione_dg: " + str(dt_registrazione_dg));
+        #print("denominazione: " + str(denominazione));
+        #print("nome: " + str(nome));
+        #print("cognome: " + str(cognome));
+        #print("----------------------------");
 
         requestOrder = request.GET.get('order', None)
         sort = request.GET.get('sort', None)
@@ -714,45 +721,75 @@ def advancedSearch(request):
         else:
             rows = Bene.objects.using('default').all()
         
-        #WAS: rows = Bene.objects.using('default').all()
+       #WAS: rows = Bene.objects.using('default').all()
         # filter id range
         #WAS: if (min_id_bene is not None and max_id_bene is not None):
         rows = rows.filter(id_bene__range=(min_id_bene, max_id_bene))
+        #print("filtrato range id, #righe: ", len(rows))
         # filter inventory code in selection list
         if (cods is not None and cods):
             rows = rows.filter(cd_invent__in=cods)
+        #print("filtrat codici, #righe: ", len(rows))
         #WAS: if (min_pg_bene is not None and max_pg_bene is not None):
         rows = rows.filter(pg_bene__range=(min_pg_bene, max_pg_bene))
+        #print("filtrato pg bene, #righe: ", len(rows))
         if (ds_bene is not None):
             rows = rows.filter(ds_bene__icontains=ds_bene)
+        #print("filtrato descrizione, #righe: ", len(rows))
         #WAS: if (from_dt_acquisto is not None and to_dt_acquisto is not None):
         rows = rows.filter(dt_registrazione_buono__range=(from_dt_acquisto, to_dt_acquisto))
+        #print("filtrato dt_registrazione_buono__range, #righe: ", len(rows))
         if (categ is not None and categ):
             rows = rows.filter(ds_categ_gruppo__in=categ)
+        #print("filtrato ds_categ_gruppo__in, #righe: ", len(rows))
+
         if (ubicazione is not None):
             rows = rows.filter(ds_spazio__icontains=ubicazione)
+        #print("filtrato ds_spazio__icontains, #righe: ", len(rows))
         if (ubicazione is not None):
             rows = rows.filter(ds_spazio__icontains=ubicazione)
+        #print("filtrato ds_spazio__icontains, #righe: ", len(rows))
+
         if (ubicazione_precisa is not None):
             rows = rows.filter(ubicazione_precisa__ubicazione__icontains=ubicazione_precisa)
+        #print("filtrato ubicazione_precisa__ubicazione__icontains, #righe: ", len(rows))
+
         #WAS: if (from_dt_ini_ammortamento is not None and to_dt_ini_ammortamento is not None):
         rows = rows.filter(dt_ini_ammortamento__range=(from_dt_ini_ammortamento, to_dt_ini_ammortamento))
+        #print("filtrato dt_ini_ammortamento__range, #righe: ", len(rows))
+
         #WAS: if (min_valore_convenzionale is not None and max_valore_convenzionale is not None):
         rows = rows.filter(valore_convenzionale__range=(min_valore_convenzionale, max_valore_convenzionale))
+        #print("filtrato valore_convenzionale__range, #righe: ", len(rows))
+
         if (nome_tipo_dg is not None):
             rows = rows.filter(nome_tipo_dg__icontains=nome_tipo_dg)
+        #print("filtrato nome_tipo_dg__icontains, #righe: ", len(rows))
+
         if (num_doc_rif is not None):
             rows = rows.filter(num_doc_rif__icontains=num_doc_rif)
+        #print("filtrato num_doc_rif__icontains, #righe: ", len(rows))
+
         #WAS: if (min_num_registrazione is not None and max_num_registrazione is not None):
         rows = rows.filter(num_registrazione__range=(min_num_registrazione, max_num_registrazione))
+        #print("filtrato num_registrazione__range, #righe: ", len(rows))
+
         if(dt_registrazione_dg is not None):
-            rows = rows.filter(dt_registrazione_dg__icontains=dt_registrazione_dg)
+            rows = rows.filter(dt_registrazione_dg__icontains = dt_registrazione_dg)
+        #print("filtrato dt_registrazione_dg__icontains, #righe: ", len(rows))
+
         if (denominazione is not None):
             rows = rows.filter(denominazione__icontains=denominazione)
+        #print("filtrato denominazione__icontains, #righe: ", len(rows))
+
         if (nome is not None):
             rows = rows.filter(nome__icontains=nome)
+        #print("filtrato nome__icontains, #righe: ", len(rows))
+
         if (cognome is not None):
             rows = rows.filter(cognome__icontains=cognome)
+        #print("filtrato cognome__icontains, #righe: ", len(rows))
+
 
         total = rows.count();
         #WAS: rows = rows.order_by(order)[offset:offset + limit]
