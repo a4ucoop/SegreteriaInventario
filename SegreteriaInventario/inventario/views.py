@@ -861,7 +861,7 @@ def ricognizioneInventarialeCreateView(request):
         ds_spazio = request.POST.get('ds_spazio',None)
         ubicazione_precisa = int(request.POST.get('ubicazione_precisa')) if(request.POST.get('ubicazione_precisa') is not None and request.POST.get('ubicazione_precisa') != '') else None
         ds_bene = request.POST.get('ds_bene',None)
-        immagine = request.FILES['immagine']
+        immagine = request.FILES.get('immagine',None)
         
         if ubicazione_precisa:
             ubicazione_precisa = UbicazionePrecisa.objects.using('default').get(pk=ubicazione_precisa)

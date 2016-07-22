@@ -2,7 +2,7 @@ body {
   padding-top: 40px;
   padding-bottom: 40px;
   background-color: #eee;
-  background: url(http://192.168.101.31:8889/static/intro-bg.jpg) no-repeat center center;
+  background: url(http://192.168.101.31:8888/static/intro-bg.jpg) no-repeat center center;
   background-size: cover;
 }
 
