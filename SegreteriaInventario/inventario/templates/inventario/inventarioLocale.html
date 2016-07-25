@@ -492,22 +492,6 @@
                     sortable: true,
                     align: 'center'
                 }
-
-                // ,{
-                //     field: 'nome',
-                //     title: 'Nome',
-                //     class: 'nome',
-                //     sortable: true,
-                //     align: 'center',
-                //     formatter: possNameFormatter
-                // },{
-                //     field: 'cognome',
-                //     title: 'Cognome',
-                //     class: 'cognome',
-                //     sortable: true,
-                //     align: 'center',
-                //     formatter: possSurnameFormatter
-                // },
                 ]
             ]
         });
@@ -556,7 +540,6 @@
     function detailFormatter(index, row) {
         var html = [];
         $.each(row, function (key, value) {
-            console.log(key.title);
             // if we're displaying the accurate location we must match the id with the actual text value
             if (key == 'accurate_location') 
             {
@@ -571,13 +554,50 @@
                     html.push('<p><b>' + key + ':</b></p><p><img style="max-width:100px;max-height:100px" src="/inventario/media/' + value + '"></p>');
                 else
                     html.push('<p><b>' + key + ': </b><b class="text-left text-danger">Foto non disponibile</b></p>');
-            else if (key == 'nome' || key == 'cognome'){
-              html.push('<p><b>' + key + ':</b> ' + possessoreFormatter(value, row, index) + '</p>');
+            else if (key == 'nome'){
+              html.push('<p><b>Possessore:</b> ' + possessoreFormatter(value, row, index) + '</p>');
+            }
+            // merge codice inventario with its description
+            else if(key == 'cd_invent')
+                html.push('<p><b>Codice Inventario:</b> ' + cdinventFormatter(value, row, index) + '</p>');
+            // merge numero inventario with its bene annesso
+            else if(key == 'pg_bene')
+                html.push('<p><b>Numero Inventario:</b> ' + numeroInventarioFormatter(value, row, index) + '</p>');
+            // merge categoria with its description
+            else if(key == 'cd_categ_gruppo')
+                html.push('<p><b>Categoria:</b> ' + categoriaFormatter(value, row, index) + '</p>');
+            else if(key == 'ubicazione_precisa')
+            {
+              if(value == 'None')
+                html.push('<p><b>Locale:</b> Vuoto </p>');
+              else
+                html.push('<p><b>Locale:</b> ' + value + '</p>');
             }
             // we hide the state 
             else if (key == 'state'){}
-            else
-                html.push('<p><b>' + key + ':</b> ' + value + '</p>');
+            // normal fields with a proper title in place of 'key'
+            else if(key == 'id_bene')
+                html.push('<p><b>ID:</b> ' + value + '</p>');
+            else if(key == 'ds_bene')
+                html.push('<p><b>Descrizione Bene:</b> ' + value + '</p>');
+            else if(key == 'dt_registrazione_buono')
+                html.push('<p><b>Data Acquisto:</b> ' + value + '</p>');
+            else if(key == 'ds_spazio')
+                html.push('<p><b>Edificio:</b> ' + value + '</p>');
+            else if(key == 'dt_ini_ammortamento')
+                html.push('<p><b>Data Inizio Ammortamento:</b> ' + value + '</p>');
+            else if(key == 'valore_convenzionale')
+                html.push('<p><b>Valore Convenzionale:</b> ' + value + '</p>');
+            else if(key == 'nome_tipo_dg')
+                html.push('<p><b>Tipo Documento:</b> ' + value + '</p>');
+            else if(key == 'num_doc_rif')
+                html.push('<p><b>Numero Documento:</b> ' + value + '</p>');
+            else if(key == 'num_registrazione')
+                html.push('<p><b>Numero Registrazione:</b> ' + value + '</p>');
+            else if(key == 'dt_registrazione_dg')
+                html.push('<p><b>Anno Registrazione:</b> ' + value + '</p>');
+            else if(key == 'denominazione')
+                html.push('<p><b>Fornitore:</b> ' + value + '</p>');
         });
         return html.join('');
     }
