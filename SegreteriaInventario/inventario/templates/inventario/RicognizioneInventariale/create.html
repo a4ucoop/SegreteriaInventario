@@ -29,15 +29,19 @@
                 <p>{{ form.cd_invent.errors }}</p>
                 <div class="col-xs-12"><p>{{ form.cd_invent.label_tag }}{{ form.cd_invent.help_text }}{% render_field form.cd_invent class+="form-control" %}</p></div>
 
-                <!-- pg_bene -->
-                <p>{{ form.pg_bene.errors }}</p>
-                <div class="col-xs-6" style="display:inline-block;"><p>{{ form.pg_bene.label_tag }}{{ form.pg_bene.help_text }}{% render_field form.pg_bene class+="form-control" %}</p></div>
-                <!-- inline dash -->
-                <p> </p>
-                <div class="col-xs-1" style="display:inline-block;"><p> - </p></div>
-                <!-- pg_bene_sub -->
-                <p>{{ form.pg_bene_sub.errors }}</p>
-                <div class="col-xs-5" style="display:inline-block;"><p>{{ form.pg_bene_sub.label_tag }}{{ form.pg_bene_sub.help_text }}{% render_field form.pg_bene_sub class+="form-control" %}</p></div>
+                <div class="col-xs-12"><p>
+                    <p>{{ form.pg_bene.errors }}</p>
+                    <p>{{ form.pg_bene_sub.errors }}</p>
+                    <p>{{ form.pg_bene.help_text }}</p>
+                    <p>{{ form.pg_bene_sub.help_text }}</p>
+                    <label for="id_cd_invent">Numero inventario e bene collegato:</label>
+                    <div class="input-group">
+                        {% render_field form.pg_bene class+="form-control col-xs-9" placeholder+="numero inventario" %}
+                        <span class="input-group-addon">-</span>
+                        {% render_field form.pg_bene_sub class+="form-control col-xs-3" placeholder+="bene collegato" %}
+                    </div>
+                </p></div>
+
                 <!-- ds_spazio -->
                 <p>{{ form.ds_spazio.errors }}</p>
                 <div class="col-xs-12"><p>{{ form.ds_spazio.label_tag }}{{ form.ds_spazio.help_text }}{% render_field form.ds_spazio class+="form-control" %}</p></div>
