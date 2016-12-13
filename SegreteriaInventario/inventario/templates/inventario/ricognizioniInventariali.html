@@ -275,6 +275,7 @@
                 }, {
                     field: 'cd_invent',
                     title: 'codice inventario',
+                    formatter: 'cdinventFormatter',
                     class: 'cd_invent',
                     sortable: true,
                     align: 'center'
@@ -378,6 +379,8 @@
                     html.push('<p><b>' + key + ':</b></p><p><img style="max-width:100px;max-height:100px" src="/inventario/media/' + value + '"></p>');
                 else
                     html.push('<p><b>' + key + ': </b><b class="text-left text-danger">Foto non disponibile</b></p>');
+            else if(key == 'cd_invent')
+                html.push('<p><b>Codice Inventario:</b> ' + cdinventFormatter(value, row, index) + '</p>');
             // we hide the state 
             else if (key == 'state'){}
             else
@@ -479,6 +482,11 @@
     function categoriaFormatter(value, row) {
         // return "<a href='/inventario/show/" + row.id + "'>" + value + "</a>";
         return row.cd_categ_gruppo + " - " + row.ds_categ_gruppo;
+    }
+
+    function cdinventFormatter(value, row) {
+        // return "<a href='/inventario/show/" + row.id + "'>" + value + "</a>";
+        return row.cd_invent + " - " + row.ds_invent;
     }
 
     $(function () {

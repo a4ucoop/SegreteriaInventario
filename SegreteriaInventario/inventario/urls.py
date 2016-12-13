@@ -26,4 +26,6 @@ urlpatterns = [
 	url(r'^ricinv$', views.ricinv, name='ricinv'),
     url(r'^table/getRicognizioniData', views.getRicognizioniData, name='getRicognizioniData'),
     url(r'^table/advancedRicognizioneInventarialeSearch$', views.advancedRicognizioneInventarialeSearch, name='advancedRicognizioneInventarialeSearch'),
+    url(r'^esse3user-autocomplete/$', views.Esse3UserAutocomplete.as_view(), name='esse3user-autocomplete'),
+    url(r'^update/esse3users', views.updateLocalEsse3Users, name='updateLocalEsse3Users'),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

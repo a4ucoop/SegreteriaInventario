@@ -1,5 +1,7 @@
 from django.db import models
 
+from django.contrib.auth.models import User
+
 class UbicazionePrecisa(models.Model):
 	ubicazione = models.CharField(max_length=2000)
 
@@ -30,11 +32,18 @@ class Bene(models.Model):
     immagine = models.FileField(upload_to='pictures/%Y/%m/%d', null=True)
 
 class RicognizioneInventariale(models.Model):
+    descrizione_bene = models.CharField(max_length=256, default='')
+    possessore = models.ForeignKey('Esse3User',default=None,related_name='ricinv_possessori')
+    inserito_da = models.ForeignKey(User, default=None, related_name='ricinv_inseritori')
     cd_invent = models.CharField(max_length=8)
     ds_invent = models.CharField(max_length=256,default=None,null=True)
     pg_bene = models.IntegerField(default=None)
-    pg_bene_sub = models.IntegerField(default=None)
-    ds_bene = models.CharField(max_length=400, null=True)
+    pg_bene_sub = models.IntegerField(default=0)
+    ds_bene = models.CharField(max_length=400, blank=True, null=True)
     ds_spazio = models.CharField(max_length=2000, null=True)
-    ubicazione_precisa = models.ForeignKey(UbicazionePrecisa, null=True, on_delete=models.SET_NULL)
+    ubicazione_precisa = models.ForeignKey(UbicazionePrecisa,blank=True, null=True, on_delete=models.SET_NULL)
     immagine = models.FileField(upload_to='pictures/%Y/%m/%d', blank=True, null=True)
+
+class Esse3User(models.Model):
+    name = models.CharField(max_length=50)
+    surname = models.CharField(max_length=50)

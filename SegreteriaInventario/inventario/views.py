@@ -14,6 +14,9 @@ from models import Bene, UbicazionePrecisa, RicognizioneInventariale
 
 from forms import PictureForm, RicognizioneInventarialeForm, AdvancedSearchForm, AdvancedSearchRicognizioneInventarialeForm
 
+from dal import autocomplete
+from models import Esse3User 
+
 #from django.forms import ChoiceField,ModelForm
 from django.forms.widgets import Select
 
@@ -109,6 +112,43 @@ def showLocalDB(request):
         'lista_codici' : lista_codici,
     }
     return render (request,'inventario/inventarioLocale.html',context)
+
+@login_required
+def updateLocalEsse3Users(request):
+    cursor = connections['cineca'].cursor()         # Cursor connessione Cineca
+    cursorLocal = connections['default'].cursor()   # Cursor DB locale
+    # Seleziona tutti i dati necessari dal DB remoto
+    cursor.execute(
+        "SELECT DISTINCT\
+                ACAB.NOME,\
+                ACAB.COGNOME\
+        FROM\
+                V_IE_AC_AB_ALL ACAB\
+        GROUP BY\
+                ACAB.NOME,\
+                ACAB.COGNOME"
+        )
+
+    rows = rows_to_dict_list(cursor)
+
+    for row in rows:
+        # Per ogni riga vede se l'oggetto esiste gia' nel database
+        try:
+            #print "obj ",row['ID_INVENTARIO_BENI'],"val res: ",row['VALORE_RESIDUO']
+            esse3user = Esse3User.objects.get(name=row['NOME'],surname=row['COGNOME'])
+
+            # Se l'oggetto esiste i dati vengono aggiornati
+        except Esse3User.DoesNotExist:
+            # Se non esiste viene creato un nuovo oggetto
+            name = row['NOME']
+            surname = row['COGNOME']
+
+            #esse3user = Esse3User(name = name,
+            #            surname = surname) 
+            #esse3user.save()
+            print name, " ", surname
+
+    return HttpResponse("creati %s utenti di esse3" % len(rows))
 
 @login_required
 def updateLocalDB(request):
@@ -855,30 +895,41 @@ def advancedSearch(request):
 def ricognizioneInventarialeCreateView(request):
     """ """
     if request.method == 'POST':
+
+        form = RicognizioneInventarialeForm(request.POST,request.FILES,initial={'pg_bene_sub' : 0})
+
         cd_invent = request.POST.get('cd_invent',None)
-        pg_bene = int(request.POST.get('pg_bene')) if (request.POST.get('pg_bene_sub') is not None) else None
-        pg_bene_sub = int(request.POST.get('pg_bene_sub')) if (request.POST.get('pg_bene_sub') is not None) else None
+        pg_bene = int(request.POST.get('pg_bene')) if (request.POST.get('pg_bene') is not None and request.POST.get('pg_bene') != '') else None
+        pg_bene_sub = int(request.POST.get('pg_bene_sub')) if (request.POST.get('pg_bene_sub') is not None and request.POST.get('pg_bene_sub') != '') else None
         ds_spazio = request.POST.get('ds_spazio',None)
         ubicazione_precisa = int(request.POST.get('ubicazione_precisa')) if(request.POST.get('ubicazione_precisa') is not None and request.POST.get('ubicazione_precisa') != '') else None
         ds_bene = request.POST.get('ds_bene',None)
         immagine = request.FILES.get('immagine',None)
+        possessore = request.POST.get('possessore',None)
+        inserito_da = request.user
         
         if ubicazione_precisa:
             ubicazione_precisa = UbicazionePrecisa.objects.using('default').get(pk=ubicazione_precisa)
 
-        if ((cd_invent is not None) and (pg_bene is not None) and (pg_bene_sub is not None)):
+        #if ((cd_invent is not None) and (pg_bene is not None) and (pg_bene_sub is not None)):
+        if(form.is_valid()):
             RicognizioneInventariale.objects.using('default').create(
                 cd_invent = cd_invent,
+                ds_invent = Bene.objects.using('default').filter(cd_invent=form.cleaned_data['cd_invent']).first().ds_invent,
                 pg_bene = pg_bene,
                 pg_bene_sub = pg_bene_sub,
                 ds_spazio = ds_spazio,
                 ubicazione_precisa = ubicazione_precisa,
                 ds_bene = ds_bene,
-                immagine = immagine
+                immagine = immagine,
+                possessore = possessore,
+                inserito_da = inserito_da
             )
-        else:
-            return HttpResponse("Not created")
-    
+        #form.save()
+        #else:
+        #    return HttpResponse("Not created")
+    else:
+        form = RicognizioneInventarialeForm(request.GET)
 
     return redirect ('ricinv')
 
@@ -898,7 +949,9 @@ def ricognizioneInventarialeEditView(request):
                 'ds_spazio' : ric_inv.ds_spazio,
                 'ubicazione_precisa' : ric_inv.ubicazione_precisa,
                 'ds_bene' : ric_inv.ds_bene,
-                'immagine' : ric_inv.immagine
+                'immagine' : ric_inv.immagine,
+                'possessore' : ric_inv.possessore,
+                'inserito_da' : ric_inv.inserito_da
         }
 
         form = RicognizioneInventarialeForm(initial=data)
@@ -908,33 +961,59 @@ def ricognizioneInventarialeEditView(request):
         
     if request.method == 'POST':
         id = int(request.GET.get('id')) if (request.GET.get('id') is not None) else None
-        cd_invent = request.POST.get('cd_invent',None)
-        ds_invent = request.POST.get('ds_invent',None)
-        pg_bene = int(request.POST.get('pg_bene')) if (request.POST.get('pg_bene_sub') is not None and request.POST.get('pg_bene_sub') != '') else None
-        pg_bene_sub = int(request.POST.get('pg_bene_sub')) if (request.POST.get('pg_bene_sub') is not None and request.POST.get('pg_bene_sub') != '') else None
-        ds_spazio = request.POST.get('ds_spazio',None)
-        ubicazione_precisa = int(request.POST.get('ubicazione_precisa')) if(request.POST.get('ubicazione_precisa') is not None and request.POST.get('ubicazione_precisa') != '') else None
-        ds_bene = request.POST.get('ds_bene',None)
-        immagine = request.FILES['immagine']
+        #cd_invent = request.POST.get('cd_invent',None)
+        #ds_invent = request.POST.get('ds_invent',None)
+        #pg_bene = int(request.POST.get('pg_bene')) if (request.POST.get('pg_bene') is not None and request.POST.get('pg_bene') != '') else None
+        #pg_bene_sub = int(request.POST.get('pg_bene_sub')) if (request.POST.get('pg_bene_sub') is not None and request.POST.get('pg_bene_sub') != '') else None
+        #ds_spazio = request.POST.get('ds_spazio',None)
+        #ubicazione_precisa = int(request.POST.get('ubicazione_precisa')) if(request.POST.get('ubicazione_precisa') is not None and request.POST.get('ubicazione_precisa') != '') else None
+        #ds_bene = request.POST.get('ds_bene',None)
+        #immagine = request.FILES.get('immagine',None)
+
+        f = RicognizioneInventarialeForm(request.POST, request.FILES)
         
-        if ubicazione_precisa:
-            ubicazione_precisa = UbicazionePrecisa.objects.using('default').get(pk=ubicazione_precisa)
+        #if ubicazione_precisa:
+        #    ubicazione_precisa = UbicazionePrecisa.objects.using('default').get(pk=ubicazione_precisa)
 
-        if (id is not None):
-            ri_bene = RicognizioneInventariale.objects.get(id=id)
-            ri_bene.cd_invent = cd_invent
-            ri_bene.ds_invent = ds_invent
-            ri_bene.pg_bene = pg_bene
-            ri_bene.pg_bene_sub = pg_bene_sub
-            ri_bene.ds_spazio = ds_spazio
-            ri_bene.ubicazione_precisa = ubicazione_precisa
-            ri_bene.ds_bene = ds_bene
-            ri_bene.immagine = immagine
+        if (id is not None): 
+            ric_inv = RicognizioneInventariale.objects.get(id=id)
+            #if (ri_bene is not None and cd_invent is not None and 
+            #    ds_invent is not None and pg_bene is not None and 
+            #    pg_bene_sub is not None and ds_spazio is not None and 
+            #    ds_bene is not None):
+            if(f.is_valid()):
+                ric_inv = RicognizioneInventariale.objects.get(id=id)
+                ric_inv.cd_invent = f.cleaned_data['cd_invent']
+                ric_inv.ds_invent = Bene.objects.using('default').filter(cd_invent=f.cleaned_data['cd_invent']).first().ds_invent
+                ric_inv.pg_bene = f.cleaned_data['pg_bene']
+                ric_inv.pg_bene_sub = f.cleaned_data['pg_bene_sub']
+                ric_inv.ds_spazio = f.cleaned_data['ds_spazio']
+                #ric_inv.ubicazione_precisa = UbicazionePrecisa.objects.using('default').get(pk=f.cleaned_data['ubicazione_precisa']).pk
+                ric_inv.ubicazione_precisa = f.cleaned_data['ubicazione_precisa']
+                ric_inv.ds_bene = f.cleaned_data['ds_bene']
+                ric_inv.immagine = f.cleaned_data['immagine']
+                ric_inv.possessore = f.cleaned_data['possessore']
+                ric_inv.inserito_da = request.user
 
-            ri_bene.save()
+                ric_inv.save()
 
-        else:
-            return HttpResponse("Not Modified")
+            else:
+                #data = {
+                #        'id': ric_inv.id,
+                #        'cd_invent' : ric_inv.cd_invent,
+                #        'ds_invent' : ric_inv.ds_invent,
+                #        'pg_bene' : ric_inv.pg_bene,
+                #        'pg_bene_sub' : ric_inv.pg_bene_sub,
+                #        'ds_spazio' : ric_inv.ds_spazio,
+                #        'ubicazione_precisa' : ric_inv.ubicazione_precisa,
+                #        'ds_bene' : ric_inv.ds_bene,
+                #        'immagine' : ric_inv.immagine
+                #}
+
+                #form = RicognizioneInventarialeForm(initial=data)
+                form = RicognizioneInventarialeForm(request.POST,request.GET)
+                #return render (request,'inventario/RicognizioneInventariale/edit.html',{'form': form})
+                #return render (request,'inventario/ricognizioniInventariali.html',{'form': form})
     
 
     return redirect ('ricinv')
@@ -1145,4 +1224,18 @@ def advancedRicognizioneInventarialeSearch(request):
         return HttpResponse(html)
         # Redirect to the document list after POST
         return redirect ('ricinv')
+
+class Esse3UserAutocomplete(autocomplete.Select2QuerySetView):
+    
+    def get_queryset(self):
+        """ """
+        if not self.request.user.is_authenticated():
+            return Esse3User.objects.using('default').none()
+
+        qs = Esse3User.objects.using('default').none()
+
+        if self.q:
+            qs = qs.filter(name__icontains=self.q) | qs.filter(surname__icontains=self.q)
+
+        return qs
 

@@ -17,16 +17,27 @@
                 {% endblock %}                        
                 {% csrf_token %}
 
+                <!-- descrizione_bene -->
+                <p>{{ form.descrizione_bene.errors }}</p>
+                <div class="col-xs-12"><p>{{ form.descrizione_bene.label_tag }}{{ form.descrizione_bene.help_text }}{% render_field form.descrizione_bene class+="form-control" %}</p></div>
+
+                <!-- possessore -->
+                <p>{{ form.possessore.errors }}</p>
+                <div class="col-xs-12"><p>{{ form.possessore.label_tag }}{{ form.possessore.help_text }}{% render_field form.possessore class+="form-control" %}</p></div>
+
                 <!-- cd_invent -->
                 <p>{{ form.cd_invent.errors }}</p>
                 <div class="col-xs-12"><p>{{ form.cd_invent.label_tag }}{{ form.cd_invent.help_text }}{% render_field form.cd_invent class+="form-control" %}</p></div>
 
                 <!-- pg_bene -->
                 <p>{{ form.pg_bene.errors }}</p>
-                <div class="col-xs-12"><p>{{ form.pg_bene.label_tag }}{{ form.pg_bene.help_text }}{% render_field form.pg_bene class+="form-control" %}</p></div>
+                <div class="col-xs-6" style="display:inline-block;"><p>{{ form.pg_bene.label_tag }}{{ form.pg_bene.help_text }}{% render_field form.pg_bene class+="form-control" %}</p></div>
+                <!-- inline dash -->
+                <p> </p>
+                <div class="col-xs-1" style="display:inline-block;"><p> - </p></div>
                 <!-- pg_bene_sub -->
                 <p>{{ form.pg_bene_sub.errors }}</p>
-                <div class="col-xs-12"><p>{{ form.pg_bene_sub.label_tag }}{{ form.pg_bene_sub.help_text }}{% render_field form.pg_bene_sub class+="form-control" %}</p></div>
+                <div class="col-xs-5" style="display:inline-block;"><p>{{ form.pg_bene_sub.label_tag }}{{ form.pg_bene_sub.help_text }}{% render_field form.pg_bene_sub class+="form-control" %}</p></div>
                 <!-- ds_spazio -->
                 <p>{{ form.ds_spazio.errors }}</p>
                 <div class="col-xs-12"><p>{{ form.ds_spazio.label_tag }}{{ form.ds_spazio.help_text }}{% render_field form.ds_spazio class+="form-control" %}</p></div>

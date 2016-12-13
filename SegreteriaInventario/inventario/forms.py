@@ -1,10 +1,13 @@
 # -*- coding: utf-8 -*-
 
 from django import forms
-from models import Bene
+from models import Bene, Esse3User
 from inventario.models import RicognizioneInventariale
+from dal import autocomplete
 
 from django.forms.widgets import Select
+
+from django.contrib.auth.models import User
 
 
 class PictureForm(forms.Form):
@@ -153,10 +156,19 @@ class AdvancedSearchForm(forms.Form):
 	)
 
 class RicognizioneInventarialeForm(forms.ModelForm):
+
+    #possessore = forms.ChoiceField(label='Possessore',widget=Select(choices=[('','---------')] + [(item[0], item[1] + " " + item[2] ) for item in User.objects.using('default').values_list('username', 'first_name', 'last_name').distinct()]))
+    possessore = forms.ModelChoiceField(
+        label='Possessore',
+        queryset=Esse3User.objects.using('default').all(),
+        widget=autocomplete.ModelSelect2(url='esse3user-autocomplete'))
+
     class Meta:
         model = RicognizioneInventariale
-        fields = ['id','cd_invent','pg_bene','pg_bene_sub','ds_spazio','ubicazione_precisa','ds_bene','immagine']
+        fields = ['descrizione_bene','id','cd_invent','pg_bene','pg_bene_sub','ds_spazio','ubicazione_precisa','ds_bene','immagine','possessore']
         labels = {
+            'descrizione_bene' : 'Descrizione',
+            'possessore' : 'Possessore',
             'cd_invent': 'Codice Inventario',
             'pg_bene': 'Numero Inventario',
             'pg_bene_sub': 'Numero Bene Collegato',
@@ -167,6 +179,8 @@ class RicognizioneInventarialeForm(forms.ModelForm):
         widgets = {
             'ds_spazio' : Select(choices=[('','---------')] + [(item,item) for item in Bene.objects.using('default').values_list('ds_spazio', flat=True).distinct()]),
             'cd_invent' : Select(choices=[('','---------')] + [(item[0], item[0] + " - " + item[1] ) for item in Bene.objects.using('default').values_list('cd_invent', 'ds_invent').distinct()]),
+            #'possessore' : Select(choices=[('','---------')] + [(item[0], item[1] + " " + item[2] ) for item in User.objects.using('default').values_list('username', 'first_name', 'last_name').distinct()]),
+            'possessore' : autocomplete.ModelSelect2(url='esse3user-autocomplete')
         }
 
 
