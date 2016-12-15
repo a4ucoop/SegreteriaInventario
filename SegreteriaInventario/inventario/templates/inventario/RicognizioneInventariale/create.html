@@ -25,10 +25,15 @@
                 <p>{{ form.possessore.errors }}</p>
                 <div class="col-xs-12"><p>{{ form.possessore.label_tag }}{{ form.possessore.help_text }}{% render_field form.possessore class+="form-control" %}</p></div>
 
+                <!-- inseritore -->
+                <p>{{ form.inserito_da.errors }}</p>
+                <div class="col-xs-12"><p>{{ form.inserito_da.label_tag }}{{ form.inserito_da.help_text }}{% render_field form.inserito_da class+="form-control" %}</p></div>
+
                 <!-- cd_invent -->
                 <p>{{ form.cd_invent.errors }}</p>
                 <div class="col-xs-12"><p>{{ form.cd_invent.label_tag }}{{ form.cd_invent.help_text }}{% render_field form.cd_invent class+="form-control" %}</p></div>
 
+                <!-- numero inventario e bene collegato -->
                 <div class="col-xs-12"><p>
                     <p>{{ form.pg_bene.errors }}</p>
                     <p>{{ form.pg_bene_sub.errors }}</p>

@@ -33,7 +33,8 @@ class Bene(models.Model):
 
 class RicognizioneInventariale(models.Model):
     descrizione_bene = models.CharField(max_length=256, default='')
-    possessore = models.ForeignKey('Esse3User',default=None,related_name='ricinv_possessori')
+    #possessore = models.ForeignKey('Esse3User',default=None,related_name='ricinv_possessori')
+    possessore = models.CharField(max_length=100)
     inserito_da = models.ForeignKey(User, default=None, related_name='ricinv_inseritori')
     cd_invent = models.CharField(max_length=8)
     ds_invent = models.CharField(max_length=256,default=None,null=True)

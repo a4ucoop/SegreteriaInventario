@@ -158,17 +158,18 @@ class AdvancedSearchForm(forms.Form):
 class RicognizioneInventarialeForm(forms.ModelForm):
 
     #possessore = forms.ChoiceField(label='Possessore',widget=Select(choices=[('','---------')] + [(item[0], item[1] + " " + item[2] ) for item in User.objects.using('default').values_list('username', 'first_name', 'last_name').distinct()]))
-    possessore = forms.ModelChoiceField(
-        label='Possessore',
-        queryset=Esse3User.objects.using('default').all(),
-        widget=autocomplete.ModelSelect2(url='esse3user-autocomplete'))
+    #possessore = forms.ModelChoiceField(
+    #    label='Possessore',
+    #    queryset=Esse3User.objects.using('default').all(),
+    #    widget=autocomplete.ModelSelect2(url='esse3user-autocomplete'))
 
     class Meta:
         model = RicognizioneInventariale
-        fields = ['descrizione_bene','id','cd_invent','pg_bene','pg_bene_sub','ds_spazio','ubicazione_precisa','ds_bene','immagine','possessore']
+        fields = ['descrizione_bene','id','cd_invent','pg_bene','pg_bene_sub','ds_spazio','ubicazione_precisa','ds_bene','immagine','possessore', 'inserito_da']
         labels = {
             'descrizione_bene' : 'Descrizione',
             'possessore' : 'Possessore',
+            'inserito_da' : 'Inserito Da',
             'cd_invent': 'Codice Inventario',
             'pg_bene': 'Numero Inventario',
             'pg_bene_sub': 'Numero Bene Collegato',
@@ -180,7 +181,7 @@ class RicognizioneInventarialeForm(forms.ModelForm):
             'ds_spazio' : Select(choices=[('','---------')] + [(item,item) for item in Bene.objects.using('default').values_list('ds_spazio', flat=True).distinct()]),
             'cd_invent' : Select(choices=[('','---------')] + [(item[0], item[0] + " - " + item[1] ) for item in Bene.objects.using('default').values_list('cd_invent', 'ds_invent').distinct()]),
             #'possessore' : Select(choices=[('','---------')] + [(item[0], item[1] + " " + item[2] ) for item in User.objects.using('default').values_list('username', 'first_name', 'last_name').distinct()]),
-            'possessore' : autocomplete.ModelSelect2(url='esse3user-autocomplete')
+            #'possessore' : autocomplete.ModelSelect2(url='esse3user-autocomplete')
         }
 
 

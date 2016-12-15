@@ -9,6 +9,21 @@
 <link href="{% static 'css/bootstrap/bootstrap-table/extensions/editable/bootstrap-editable.css'%}" rel="stylesheet">
 <link href="{% static 'css/bootstrap/simple-sidebar/simple-sidebar.css'%}" rel="stylesheet">
 <link href="{% static 'inventario/css/showLocalDBTableColumns.css'%}" rel="stylesheet">
+<style>
+.ui-autocomplete {
+    z-index: 5000;
+    max-height: 200px;
+    overflow-y: auto;
+    /* prevent horizontal scrollbar */
+    overflow-x: hidden;
+  }
+  /* IE 6 doesn't support max-height
+   * we use height instead, but this forces the menu to always be this tall
+   */
+  * html .ui-autocomplete {
+    height: 200px;
+  }
+</style>
 {% endblock %}
 
 
@@ -299,6 +314,12 @@
                     sortable: true,
                     align: 'center'
                 }, {
+                    field: 'possessore',
+                    title: 'possessore',
+                    class: 'possessore',
+                    sortable: true,
+                    align: 'center'
+                }, {
                     field: 'ubicazione_precisa',
                     title: 'locale',
                     class: 'ubicazione_precisa',
@@ -573,7 +594,6 @@
         });
     }
 
-
     // mostra/nasconde l'input per aggiungere una nuova posizione
     function showNewAccLocationDiv () {
         if ($("#newAccLocationDiv").is(":visible")==false) $("#newAccLocationDiv").show();
@@ -632,6 +652,29 @@ window.addEventListener("DOMContentLoaded", function () {
 <script type="text/javascript">
 $( document ).ready(function() {
     $( "#ricInvLink" ).addClass( "active" );
+
+    url = '/inventario/ricinv/getPossessori';
+    var possessori = [];
+    $.ajax({ 
+        type: 'GET', 
+        url: url, 
+        dataType: 'json',
+        success: function (data) { 
+            var i = 0;
+            $.each(data, function(index, element) {
+                    // alert("id= " + element.value + " value= " + element.text);
+                    var possessore = "" + element.nome + " " + element.cognome;
+                    possessori[i] = possessore;
+                    //alert(possessore);
+                    //alert(possessori[i]);
+                    //possessori.push(item);
+                    i++;
+            });
+            $( "#id_possessore" ).autocomplete({
+              source: possessori
+            });
+        }
+    });
 });
 </script>
 {% endblock %}

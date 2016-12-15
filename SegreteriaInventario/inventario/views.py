@@ -925,9 +925,6 @@ def ricognizioneInventarialeCreateView(request):
                 possessore = possessore,
                 inserito_da = inserito_da
             )
-        #form.save()
-        #else:
-        #    return HttpResponse("Not created")
     else:
         form = RicognizioneInventarialeForm(request.GET)
 
@@ -1101,6 +1098,7 @@ def getRicognizioniData(request):
             Q(pg_bene_sub__icontains= search) | \
             Q(ds_bene__icontains= search) | \
             Q(ds_spazio__icontains= search) | \
+            Q(possessore__icontains= search) | \
             Q(ubicazione_precisa__ubicazione__icontains= search)  \
             ).count()
 
@@ -1113,6 +1111,7 @@ def getRicognizioniData(request):
             Q(pg_bene_sub__icontains= search) | \
             Q(ds_bene__icontains= search) | \
             Q(ds_spazio__icontains= search) | \
+            Q(possessore__icontains= search) | \
             Q(ubicazione_precisa__ubicazione__icontains= search)  \
             ).order_by(order)[offset:offset + limit]
 
@@ -1137,6 +1136,7 @@ def getRicognizioniData(request):
         "pg_bene_sub": ' + json.dumps(str(row.pg_bene_sub)) + ', \
         "ds_bene": ' + json.dumps(row.ds_bene) + ', \
         "ds_spazio": ' + json.dumps(row.ds_spazio) + ', \
+        "possessore": ' + json.dumps(row.possessore) + ', \
         "ubicazione_precisa": ' + json.dumps(str(row.ubicazione_precisa_id)) + ', \
         "immagine": ' + json.dumps(str(row.immagine)) + \
         ' }, '
@@ -1224,6 +1224,23 @@ def advancedRicognizioneInventarialeSearch(request):
         return HttpResponse(html)
         # Redirect to the document list after POST
         return redirect ('ricinv')
+
+@login_required
+def getPossessori(request):
+    cursor = connections['cineca'].cursor()         # Cursor connessione Cineca
+    cursorLocal = connections['default'].cursor()   # Cursor DB locale
+    
+    cursor.execute("SELECT DISTINCT NOME, COGNOME FROM V_IE_AC_AB_ALL")
+    rows = rows_to_dict_list(cursor)
+
+    list = "["
+    # we create the JSON response according to the x-edit plugin data format
+    for row in rows:
+        list = list + "{ \"nome\": " + json.dumps(row['NOME']) + ", " + "\"cognome\": " + json.dumps(row['COGNOME']) + "},"
+    list = list[:-1] + "]"
+    # the HttpResponse contains the JSON data
+    return HttpResponse(list)
+
 
 class Esse3UserAutocomplete(autocomplete.Select2QuerySetView):
     
