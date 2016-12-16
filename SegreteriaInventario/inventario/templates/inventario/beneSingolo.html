@@ -8,20 +8,32 @@
 	<p class="text-left"><b>categoria: </b>{{ cd_categ_gruppo }} - {{ ds_categ_gruppo }}</p>
 	<p class="text-left"><b>data acquisto: </b>{{ dt_registrazione_buono }}</p>
 	<p class="text-left"><b>edificio: </b>{{ ds_spazio }}</p>
-	<p class="text-left"><b>locale: </b>{{ ubicazione_precisa }}</p>
+	<p class="text-left"><b>locale: </b>
+	{% if ubicazione_precisa %}
+		{{ ubicazione_precisa }}</p>
+	{% else %}
+		<a class="text-left text-danger"><b>Non disponibile</b></a></p>
+	{% endif %}	
+
 	<p class="text-left"><b>data inizio ammortamento: </b>{{ dt_ini_ammortamento }}</p>
 	<p class="text-left"><b>valore convenzionale: </b>{{ valore_convenzionale }}</p>
 	<p class="text-left"><b>tipo documento: </b>{{ nome_tipo_dg }}</p>
 	<p class="text-left"><b>documento di riferimento: </b>{{ num_doc_rif }}</p>
-	<p class="text-left"><b>muero di registrazione: </b>{{ num_registrazione }}</p>
+	<p class="text-left"><b>numero di registrazione: </b>{{ num_registrazione }}</p>
 	<p class="text-left"><b>fornitore: </b>{{ denominazione }}</p>
-	<p class="text-left"><b>nome: </b>{{ nome }}</p>
-	<p class="text-left"><b>cognome: </b>{{ cognome }}</p>
-	<p class="text-left"><b>immagine: </b></p><p class="text-left">
-	{% if immagine %}
-		<img style="max-width:20%;" src="/inventario{{ immagine.url }}" ></p>
+	
+	<p class="text-left"><b>possessore: </b>
+	{% if nome %}
+		{{ nome }} {{ cognome }}</p>
 	{% else %}
-		<p class="text-left text-danger"><b>Foto non disponibile</b></p>
+		<a class="text-left text-danger"><b>Non disponibile</b></a></p>
+	{% endif %}	
+
+	<p class="text-left"><b>immagine: </b>
+	{% if immagine %}
+		</p><p class="text-left"><img style="max-width:20%;" src="/inventario{{ immagine.url }}" ></p>
+	{% else %}
+		<a class="text-left text-danger"><b>Non disponibile</b></a></p>
 	{% endif %}
 </div>
 {% endblock %}

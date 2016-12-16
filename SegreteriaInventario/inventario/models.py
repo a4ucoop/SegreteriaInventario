@@ -35,14 +35,16 @@ class RicognizioneInventariale(models.Model):
     descrizione_bene = models.CharField(max_length=256, default='')
     #possessore = models.ForeignKey('Esse3User',default=None,related_name='ricinv_possessori')
     possessore = models.CharField(max_length=100)
-    inserito_da = models.ForeignKey(User, default=None, related_name='ricinv_inseritori')
+    nuovo_possessore = models.CharField(max_length=100,default=None,null=True)
+    inserito_da = models.ForeignKey(User, default=None, related_name='ricinv_inseritori', blank=True, null=True)
     cd_invent = models.CharField(max_length=8)
     ds_invent = models.CharField(max_length=256,default=None,null=True)
     pg_bene = models.IntegerField(default=None)
     pg_bene_sub = models.IntegerField(default=0)
-    ds_bene = models.CharField(max_length=400, blank=True, null=True)
+    ds_bene = models.CharField(max_length=400, default="")
     ds_spazio = models.CharField(max_length=2000, null=True)
     ubicazione_precisa = models.ForeignKey(UbicazionePrecisa,blank=True, null=True, on_delete=models.SET_NULL)
+    note = models.CharField(max_length=400, blank=True, null=True)
     immagine = models.FileField(upload_to='pictures/%Y/%m/%d', blank=True, null=True)
 
 class Esse3User(models.Model):

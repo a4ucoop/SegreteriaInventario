@@ -22,6 +22,8 @@ from django.forms.widgets import Select
 
 import datetime
 import json
+from django.core import serializers
+from django.http import JsonResponse
 
 @login_required
 def index(request):
@@ -460,6 +462,8 @@ def showSingleItem(request, remote_id):
         'num_registrazione' : bene.num_registrazione,
         'dt_registrazione_dg' : bene.dt_registrazione_dg,
         'denominazione' : bene.denominazione, 
+        'nome' : bene.nome,
+        'cognome' : bene.cognome,
         'immagine': bene.immagine,
     }
     return render (request, 'inventario/beneSingolo.html', context)
@@ -906,6 +910,7 @@ def ricognizioneInventarialeCreateView(request):
         ds_bene = request.POST.get('ds_bene',None)
         immagine = request.FILES.get('immagine',None)
         possessore = request.POST.get('possessore',None)
+        note = request.POST.get('note',None)
         inserito_da = request.user
         
         if ubicazione_precisa:
@@ -923,8 +928,11 @@ def ricognizioneInventarialeCreateView(request):
                 ds_bene = ds_bene,
                 immagine = immagine,
                 possessore = possessore,
-                inserito_da = inserito_da
+                inserito_da = inserito_da,
+                note = note
             )
+        else:
+            print(form.errors)
     else:
         form = RicognizioneInventarialeForm(request.GET)
 
@@ -1099,6 +1107,8 @@ def getRicognizioniData(request):
             Q(ds_bene__icontains= search) | \
             Q(ds_spazio__icontains= search) | \
             Q(possessore__icontains= search) | \
+            Q(nuovo_possessore__icontains= search) | \
+            Q(note__icontains= search) | \
             Q(ubicazione_precisa__ubicazione__icontains= search)  \
             ).count()
 
@@ -1112,6 +1122,8 @@ def getRicognizioniData(request):
             Q(ds_bene__icontains= search) | \
             Q(ds_spazio__icontains= search) | \
             Q(possessore__icontains= search) | \
+            Q(nuovo_possessore__icontains= search) | \
+            Q(note__icontains= search) | \
             Q(ubicazione_precisa__ubicazione__icontains= search)  \
             ).order_by(order)[offset:offset + limit]
 
@@ -1137,7 +1149,9 @@ def getRicognizioniData(request):
         "ds_bene": ' + json.dumps(row.ds_bene) + ', \
         "ds_spazio": ' + json.dumps(row.ds_spazio) + ', \
         "possessore": ' + json.dumps(row.possessore) + ', \
+        "nuovo_possessore": ' + json.dumps(row.nuovo_possessore) + ', \
         "ubicazione_precisa": ' + json.dumps(str(row.ubicazione_precisa_id)) + ', \
+        "note": ' + json.dumps(row.note) + ', \
         "immagine": ' + json.dumps(str(row.immagine)) + \
         ' }, '
 
@@ -1227,20 +1241,21 @@ def advancedRicognizioneInventarialeSearch(request):
 
 @login_required
 def getPossessori(request):
+    term = request.GET.get('term', "")
     cursor = connections['cineca'].cursor()         # Cursor connessione Cineca
     cursorLocal = connections['default'].cursor()   # Cursor DB locale
     
-    cursor.execute("SELECT DISTINCT NOME, COGNOME FROM V_IE_AC_AB_ALL")
+    cursor.execute(
+        "SELECT DISTINCT NOME, COGNOME FROM V_IE_AC_AB_ALL WHERE LOWER(NOME) LIKE '%" + term.lower() + "%' OR LOWER(COGNOME) LIKE '%" + term.lower() + "%'"
+    )
     rows = rows_to_dict_list(cursor)
+    return JsonResponse({'results': list(rows)})
 
-    list = "["
-    # we create the JSON response according to the x-edit plugin data format
-    for row in rows:
-        list = list + "{ \"nome\": " + json.dumps(row['NOME']) + ", " + "\"cognome\": " + json.dumps(row['COGNOME']) + "},"
-    list = list[:-1] + "]"
-    # the HttpResponse contains the JSON data
-    return HttpResponse(list)
-
+def getBeniForRicInve(request):
+    term = request.GET.get('term', "")
+    rows = Bene.objects.using('default').values_list('ds_bene', 'nome', 'cognome', 'cd_invent', 'ds_invent', 'pg_bene', 'pg_bene_sub', 'ds_spazio', 'ubicazione_precisa')
+    rows = rows.filter(pg_bene__icontains = term)
+    return JsonResponse({'results': list(rows)})
 
 class Esse3UserAutocomplete(autocomplete.Select2QuerySetView):
     

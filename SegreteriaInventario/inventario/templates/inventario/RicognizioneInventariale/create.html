@@ -3,81 +3,97 @@
 
     <!-- Modal content-->
     <div class="modal-content">
-        <div class="modal-header">
-            <button type="button" class="close" data-dismiss="modal">&times;</button>
-            <h4 class="modal-title">
-                {% block modal-title %}
-                Nuova Ricognizione Inventariale
-                {% endblock %}
-            </h4>
-        </div>
-        <div class="modal-body">
-            {% block form-header %}
-            <form name="ricinv_form" id="ricinv_create_form_id" method="POST" action="{% url "inventario.views.ricognizioneInventarialeCreateView" %}" enctype="multipart/form-data">    
-                {% endblock %}                        
-                {% csrf_token %}
+        {% block form-header %}
+        <form name="ricinv_form" id="ricinv_create_form_id" method="POST" action="{% url "inventario.views.ricognizioneInventarialeCreateView" %}" enctype="multipart/form-data">    
+        {% endblock %}                        
+        {% csrf_token %}
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                <h4 class="modal-title">
+                    {% block modal-title %}
+                    Nuova Ricognizione Inventariale
+                    {% endblock %}
+                </h4>
+            </div>
+            <div class="modal-body">
 
-                <!-- descrizione_bene -->
-                <p>{{ form.descrizione_bene.errors }}</p>
-                <div class="col-xs-12"><p>{{ form.descrizione_bene.label_tag }}{{ form.descrizione_bene.help_text }}{% render_field form.descrizione_bene class+="form-control" %}</p></div>
+                    <!-- descrizione bene -->
+                    <p>{{ form.ds_bene.errors }}</p>
+                    <div class="col-xs-12"><p>{{ form.ds_bene.label_tag }}<a class="text-left text-danger"><b>*</b></a>{{ form.ds_bene.help_text }}{% render_field form.ds_bene class+="form-control required"%}</p></div>
 
-                <!-- possessore -->
-                <p>{{ form.possessore.errors }}</p>
-                <div class="col-xs-12"><p>{{ form.possessore.label_tag }}{{ form.possessore.help_text }}{% render_field form.possessore class+="form-control" %}</p></div>
-
-                <!-- inseritore -->
-                <p>{{ form.inserito_da.errors }}</p>
-                <div class="col-xs-12"><p>{{ form.inserito_da.label_tag }}{{ form.inserito_da.help_text }}{% render_field form.inserito_da class+="form-control" %}</p></div>
-
-                <!-- cd_invent -->
-                <p>{{ form.cd_invent.errors }}</p>
-                <div class="col-xs-12"><p>{{ form.cd_invent.label_tag }}{{ form.cd_invent.help_text }}{% render_field form.cd_invent class+="form-control" %}</p></div>
-
-                <!-- numero inventario e bene collegato -->
-                <div class="col-xs-12"><p>
-                    <p>{{ form.pg_bene.errors }}</p>
-                    <p>{{ form.pg_bene_sub.errors }}</p>
-                    <p>{{ form.pg_bene.help_text }}</p>
-                    <p>{{ form.pg_bene_sub.help_text }}</p>
-                    <label for="id_cd_invent">Numero inventario e bene collegato:</label>
-                    <div class="input-group">
-                        {% render_field form.pg_bene class+="form-control col-xs-9" placeholder+="numero inventario" %}
-                        <span class="input-group-addon">-</span>
-                        {% render_field form.pg_bene_sub class+="form-control col-xs-3" placeholder+="bene collegato" %}
+                    <!-- possessore -->
+                    <p>{{ form.possessore.errors }}</p>
+                    <div class="col-xs-12">
+                             <p>{{ form.possessore.label_tag }}<a class="text-left text-danger"><b>*</b></a>
+                                {{ form.possessore.help_text }}
+                                 <div class="input-group">
+                                    {% render_field form.possessore class+="form-control required" %}
+                                 <span class="input-group-btn">
+                                      <button id="id_btn_nuovo_possessore" class="btn btn-default" type="button" title="Nuovo Possessore">
+                                          <span class="glyphicon glyphicon-user"></span>&nbsp;
+                                      </button>
+                                 </span>
+                                </div>
+                            </p>
                     </div>
-                </p></div>
 
-                <!-- ds_spazio -->
-                <p>{{ form.ds_spazio.errors }}</p>
-                <div class="col-xs-12"><p>{{ form.ds_spazio.label_tag }}{{ form.ds_spazio.help_text }}{% render_field form.ds_spazio class+="form-control" %}</p></div>
-                <!-- ubicazione_precisa -->
-                <p>{{ form.ubicazione_precisa.errors }}</p>
-                <div class="col-xs-12"><p>{{ form.ubicazione_precisa.label_tag }}{{ form.ubicazione_precisa.help_text }}{% render_field form.ubicazione_precisa class+="form-control" %}</p></div>
-                <!-- descrizione bene -->
-                <div class="col-xs-12" style="padding-left:2.5%;padding-right:2.5%;">
-                  <p>
-                      <p>{{ form.ds_bene.errors }}</p>
-                      <p>{{ form.ds_bene.label_tag }} {{ form.ds_bene.help_text }} {% render_field form.ds_bene class+="form-control" %}</p>
-                  </p>
-                </div>
-                <!-- immagine -->
-                <div class="col-xs-12" style="padding-left:2.5%;padding-right:2.5%;">
-                    <p>{{ form.non_field_errors }}</p>
-                    <p>{{ form.immagine.label_tag }} {{ form.immagine.help_text }}</p>
-                    <p>
-                        {{ form.immagine.errors }}
-                        <span class="btn btn-primary btn-file">
-                            Scegli un Immagine... {{ form.immagine }}
-                        </span>
-                    </p>
-                </div>
-            </form>
+                    <!-- nuovo nuovo_possessore -->
+                    <p>{{ form.nuovo_possessore.errors }}</p>
+                    <div class="col-xs-12" id="div_id_nuovo_possessore"><p>{{ form.nuovo_possessore.label_tag }} {{ form.nuovo_possessore.help_text }}{% render_field form.nuovo_possessore class+="form-control" %}</p></div>
+
+                    <!-- inseritore -->
+                    <p>{{ form.inserito_da.errors }}</p>
+                    <div class="col-xs-12"><p>{{ form.inserito_da.label_tag }}{{ form.inserito_da.help_text }}{% render_field form.inserito_da class+="form-control" %}</p></div>
+
+                    <!-- cd_invent -->
+                    <p>{{ form.cd_invent.errors }}</p>
+                    <div class="col-xs-12"><p>{{ form.cd_invent.label_tag }}<a class="text-left text-danger"><b>*</b></a>{{ form.cd_invent.help_text }}{% render_field form.cd_invent class+="form-control required" %}</p></div>
+
+                    <!-- numero inventario e bene collegato -->
+                    <div class="col-xs-12"><p>
+                        <p>{{ form.pg_bene.errors }}</p>
+                        <p>{{ form.pg_bene_sub.errors }}</p>
+                        <p>{{ form.pg_bene.help_text }}</p>
+                        <p>{{ form.pg_bene_sub.help_text }}</p>
+                        <label for="id_cd_invent">Numero inventario e bene collegato:</label><a class="text-left text-danger"><b>*</b></a>
+                        <div class="input-group">
+                            {% render_field form.pg_bene class+="form-control col-xs-9 required" placeholder+="numero inventario" %}
+                            <span class="input-group-addon">-</span>
+                            {% render_field form.pg_bene_sub class+="form-control col-xs-3 required" placeholder+="bene collegato" %}
+                        </div>
+                    </p></div>
+
+                    <!-- ds_spazio -->
+                    <p>{{ form.ds_spazio.errors }}</p>
+                    <div class="col-xs-12"><p>{{ form.ds_spazio.label_tag }}<a class="text-left text-danger"><b>*</b></a>{{ form.ds_spazio.help_text }}{% render_field form.ds_spazio class+="form-control required" %}</p></div>
+                    <!-- ubicazione_precisa -->
+                    <p>{{ form.ubicazione_precisa.errors }}</p>
+                    <div class="col-xs-12"><p>{{ form.ubicazione_precisa.label_tag }}{{ form.ubicazione_precisa.help_text }}{% render_field form.ubicazione_precisa class+="form-control" %}</p></div>
+                    <!-- note -->
+                    <div class="col-xs-12" style="padding-left:2.5%;padding-right:2.5%;">
+                      <p>
+                          <p>{{ form.note.errors }}</p>
+                          <p>{{ form.note.label_tag }} {{ form.note.help_text }} {% render_field form.note class+="form-control" %}</p>
+                      </p>
+                    </div>
+                    <!-- immagine -->
+                    <div class="col-xs-12" style="padding-left:2.5%;padding-right:2.5%;">
+                        <p>{{ form.non_field_errors }}</p>
+                        <p>{{ form.immagine.label_tag }} {{ form.immagine.help_text }}</p>
+                        <p>
+                            {{ form.immagine.errors }}
+                            <span class="btn btn-primary btn-file">
+                                Scegli un Immagine... {{ form.immagine }}
+                            </span>
+                        </p>
+                    </div>
+            </div>
+            <div class="modal-footer">
+                {% block submit-button %}
+                <input id="create_submit_btn_id" type="submit" class="btn btn-primary" value="Crea"/>
+                {% endblock %}
+                <button type="button" class="btn btn-default" data-dismiss="modal">Chiudi</button>
+            </div>
         </div>
-        <div class="modal-footer">
-            {% block submit-button %}
-            <input id="create_submit_btn_id" type="submit" class="btn btn-primary" value="Crea"/>
-            {% endblock %}
-            <button type="button" class="btn btn-default" data-dismiss="modal">Chiudi</button>
-        </div>
-    </div>
+    </form>
 </div>

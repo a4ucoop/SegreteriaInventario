@@ -320,6 +320,18 @@
                     sortable: true,
                     align: 'center'
                 }, {
+                    field: 'nuovo_possessore',
+                    title: 'nuovo possessore',
+                    class: 'nuovo_possessore',
+                    sortable: true,
+                    align: 'center'
+                },{
+                    field: 'note',
+                    title: 'note',
+                    class: 'note',
+                    sortable: true,
+                    align: 'center'
+                }, {
                     field: 'ubicazione_precisa',
                     title: 'locale',
                     class: 'ubicazione_precisa',
@@ -387,21 +399,31 @@
         var html = [];
         $.each(row, function (key, value) {
             // if we're displaying the accurate location we must match the id with the actual text value
-            if (key == 'accurate_location') 
+            if(key == 'cd_invent')
+                html.push('<p><b>Codice Inventario:</b> ' + cdinventFormatter(value, row, index) + '</p>');
+            else if (key == 'ds_invent');
+            else if (key == 'pg_bene')
+                html.push('<p><b>Numero inventario:</b> ' + pgFormatter(value, row, index) + '</p>');
+            else if (key == 'pg_bene_sub');
+            else if (key == 'ds_bene') 
+                html.push('<p><b>Descrizione:</b> ' + value + '</p>');
+            else if (key == 'ds_spazio')
+                html.push('<p><b>Edificio:</b> ' + value + '</p>');
+            else if (key == 'possessore')
+                html.push('<p><b>Possessore:</b> ' + value + '</p>');
+            else if (key == 'ubicazione_precisa') 
             {
                 if (value != "None")
-                    html.push('<p><b>' + key + ':</b> ' + AccurateLocationsArray[value] + '</p>');
+                    html.push('<p><b>Locale:</b> ' + AccurateLocationsArray[value] + '</p>');
                 else
-                    html.push('<p><b>' + key + ':</b> Empty </p>');
+                    html.push('<p><b>Locale:</b> <b class="text-left text-danger">Non specificato</b></p>');
             }
             // we need to show the render the immagine based on the filepath
             else if(key == 'immagine')
                 if ( value != "")
                     html.push('<p><b>' + key + ':</b></p><p><img style="max-width:100px;max-height:100px" src="/inventario/media/' + value + '"></p>');
                 else
-                    html.push('<p><b>' + key + ': </b><b class="text-left text-danger">Foto non disponibile</b></p>');
-            else if(key == 'cd_invent')
-                html.push('<p><b>Codice Inventario:</b> ' + cdinventFormatter(value, row, index) + '</p>');
+                    html.push('<p><b>' + key + ': </b><b class="text-left text-danger">Non disponibile</b></p>');
             // we hide the state 
             else if (key == 'state'){}
             else
@@ -508,6 +530,11 @@
     function cdinventFormatter(value, row) {
         // return "<a href='/inventario/show/" + row.id + "'>" + value + "</a>";
         return row.cd_invent + " - " + row.ds_invent;
+    }
+
+    function pgFormatter(value, row) {
+        // return "<a href='/inventario/show/" + row.id + "'>" + value + "</a>";
+        return row.pg_bene + "-" + row.pg_bene_sub;
     }
 
     $(function () {
@@ -652,29 +679,111 @@ window.addEventListener("DOMContentLoaded", function () {
 <script type="text/javascript">
 $( document ).ready(function() {
     $( "#ricInvLink" ).addClass( "active" );
+    $(".required").prop('required',true);
 
-    url = '/inventario/ricinv/getPossessori';
-    var possessori = [];
-    $.ajax({ 
-        type: 'GET', 
-        url: url, 
-        dataType: 'json',
-        success: function (data) { 
-            var i = 0;
-            $.each(data, function(index, element) {
-                    // alert("id= " + element.value + " value= " + element.text);
-                    var possessore = "" + element.nome + " " + element.cognome;
-                    possessori[i] = possessore;
-                    //alert(possessore);
-                    //alert(possessori[i]);
-                    //possessori.push(item);
-                    i++;
-            });
-            $( "#id_possessore" ).autocomplete({
-              source: possessori
-            });
-        }
+    // autocomplete width according to the parent
+    jQuery.ui.autocomplete.prototype._resizeMenu = function () {
+      var ul = this.menu.element;
+      ul.outerWidth(this.element.outerWidth());
+    }
+
+
+    $('#div_id_nuovo_possessore').hide();
+    
+    $('#id_btn_nuovo_possessore').click(function show_nuovo_possessore(argument) {
+      $('#div_id_nuovo_possessore').slideDown();
     });
+
+    // autocomplete possessori
+    var autocomplete = function(element, data) {
+      element.autocomplete({
+        // gets the data source from the server
+        source: function( request, response ) {
+          var url = '/inventario/ricinv/getPossessori';
+          $.ajax({ 
+              type: 'GET', 
+              url: url, 
+              dataType: 'json',
+              data:{term : request.term},
+              success: function (data) { 
+                  var possessori = [];
+                  var i = 0;
+                  // parse the JSON into a string Array
+                  $.each(data.results, function(index, element) {
+                      var possessore = "" + element['NOME'] + " " + element['COGNOME'];
+                      possessori[i] = possessore;
+                      i++;
+                  });
+                  response(possessori);
+              }
+          });
+        },
+      });
+    }
+
+    autocomplete($('#id_possessore'));
+    autocomplete($('#id_nuovo_possessore'));
+
+
+    // autocomplete beni
+    $( '#id_pg_bene' ).autocomplete({
+      // gets the data source from the server
+      source: function( request, response ) {
+        var url = '/inventario/ricinv/getBeniForRicInve';
+        $.ajax({ 
+            type: 'GET', 
+            url: url, 
+            dataType: 'json',
+            data:{term : request.term},
+            success: function (data) { 
+                var beni = [];
+                var i = 0;
+                // parse the JSON into an Object Array
+                $.each(data.results, function(index, element) {
+                        var bene = {
+                          ds_bene : element[0],
+                          nome : element[1],
+                          cognome : element[2],
+                          cd_invent : element[3],
+                          ds_invent : element[4],
+                          pg_bene : element[5],
+                          pg_bene_sub : element[6],
+                          ds_spazio : element[7],
+                          ubicazione_precisa : element[8]
+                        };
+                        beni[i] = bene;
+                        i++;
+                });
+                // matches every item of the array with the search term
+                var matcher = new RegExp($.ui.autocomplete.escapeRegex(request.term), "i");
+                response($.grep(beni, function(value) {
+                    // for each object returns only pg_bene
+                    return matcher.test(value.pg_bene);
+                }));
+            }
+        });
+      },
+    // triggered when an item of the list is selected
+    select: function(event, bene) {
+        // fill the form with the received data
+        $('#id_ds_bene').val(bene.item.ds_bene);
+        $('#id_possessore').val(bene.item.nome + ' ' + bene.item.cognome);
+        $('#id_cd_invent').val(bene.item.cd_invent);
+        $('#id_pg_bene').val(bene.item.pg_bene);
+        $('#id_pg_bene_sub').val(bene.item.pg_bene_sub);
+        $('#id_ds_spazio').val(bene.item.ds_spazio);
+        $('#id_ubicazione_precisa').val(bene.item.ubicazione_precisa);
+        return false;
+    }
+    })
+    // custom render of the items, we only need ID and description
+    .data('uiAutocomplete')._renderItem = function(ul, item) {
+    return $('<li></li>')
+        .data('item.autocomplete', item)
+        .append('<a>' + item.pg_bene + ' ' + item.ds_bene + '</a>')
+        .appendTo(ul);
+    };
+
 });
 </script>
 {% endblock %}

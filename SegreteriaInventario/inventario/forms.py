@@ -163,25 +163,50 @@ class RicognizioneInventarialeForm(forms.ModelForm):
     #    queryset=Esse3User.objects.using('default').all(),
     #    widget=autocomplete.ModelSelect2(url='esse3user-autocomplete'))
 
+#    def __init__(self, *args, **kwargs):
+#        super(RicognizioneInventarialeForm, self).__init__(*args, **kwargs)
+#        for name, field in self.fields.items():
+#        	if field == 'descrizione_bene':
+#        		field.widget = forms.TextInput(attrs={ 'required': 'true' })
+            # if field.widget.__class__ == forms.widgets.TextInput:
+            #     if field.widget.attrs.has_key('class'):
+            #         field.widget.attrs['class'] += ' my-class'
+            #     else:
+            #         field.widget.attrs.update({'class':'my-class'})
+
     class Meta:
         model = RicognizioneInventariale
-        fields = ['descrizione_bene','id','cd_invent','pg_bene','pg_bene_sub','ds_spazio','ubicazione_precisa','ds_bene','immagine','possessore', 'inserito_da']
+        fields = [
+        	'id',
+        	'ds_bene',
+        	'cd_invent',
+        	'pg_bene',
+        	'pg_bene_sub',
+        	'ds_spazio',
+        	'ubicazione_precisa',
+        	'note',
+        	'immagine',
+        	'possessore', 
+        	'nuovo_possessore', 
+        	'inserito_da']
         labels = {
-            'descrizione_bene' : 'Descrizione',
+            'ds_bene' : 'Descrizione',
             'possessore' : 'Possessore',
+            'nuovo_possessore' : 'Nuovo Possessore',
             'inserito_da' : 'Inserito Da',
             'cd_invent': 'Codice Inventario',
             'pg_bene': 'Numero Inventario',
             'pg_bene_sub': 'Numero Bene Collegato',
             'ds_spazio': 'Edificio',
+            'note': 'Note',
             'ubicazione_precisa': 'Locale',
-            'ds_bene': 'Note',
         }
         widgets = {
+        	#'descrizione_bene' : forms.CharField( required=True, label='descrizione', max_length=None ),
+            'pg_bene' : forms.TextInput(),
+        	'pg_bene_sub' : forms.TextInput(),
             'ds_spazio' : Select(choices=[('','---------')] + [(item,item) for item in Bene.objects.using('default').values_list('ds_spazio', flat=True).distinct()]),
             'cd_invent' : Select(choices=[('','---------')] + [(item[0], item[0] + " - " + item[1] ) for item in Bene.objects.using('default').values_list('cd_invent', 'ds_invent').distinct()]),
-            #'possessore' : Select(choices=[('','---------')] + [(item[0], item[1] + " " + item[2] ) for item in User.objects.using('default').values_list('username', 'first_name', 'last_name').distinct()]),
-            #'possessore' : autocomplete.ModelSelect2(url='esse3user-autocomplete')
         }
 
 

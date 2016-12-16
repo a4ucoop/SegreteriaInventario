@@ -23,6 +23,7 @@ urlpatterns = [
 	url(r'^ricinv/create$', views.ricognizioneInventarialeCreateView,name='ricinv_add'),
 	url(r'^ricinv/edit/', views.ricognizioneInventarialeEditView,name='ricinv_edit'),
     url(r'^ricinv/delete/', views.ricognizioneInventarialeDeleteView,name='ricinv_delete'),
+    url(r'^ricinv/getBeniForRicInve/$', views.getBeniForRicInve, name='getBeniForRicInve'),
     url(r'^ricinv/getPossessori/$', views.getPossessori, name='getPossessori'),
 	url(r'^ricinv$', views.ricinv, name='ricinv'),
     url(r'^table/getRicognizioniData', views.getRicognizioniData, name='getRicognizioniData'),
