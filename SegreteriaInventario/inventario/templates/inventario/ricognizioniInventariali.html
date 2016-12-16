@@ -84,8 +84,8 @@
         <div id="toolbar">
             <div class="btn-group" role="group">
               <button type="button"
+                      id="createRicInvModalBtn" 
                       class="btn btn-default"
-                      onClick="$('#createRicInvModal').modal();"
                       title="Inserisci una nuova ricognizione inventariale"
                       >
                 <span class="glyphicon glyphicon-plus" aria-hidden="true"></span>
@@ -159,7 +159,7 @@
         </div>
         
         <!-- Create RecInv -->
-        <div id="createRicInvModal" class="modal fade" role="dialog">
+        <div class="modal fade" id="createRicInvModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
           {% include "inventario/RicognizioneInventariale/create.html" %}
         </div>
         <!-- Edit RecInv -->
@@ -519,7 +519,10 @@
 
     function numeroInventarioFormatter(value, row) {
         // return "<a href='/inventario/show/" + row.id + "'>" + value + "</a>";
-        return row.pg_bene + "-" + row.pg_bene_sub;
+        response = "<a class=\"text-left text-danger\">non disponibile</a>";
+        if (row.pg_bene != "None" && row.pg_bene_sub != "None")
+          response = row.pg_bene + " - " + row.pg_bene_sub;;
+        return response
     }
 
     function categoriaFormatter(value, row) {
@@ -529,7 +532,10 @@
 
     function cdinventFormatter(value, row) {
         // return "<a href='/inventario/show/" + row.id + "'>" + value + "</a>";
-        return row.cd_invent + " - " + row.ds_invent;
+        response = "<a class=\"text-left text-danger\">non disponibile</a>";
+        if (row.cd_invent != null && row.ds_invent != null)
+          response = row.cd_invent + " - " + row.ds_invent;
+        return response
     }
 
     function pgFormatter(value, row) {
@@ -667,16 +673,6 @@
 </script>
 
 <script type="text/javascript">
-window.addEventListener("DOMContentLoaded", function () {
-  var form = document.getElementById("ricinv_create_form_id");
-
-  document.getElementById("create_submit_btn_id").addEventListener("click", function () {
-    form.submit();
-  });
-});
-</script>
-
-<script type="text/javascript">
 $( document ).ready(function() {
     $( "#ricInvLink" ).addClass( "active" );
     $(".required").prop('required',true);
@@ -687,6 +683,18 @@ $( document ).ready(function() {
       ul.outerWidth(this.element.outerWidth());
     }
 
+    $("#createRicInvModalBtn").click(function() {
+      $('#createRicInvModal').modal({
+          backdrop: 'static',
+          keyboard: false
+      });   
+    });
+
+    $("#save-button").click(function() {
+        var id = $(".mytabs.active")[0].id;
+        var $myForm = $("#" + id + "-form");
+        $myForm.find(':submit').click()
+    });
 
     $('#div_id_nuovo_possessore').hide();
     
@@ -721,9 +729,7 @@ $( document ).ready(function() {
       });
     }
 
-    autocomplete($('#id_possessore'));
-    autocomplete($('#id_nuovo_possessore'));
-
+    autocomplete($('.autocomplete_possessore'));
 
     // autocomplete beni
     $( '#id_pg_bene' ).autocomplete({

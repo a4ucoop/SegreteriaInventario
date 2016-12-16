@@ -47,6 +47,16 @@
     word-wrap: break-word !important;
 }
 
+.nuovo_possessore {
+    min-width:300px !important;
+    word-wrap: break-word !important;
+}
+
+.note {
+    min-width:500px !important;
+    word-wrap: break-word !important;
+}
+
 .btn-file {
     position: relative;
     overflow: hidden;

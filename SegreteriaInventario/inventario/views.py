@@ -884,17 +884,6 @@ def advancedSearch(request):
         return redirect ('showLocalDB')
 
 
-#class RicognizioneInventarialeCreateView(CreateView):
-#    """ """
-#    
-#    form_class = RicognizioneInventarialeForm
-#    template_name = "inventario/RicognizioneInventariale/create.html"
-#
-#    def form_valid(self, form):
-#
-#        form.save()
-#        success_url = ""
-#        return HttpResponse("OK")
 @login_required
 def ricognizioneInventarialeCreateView(request):
     """ """
@@ -910,6 +899,7 @@ def ricognizioneInventarialeCreateView(request):
         ds_bene = request.POST.get('ds_bene',None)
         immagine = request.FILES.get('immagine',None)
         possessore = request.POST.get('possessore',None)
+        nuovo_possessore = request.POST.get('nuovo_possessore',None)
         note = request.POST.get('note',None)
         inserito_da = request.user
         
@@ -928,7 +918,41 @@ def ricognizioneInventarialeCreateView(request):
                 ds_bene = ds_bene,
                 immagine = immagine,
                 possessore = possessore,
+                nuovo_possessore = nuovo_possessore,
                 inserito_da = inserito_da,
+                note = note
+            )
+        else:
+            print(form.errors)
+    else:
+        form = RicognizioneInventarialeForm(request.GET)
+
+    return redirect ('ricinv')
+
+@login_required
+def ricognizioneInventarialeCreateNoLabelView(request):
+    """ """
+    if request.method == 'POST':
+
+        form = RicognizioneInventarialeForm(request.POST,request.FILES)
+
+        ds_spazio = request.POST.get('ds_spazio',None)
+        ubicazione_precisa = int(request.POST.get('ubicazione_precisa')) if(request.POST.get('ubicazione_precisa') is not None and request.POST.get('ubicazione_precisa') != '') else None
+        ds_bene = request.POST.get('ds_bene',None)
+        immagine = request.FILES.get('immagine',None)
+        possessore = request.POST.get('possessore',None)
+        note = request.POST.get('note',None)
+        
+        if ubicazione_precisa:
+            ubicazione_precisa = UbicazionePrecisa.objects.using('default').get(pk=ubicazione_precisa)
+
+        if(form.is_valid()):
+            RicognizioneInventariale.objects.using('default').create(
+                ds_spazio = ds_spazio,
+                ubicazione_precisa = ubicazione_precisa,
+                ds_bene = ds_bene,
+                immagine = immagine,
+                possessore = possessore,
                 note = note
             )
         else:
