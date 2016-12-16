@@ -163,9 +163,8 @@
           {% include "inventario/RicognizioneInventariale/create.html" %}
         </div>
         <!-- Edit RecInv -->
-        <div id="editRicInvModal" class="modal fade" role="dialog">
-            <div class="modal-dialog">
-            </div>
+        <div class="modal fade" id="editRicInvModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+          {% include "inventario/RicognizioneInventariale/edit.html" %}
         </div>
 
         <!-- Delete RecInv -->
@@ -411,6 +410,8 @@
                 html.push('<p><b>Edificio:</b> ' + value + '</p>');
             else if (key == 'possessore')
                 html.push('<p><b>Possessore:</b> ' + value + '</p>');
+            else if (key == 'nuovo_possessore')
+                html.push('<p><b>Nuovo possessore:</b> ' + value + '</p>');
             else if (key == 'ubicazione_precisa') 
             {
                 if (value != "None")
@@ -465,17 +466,17 @@
             success: function (data) { 
                 $('#editRicInvModal').html(data);
 
-                // append the id to the form action
-                action = $('#ricinv_edit_form_id').attr('action');
-                action = action + "?id=" + id;
-                $('#ricinv_edit_form_id').attr('action', action);
-
-                // bind the click event of the button
-                var form = document.getElementById("ricinv_edit_form_id");
-
-                document.getElementById("edit_submit_btn_id").addEventListener("click", function () {
-                  form.submit();
-                });
+                //// append the id to the form action
+                //action = $('#ricinv_edit_form_id').attr('action');
+                //action = action + "?id=" + id;
+                //$('#ricinv_edit_form_id').attr('action', action);
+//
+                //// bind the click event of the button
+                //var form = document.getElementById("ricinv_edit_form_id");
+//
+                //document.getElementById("edit_submit_btn_id").addEventListener("click", function () {
+                //  form.submit();
+                //});
 
                 // shows the form
                 $('#editRicInvModal').modal();
@@ -683,6 +684,9 @@ $( document ).ready(function() {
       ul.outerWidth(this.element.outerWidth());
     }
 
+    $("#id_pg_bene").val("");
+    $("#id_pg_bene_sub").val("");
+
     $("#createRicInvModalBtn").click(function() {
       $('#createRicInvModal').modal({
           backdrop: 'static',
@@ -773,7 +777,7 @@ $( document ).ready(function() {
     select: function(event, bene) {
         // fill the form with the received data
         $('#id_ds_bene').val(bene.item.ds_bene);
-        $('#id_possessore').val(bene.item.nome + ' ' + bene.item.cognome);
+        $('#id_possessore').val((bene.item.nome + ' ' + bene.item.cognome).trim());
         $('#id_cd_invent').val(bene.item.cd_invent);
         $('#id_pg_bene').val(bene.item.pg_bene);
         $('#id_pg_bene_sub').val(bene.item.pg_bene_sub);

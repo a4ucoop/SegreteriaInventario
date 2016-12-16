@@ -897,7 +897,7 @@ def ricognizioneInventarialeCreateView(request):
         ds_spazio = request.POST.get('ds_spazio',None)
         ubicazione_precisa = int(request.POST.get('ubicazione_precisa')) if(request.POST.get('ubicazione_precisa') is not None and request.POST.get('ubicazione_precisa') != '') else None
         ds_bene = request.POST.get('ds_bene',None)
-        immagine = request.FILES.get('immagine',None)
+        immagine = request.FILES['immagine'] if len(request.FILES) != 0 else None
         possessore = request.POST.get('possessore',None)
         nuovo_possessore = request.POST.get('nuovo_possessore',None)
         note = request.POST.get('note',None)
@@ -939,7 +939,7 @@ def ricognizioneInventarialeCreateNoLabelView(request):
         ds_spazio = request.POST.get('ds_spazio',None)
         ubicazione_precisa = int(request.POST.get('ubicazione_precisa')) if(request.POST.get('ubicazione_precisa') is not None and request.POST.get('ubicazione_precisa') != '') else None
         ds_bene = request.POST.get('ds_bene',None)
-        immagine = request.FILES.get('immagine',None)
+        immagine = request.FILES['immagine'] if len(request.FILES) != 0 else None
         possessore = request.POST.get('possessore',None)
         note = request.POST.get('note',None)
         
@@ -1199,6 +1199,17 @@ def advancedRicognizioneInventarialeSearch(request):
         ds_bene = request.GET.get('ds_bene')
         ubicazione = request.GET.get('ubicazione')
         ubicazione_precisa = request.GET.get('ubicazione_precisa')
+
+        print("----------------------------");
+        print("min_id_bene: " + str(min_id));
+        print("max_id_bene: " + str(max_id));
+        print("cods: " + str(cods));
+        print("min_pg_bene: " + str(min_pg_bene));
+        print("max_pg_bene: " + str(max_pg_bene));
+        print("ds_bene: " + str(ds_bene));
+        print("ubicazione: " + str(ubicazione));
+        print("ubicazione_precisa: " + str(ubicazione_precisa));
+        print("----------------------------");
 
         requestOrder = request.GET.get('order', None)
         sort = request.GET.get('sort', None)
