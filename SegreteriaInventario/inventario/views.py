@@ -903,12 +903,13 @@ def ricognizioneInventarialeCreateView(request):
         possessore = request.POST.get('possessore',None)
         nuovo_possessore = request.POST.get('nuovo_possessore',None)
         note = request.POST.get('note',None)
-        inserito_da = request.user
         
         if ubicazione_precisa:
             ubicazione_precisa = UbicazionePrecisa.objects.using('default').get(pk=ubicazione_precisa)
 
         if(form.is_valid()):
+            inserito_da = form.cleaned_data['inserito_da'] if (form.cleaned_data['inserito_da'] is not None) else request.user
+            
             RicognizioneInventariale.objects.using('default').create(
                 inventario = Inventario.objects.get(cd_invent=inventario),
                 pg_bene = pg_bene,
@@ -953,6 +954,7 @@ def ricognizioneInventarialeCreateNoLabelView(request):
                 ds_bene = ds_bene,
                 immagine = immagine,
                 possessore = possessore,
+                inserito_da = request.user,
                 note = note
             )
         else:
@@ -991,9 +993,9 @@ def ricognizioneInventarialeEditView(request):
                     ric_inv.immagine = f.cleaned_data['immagine']
                 ric_inv.possessore = f.cleaned_data['possessore']
                 ric_inv.nuovo_possessore = f.cleaned_data['nuovo_possessore']
+                ric_inv.inserito_da = f.cleaned_data['inserito_da'] if (f.cleaned_data['inserito_da'] is not None) else request.user
                 ric_inv.note = f.cleaned_data['note']
-                ric_inv.inserito_da = request.user
-
+                
                 ric_inv.save()
 
             else:
@@ -1110,6 +1112,7 @@ def getRicognizioniData(request):
             Q(ds_spazio__icontains= search) | \
             Q(possessore__icontains= search) | \
             Q(nuovo_possessore__icontains= search) | \
+            Q(inserito_da__username__icontains= search) | \
             Q(note__icontains= search) | \
             Q(ubicazione_precisa__ubicazione__icontains= search)  \
             ).count()
@@ -1125,6 +1128,7 @@ def getRicognizioniData(request):
             Q(ds_spazio__icontains= search) | \
             Q(possessore__icontains= search) | \
             Q(nuovo_possessore__icontains= search) | \
+            Q(inserito_da__username__icontains= search) | \
             Q(note__icontains= search) | \
             Q(ubicazione_precisa__ubicazione__icontains= search)  \
             ).order_by(order)[offset:offset + limit]
@@ -1151,6 +1155,7 @@ def getRicognizioniData(request):
         "ds_spazio": ' + json.dumps(row.ds_spazio) + ', \
         "possessore": ' + json.dumps(row.possessore) + ', \
         "nuovo_possessore": ' + json.dumps(row.nuovo_possessore) + ', \
+        "inserito_da": ' + json.dumps(str(row.inserito_da)) + ', \
         "ubicazione_precisa": ' + json.dumps(str(row.ubicazione_precisa_id)) + ', \
         "note": ' + json.dumps(row.note) + ', \
         "immagine": ' + json.dumps(str(row.immagine)) + \

@@ -347,6 +347,13 @@
                     class: 'nuovo_possessore',
                     sortable: true,
                     align: 'center'
+                }, {
+                    field: 'inserito_da',
+                    title: 'Inseritore',
+                    //formatter: 'nuovoPossessoreFormatter',
+                    class: 'inserito_da',
+                    sortable: true,
+                    align: 'center'
                 },{
                     field: 'note',
                     title: 'note',
@@ -437,6 +444,8 @@
                 html.push('<p><b>Possessore:</b> ' + value + '</p>');
             else if (key == 'nuovo_possessore')
                 html.push('<p><b>Nuovo possessore:</b> ' + nuovoPossessoreFormatter(value, row, index) + '</p>');
+            else if (key == 'inserito_da')
+                html.push('<p><b>Inseritore:</b> ' + value + '</p>');
             else if (key == 'note')
                 html.push('<p><b>Note:</b> ' + noteFormatter(value, row, index) + '</p>');
             else if (key == 'ubicazione_precisa')

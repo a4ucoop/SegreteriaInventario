@@ -57,6 +57,11 @@
     word-wrap: break-word !important;
 }
 
+.inserito_da {
+    min-width:300px !important;
+    word-wrap: break-word !important;
+}
+
 .note {
     min-width:500px !important;
     word-wrap: break-word !important;
