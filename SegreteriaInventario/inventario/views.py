@@ -15,6 +15,7 @@ from models import Bene, UbicazionePrecisa, RicognizioneInventariale
 from forms import PictureForm, RicognizioneInventarialeForm, AdvancedSearchForm, AdvancedSearchRicognizioneInventarialeForm
 
 from dal import autocomplete
+from models import Inventario
 from models import Esse3User 
 
 #from django.forms import ChoiceField,ModelForm
@@ -638,6 +639,7 @@ def uploadPicture(request):
 
 @login_required
 def editAccurateLocation(request):
+    print("il numero magico e':", request.POST.get("pk"))
     postID = int(request.POST.get("pk"))
     value = str(request.POST.get("value"))
 
@@ -891,7 +893,7 @@ def ricognizioneInventarialeCreateView(request):
 
         form = RicognizioneInventarialeForm(request.POST,request.FILES,initial={'pg_bene_sub' : 0})
 
-        cd_invent = request.POST.get('cd_invent',None)
+        inventario = request.POST.get('inventario',None)
         pg_bene = int(request.POST.get('pg_bene')) if (request.POST.get('pg_bene') is not None and request.POST.get('pg_bene') != '') else None
         pg_bene_sub = int(request.POST.get('pg_bene_sub')) if (request.POST.get('pg_bene_sub') is not None and request.POST.get('pg_bene_sub') != '') else None
         ds_spazio = request.POST.get('ds_spazio',None)
@@ -906,11 +908,9 @@ def ricognizioneInventarialeCreateView(request):
         if ubicazione_precisa:
             ubicazione_precisa = UbicazionePrecisa.objects.using('default').get(pk=ubicazione_precisa)
 
-        #if ((cd_invent is not None) and (pg_bene is not None) and (pg_bene_sub is not None)):
         if(form.is_valid()):
             RicognizioneInventariale.objects.using('default').create(
-                cd_invent = cd_invent,
-                ds_invent = Bene.objects.using('default').filter(cd_invent=form.cleaned_data['cd_invent']).first().ds_invent,
+                inventario = Inventario.objects.get(cd_invent=inventario),
                 pg_bene = pg_bene,
                 pg_bene_sub = pg_bene_sub,
                 ds_spazio = ds_spazio,
@@ -967,86 +967,64 @@ def ricognizioneInventarialeEditView(request):
     """ """
     if request.method == 'GET':
         bene_id = request.GET.get('id', '')
-        ric_inv = RicognizioneInventariale.objects.get(id=bene_id)
-        
-        data = {
-                'id': ric_inv.id,
-                'cd_invent' : ric_inv.cd_invent,
-                'ds_invent' : ric_inv.ds_invent,
-                'pg_bene' : ric_inv.pg_bene,
-                'pg_bene_sub' : ric_inv.pg_bene_sub,
-                'ds_spazio' : ric_inv.ds_spazio,
-                'ubicazione_precisa' : ric_inv.ubicazione_precisa,
-                'ds_bene' : ric_inv.ds_bene,
-                'immagine' : ric_inv.immagine,
-                'possessore' : ric_inv.possessore,
-                'inserito_da' : ric_inv.inserito_da
-        }
-
-        form = RicognizioneInventarialeForm(initial=data)
-
-        return render (request,'inventario/RicognizioneInventariale/edit.html',{'form': form})
+        rows = RicognizioneInventariale.objects.using('default').values_list('ds_bene','possessore','nuovo_possessore','inserito_da','inventario','pg_bene','pg_bene_sub','ds_spazio','ubicazione_precisa','note','immagine')
+        rows = rows.filter(id = bene_id)
+        return JsonResponse({'results': list(rows)})
 
         
     if request.method == 'POST':
         id = int(request.GET.get('id')) if (request.GET.get('id') is not None) else None
-        #cd_invent = request.POST.get('cd_invent',None)
-        #ds_invent = request.POST.get('ds_invent',None)
-        #pg_bene = int(request.POST.get('pg_bene')) if (request.POST.get('pg_bene') is not None and request.POST.get('pg_bene') != '') else None
-        #pg_bene_sub = int(request.POST.get('pg_bene_sub')) if (request.POST.get('pg_bene_sub') is not None and request.POST.get('pg_bene_sub') != '') else None
-        #ds_spazio = request.POST.get('ds_spazio',None)
-        #ubicazione_precisa = int(request.POST.get('ubicazione_precisa')) if(request.POST.get('ubicazione_precisa') is not None and request.POST.get('ubicazione_precisa') != '') else None
-        #ds_bene = request.POST.get('ds_bene',None)
-        #immagine = request.FILES.get('immagine',None)
 
         f = RicognizioneInventarialeForm(request.POST, request.FILES)
-        
-        #if ubicazione_precisa:
-        #    ubicazione_precisa = UbicazionePrecisa.objects.using('default').get(pk=ubicazione_precisa)
 
         if (id is not None): 
             ric_inv = RicognizioneInventariale.objects.get(id=id)
-            #if (ri_bene is not None and cd_invent is not None and 
-            #    ds_invent is not None and pg_bene is not None and 
-            #    pg_bene_sub is not None and ds_spazio is not None and 
-            #    ds_bene is not None):
             if(f.is_valid()):
                 ric_inv = RicognizioneInventariale.objects.get(id=id)
-                ric_inv.cd_invent = f.cleaned_data['cd_invent']
-                ric_inv.ds_invent = Bene.objects.using('default').filter(cd_invent=f.cleaned_data['cd_invent']).first().ds_invent
+                ric_inv.inventario = f.cleaned_data['inventario']
                 ric_inv.pg_bene = f.cleaned_data['pg_bene']
                 ric_inv.pg_bene_sub = f.cleaned_data['pg_bene_sub']
                 ric_inv.ds_spazio = f.cleaned_data['ds_spazio']
-                #ric_inv.ubicazione_precisa = UbicazionePrecisa.objects.using('default').get(pk=f.cleaned_data['ubicazione_precisa']).pk
                 ric_inv.ubicazione_precisa = f.cleaned_data['ubicazione_precisa']
                 ric_inv.ds_bene = f.cleaned_data['ds_bene']
-                ric_inv.immagine = f.cleaned_data['immagine']
+                if len(request.FILES) != 0:
+                    ric_inv.immagine = f.cleaned_data['immagine']
                 ric_inv.possessore = f.cleaned_data['possessore']
+                ric_inv.nuovo_possessore = f.cleaned_data['nuovo_possessore']
+                ric_inv.note = f.cleaned_data['note']
                 ric_inv.inserito_da = request.user
 
                 ric_inv.save()
 
             else:
-                #data = {
-                #        'id': ric_inv.id,
-                #        'cd_invent' : ric_inv.cd_invent,
-                #        'ds_invent' : ric_inv.ds_invent,
-                #        'pg_bene' : ric_inv.pg_bene,
-                #        'pg_bene_sub' : ric_inv.pg_bene_sub,
-                #        'ds_spazio' : ric_inv.ds_spazio,
-                #        'ubicazione_precisa' : ric_inv.ubicazione_precisa,
-                #        'ds_bene' : ric_inv.ds_bene,
-                #        'immagine' : ric_inv.immagine
-                #}
-
-                #form = RicognizioneInventarialeForm(initial=data)
                 form = RicognizioneInventarialeForm(request.POST,request.GET)
-                #return render (request,'inventario/RicognizioneInventariale/edit.html',{'form': form})
-                #return render (request,'inventario/ricognizioniInventariali.html',{'form': form})
-    
 
     return redirect ('ricinv')
 
+def ricognizioneInventarialeEditNoLabelView(request):
+    if request.method == 'POST':
+        id = int(request.GET.get('id')) if (request.GET.get('id') is not None) else None
+
+        f = RicognizioneInventarialeForm(request.POST, request.FILES)
+
+        if (id is not None): 
+            ric_inv = RicognizioneInventariale.objects.get(id=id)
+            if(f.is_valid()):
+                ric_inv = RicognizioneInventariale.objects.get(id=id)
+                ric_inv.ds_spazio = f.cleaned_data['ds_spazio']
+                ric_inv.ubicazione_precisa = f.cleaned_data['ubicazione_precisa']
+                ric_inv.ds_bene = f.cleaned_data['ds_bene']
+                if len(request.FILES) != 0:
+                    ric_inv.immagine = f.cleaned_data['immagine']
+                ric_inv.possessore = f.cleaned_data['possessore']
+                ric_inv.note = f.cleaned_data['note']
+                ric_inv.inserito_da = request.user
+
+                ric_inv.save()
+
+            else:
+                form = RicognizioneInventarialeForm(request.POST,request.GET)
+    return redirect ('ricinv')
 
 @login_required
 def ricognizioneInventarialeDeleteView(request):
@@ -1077,7 +1055,7 @@ def showRicognizioniInventariali(request):
     # prende le accurateLocation dal DB per popolare il menu della quicksearch
     accurateLocations = UbicazionePrecisa.objects.using('default').all().order_by('ubicazione')
 
-    codici_inventario = Bene.objects.using('default').order_by('cd_invent').values_list('cd_invent', 'ds_invent').distinct()
+    codici_inventario = Inventario.objects.using('default').values_list('cd_invent', 'ds_invent').distinct()
     codici_inventario = filter(None, codici_inventario)
     lista_codici = dict()
 # metto i codici in una lista
@@ -1124,8 +1102,8 @@ def getRicognizioniData(request):
         # counts the number of objects that match the query
         total = RicognizioneInventariale.objects.using('default').filter(\
             Q(id__icontains= search) | \
-            Q(cd_invent__icontains= search) | \
-            Q(ds_invent__icontains= search) | \
+            Q(inventario__cd_invent__icontains= search) | \
+            Q(inventario__ds_invent__icontains= search) | \
             Q(pg_bene__icontains= search) | \
             Q(pg_bene_sub__icontains= search) | \
             Q(ds_bene__icontains= search) | \
@@ -1139,8 +1117,8 @@ def getRicognizioniData(request):
         # retrieve the objects that match the query
         rows = RicognizioneInventariale.objects.using('default').filter(\
             Q(id__icontains= search) | \
-            Q(cd_invent__icontains= search) | \
-            Q(ds_invent__icontains= search) | \
+            Q(inventario__cd_invent__icontains= search) | \
+            Q(inventario__ds_invent__icontains= search) | \
             Q(pg_bene__icontains= search) | \
             Q(pg_bene_sub__icontains= search) | \
             Q(ds_bene__icontains= search) | \
@@ -1166,8 +1144,7 @@ def getRicognizioniData(request):
         ubicazione_precisa = row.ubicazione_precisa.id if (row.ubicazione_precisa is not None) else None
         html = html + '{ \
         "id": ' + json.dumps(row.id) + ', \
-        "cd_invent": ' + json.dumps(row.cd_invent) + ', \
-        "ds_invent": ' + json.dumps(row.ds_invent) + ', \
+        "inventario": ' + json.dumps(str(row.inventario)) + ', \
         "pg_bene": ' + json.dumps(str(row.pg_bene)) + ', \
         "pg_bene_sub": ' + json.dumps(str(row.pg_bene_sub)) + ', \
         "ds_bene": ' + json.dumps(row.ds_bene) + ', \
@@ -1197,19 +1174,20 @@ def advancedRicognizioneInventarialeSearch(request):
         min_pg_bene = int(request.GET.get('min_pg_bene')) if (request.GET.get('min_pg_bene') is not None) else ricinv.order_by("pg_bene").first().pg_bene 
         max_pg_bene = int(request.GET.get('max_pg_bene')) if (request.GET.get('max_pg_bene') is not None) else ricinv.order_by("-pg_bene").first().pg_bene 
         ds_bene = request.GET.get('ds_bene')
+        possessore = request.GET.get('possessore')
         ubicazione = request.GET.get('ubicazione')
         ubicazione_precisa = request.GET.get('ubicazione_precisa')
 
-        print("----------------------------");
-        print("min_id_bene: " + str(min_id));
-        print("max_id_bene: " + str(max_id));
-        print("cods: " + str(cods));
-        print("min_pg_bene: " + str(min_pg_bene));
-        print("max_pg_bene: " + str(max_pg_bene));
-        print("ds_bene: " + str(ds_bene));
-        print("ubicazione: " + str(ubicazione));
-        print("ubicazione_precisa: " + str(ubicazione_precisa));
-        print("----------------------------");
+        #print("----------------------------");
+        #print("min_id_bene: " + str(min_id));
+        #print("max_id_bene: " + str(max_id));
+        #print("cods: " + str(cods));
+        #print("min_pg_bene: " + str(min_pg_bene));
+        #print("max_pg_bene: " + str(max_pg_bene));
+        #print("ds_bene: " + str(ds_bene));
+        #print("ubicazione: " + str(ubicazione));
+        #print("ubicazione_precisa: " + str(ubicazione_precisa));
+        #print("----------------------------");
 
         requestOrder = request.GET.get('order', None)
         sort = request.GET.get('sort', None)
@@ -1234,11 +1212,13 @@ def advancedRicognizioneInventarialeSearch(request):
         #WAS: if (min_id is not None and max_id is not None):
         rows = rows.filter(id__range=(min_id, max_id))
         if (cods is not None and cods):
-            rows = rows.filter(cd_invent__in=cods)
+            rows = rows.filter(inventario__cd_invent__in=cods)
         #WAS: if (min_pg_bene is not None and max_pg_bene is not None):
         rows = rows.filter(pg_bene__range=(min_pg_bene, max_pg_bene))
         if (ds_bene is not None):
             rows = rows.filter(ds_bene__icontains=ds_bene)
+        if (possessore is not None):
+            rows = rows.filter(possessore__icontains=possessore)
         if (ubicazione is not None):
             rows = rows.filter(ds_spazio__icontains=ubicazione)
         if (ubicazione_precisa is not None):
@@ -1256,11 +1236,11 @@ def advancedRicognizioneInventarialeSearch(request):
             ubicazione_precisa = row.ubicazione_precisa.id if (row.ubicazione_precisa is not None) else None
             html = html + '{ \
             "id": ' + json.dumps(str(row.id)) + ', \
-            "cd_invent": ' + json.dumps(row.cd_invent) + ', \
-            "ds_invent": ' + json.dumps(row.ds_invent) + ', \
+            "inventario": ' + json.dumps(str(row.inventario)) + ', \
             "pg_bene": ' + json.dumps(str(row.pg_bene)) + ', \
             "pg_bene_sub": ' + json.dumps(str(row.pg_bene_sub)) + ', \
             "ds_bene": ' + json.dumps(row.ds_bene) + ', \
+            "possessore" : ' + json.dumps(row.possessore) + ', \
             "ds_spazio": ' + json.dumps(row.ds_spazio) + ', \
             "ubicazione_precisa": ' + json.dumps(str(row.ubicazione_precisa_id)) + ', \
             "immagine": ' + json.dumps(str(row.immagine)) + \
@@ -1291,6 +1271,36 @@ def getBeniForRicInve(request):
     rows = Bene.objects.using('default').values_list('ds_bene', 'nome', 'cognome', 'cd_invent', 'ds_invent', 'pg_bene', 'pg_bene_sub', 'ds_spazio', 'ubicazione_precisa')
     rows = rows.filter(pg_bene__icontains = term)
     return JsonResponse({'results': list(rows)})
+
+def updateCodiciInventario(request):
+    rows = Bene.objects.using('default').values_list('cd_invent', 'ds_invent').distinct()
+    for r in rows:
+        try:
+            inventario = Inventario.objects.get(cd_invent=r[0])
+            inventario.ds_invent = r[1]
+            inventario.save()
+        except Inventario.DoesNotExist:
+            inventario = Inventario(cd_invent = r[0], ds_invent = r[1])
+            inventario.save()
+
+    return JsonResponse({'results': list(rows)})
+
+@login_required
+def addCodiceInventario(request):
+    response = HttpResponse("ERROR")
+    response.status_code = 400
+    cd_invent = str(request.POST.get("newInvCodeCd"))
+    ds_invent = str(request.POST.get("newInvCodeDs"))
+    if cd_invent is not None and ds_invent is not None:
+        try:
+            Inventario.objects.get(cd_invent=cd_invent)
+            response.reason_phrase = "Il codice immesso e' gia' in uso"
+        except Inventario.DoesNotExist:
+            inventario = Inventario(cd_invent=cd_invent, ds_invent=ds_invent)
+            inventario.save()
+            response = HttpResponse("OK")
+            response.status_code = 200
+    return response
 
 class Esse3UserAutocomplete(autocomplete.Select2QuerySetView):
     

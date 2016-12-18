@@ -8,6 +8,7 @@ from dal import autocomplete
 from django.forms.widgets import Select
 
 from django.contrib.auth.models import User
+from models import Inventario
 
 
 class PictureForm(forms.Form):
@@ -146,12 +147,12 @@ class AdvancedSearchForm(forms.Form):
 	)
 	nome = forms.CharField(		
 		required=False,
-		label='nome', 
+		label='nome possessore', 
 		max_length=None
 	)
 	cognome = forms.CharField(		
 		required=False,
-		label='cognome', 
+		label='cognome possessore', 
 		max_length=None
 	)
 
@@ -179,7 +180,7 @@ class RicognizioneInventarialeForm(forms.ModelForm):
         fields = [
         	'id',
         	'ds_bene',
-        	'cd_invent',
+        	'inventario',
         	'pg_bene',
         	'pg_bene_sub',
         	'ds_spazio',
@@ -194,7 +195,7 @@ class RicognizioneInventarialeForm(forms.ModelForm):
             'possessore' : 'Possessore',
             'nuovo_possessore' : 'Nuovo Possessore',
             'inserito_da' : 'Inserito Da',
-            'cd_invent': 'Codice Inventario',
+            'inventario' : 'Inventario',
             'pg_bene': 'Numero Inventario',
             'pg_bene_sub': 'Numero Bene Collegato',
             'ds_spazio': 'Edificio',
@@ -202,13 +203,23 @@ class RicognizioneInventarialeForm(forms.ModelForm):
             'ubicazione_precisa': 'Locale',
         }
         widgets = {
-        	#'descrizione_bene' : forms.CharField( required=True, label='descrizione', max_length=None ),
             'pg_bene' : forms.TextInput(),
         	'pg_bene_sub' : forms.TextInput(),
             'ds_spazio' : Select(choices=[('','---------')] + [(item,item) for item in Bene.objects.using('default').values_list('ds_spazio', flat=True).distinct()]),
-            'cd_invent' : Select(choices=[('','---------')] + [(item[0], item[0] + " - " + item[1] ) for item in Bene.objects.using('default').values_list('cd_invent', 'ds_invent').distinct()]),
         }
 
+
+# ricavo tutti i codici degli inventari
+codici_inventario_ricinv = Inventario.objects.using('default').values_list('cd_invent', 'ds_invent').distinct()
+codici_inventario_ricinv = filter(None, codici_inventario_ricinv)
+lista_codici_ricinv = []
+# metto i codici in una lista
+for c in codici_inventario_ricinv:
+	lista_codici_ricinv.append(
+		(c[0],c[0])
+	)
+# li converto in tupla per passarli alla form
+codici_inventario_ricinv = lista_codici_ricinv
 
 class AdvancedSearchRicognizioneInventarialeForm(forms.Form):
 	min_id = forms.IntegerField(		
@@ -224,7 +235,7 @@ class AdvancedSearchRicognizioneInventarialeForm(forms.Form):
 	codice_inventario = forms.MultipleChoiceField(
 		required=False,
         widget=forms.CheckboxSelectMultiple,
-        choices=codici_inventario
+        choices=codici_inventario_ricinv
     )
 	min_pg_bene = forms.IntegerField(		
 		required=False,
@@ -239,6 +250,11 @@ class AdvancedSearchRicognizioneInventarialeForm(forms.Form):
 	ds_bene = forms.CharField(		
 		required=False,
 		label='descrizione', 
+		max_length=None
+	)
+	possessore = forms.CharField(		
+		required=False,
+		label='possessore', 
 		max_length=None
 	)
 	ubicazione = forms.CharField(		

@@ -8,7 +8,3 @@ Modifica Ricognizione Inventariale
 {% block form-header %}
 <form name="ricinv_edit_form" id="ricinv_edit_form_id" method="POST" action="{% url "inventario.views.ricognizioneInventarialeEditView" %}" enctype="multipart/form-data">    
 {% endblock %}
-
-{% block submit-button %}
-<input id="edit_submit_btn_id" type="submit" class="btn btn-primary" value="Salva"/>
-{% endblock %}

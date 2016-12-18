@@ -91,6 +91,27 @@
                 <span class="glyphicon glyphicon-plus" aria-hidden="true"></span>
               </button>
             </div>
+
+            <div class="btn-group" role="group">
+              <button type="button"
+                      id="newInvCode" 
+                      class="btn btn-default"
+                      onClick="showNewInvCodeDiv()"
+                      title="Inserisci un nuovo codice inventariale"
+                      >
+                <span class="glyphicon glyphicon-tag" aria-hidden="true"></span>
+              </button>
+            </div>
+            <div id="newInvCodeDiv" class="btn-group" role="group" style="display:none">
+                <div class="input-group">
+                    <input id="newInvCodeCd" type="text" class="form-control" placeholder="Codice"/>
+                    <span class="input-group-addon">-</span>
+                    <input id="newInvCodeDs" type="text" class="form-control" placeholder="Descrizione"/>
+                    <span class="input-group-btn">
+                         <button class="btn btn-default" type="button" onClick="addInvCode()"><b>ok</b></button>
+                    </span>
+                </div>
+            </div>
             <div class="btn-group" role="group">
               <button type="button"
                       class="btn btn-default"
@@ -162,10 +183,6 @@
         <div class="modal fade" id="createRicInvModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
           {% include "inventario/RicognizioneInventariale/create.html" %}
         </div>
-        <!-- Edit RecInv -->
-        <div class="modal fade" id="editRicInvModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
-          {% include "inventario/RicognizioneInventariale/edit.html" %}
-        </div>
 
         <!-- Delete RecInv -->
         <div id="deleteRicInvModal" class="modal fade" role="dialog">
@@ -211,6 +228,13 @@
                                   <p>
                                       <p>{{ asform.ds_bene.errors }}</p>
                                       <p>{{ asform.ds_bene.label_tag }} {{ asform.ds_bene.help_text }} {% render_field asform.ds_bene class+="form-control" %}</p>
+                                  </p>
+                                </div>
+                                <!-- possessore -->
+                                <div class="col-xs-12" style="padding-left:2.5%;padding-right:2.5%;">
+                                  <p>
+                                      <p>{{ asform.possessore.errors }}</p>
+                                      <p>{{ asform.possessore.label_tag }} {{ asform.possessore.help_text }} {% render_field asform.possessore class+="form-control" %}</p>
                                   </p>
                                 </div>
                                 <!-- ubicazione -->
@@ -272,28 +296,26 @@
                 //        valign: 'middle'
                 //    },
                 {
-                        field: 'operate',
-                        title: 'azioni',
-                        class: 'actions',
-                        align: 'center',
-                        events: operateEvents,
-                        formatter: operateFormatter
-                    },                 
-
-                {
+                    field: 'operate',
+                    title: 'azioni',
+                    class: 'actions',
+                    align: 'center',
+                    events: operateEvents,
+                    formatter: operateFormatter
+                }, {
                     field: 'id',
                     title: 'ID',
                     class: 'id',
                     sortable: true,
                     align: 'center'
                 }, {
-                    field: 'cd_invent',
-                    title: 'codice inventario',
-                    formatter: 'cdinventFormatter',
-                    class: 'cd_invent',
+                    field: 'inventario',
+                    title: 'inventario',
+                    formatter : 'cdinventFormatter',
+                    class: 'inventario',
                     sortable: true,
                     align: 'center'
-                }, {
+                },{
                     field: 'pg_bene',
                     title: 'numero inventario',
                     formatter: 'numeroInventarioFormatter',
@@ -321,12 +343,14 @@
                 }, {
                     field: 'nuovo_possessore',
                     title: 'nuovo possessore',
+                    formatter: 'nuovoPossessoreFormatter',
                     class: 'nuovo_possessore',
                     sortable: true,
                     align: 'center'
                 },{
                     field: 'note',
                     title: 'note',
+                    formatter: 'noteFormatter',
                     class: 'note',
                     sortable: true,
                     align: 'center'
@@ -334,18 +358,19 @@
                     field: 'ubicazione_precisa',
                     title: 'locale',
                     class: 'ubicazione_precisa',
-                    editable: {
-                        type: 'select',
-                        inputclass: 'accurate-location-select',
-                        source: AccurateLocationsList,
-                        title: 'Nuovo Locale',
-                        validate: function (value) {
-                            value = $.trim(value);
-                            if (!value) return 'This field is required';
-                        },
-                        url: '/inventario/table/editable/editAccurateLocation',
-                        params: { csrfmiddlewaretoken:'{{csrf_token}}'},
-                    },
+                    formatter : 'accurateLocationsFormatter',
+                    //editable: {
+                    //    type: 'select',
+                    //    inputclass: 'accurate-location-select',
+                    //    source: AccurateLocationsList,
+                    //    title: 'Nuovo Locale',
+                    //    validate: function (value) {
+                    //        value = $.trim(value);
+                    //        if (!value) return 'This field is required';
+                    //    },
+                    //    url: '/inventario/table/editable/editAccurateLocation',
+                    //    params: { csrfmiddlewaretoken:'{{csrf_token}}'},
+                    //},
                     sortable: true,
                     align: 'center'
                 }, 
@@ -398,11 +423,11 @@
         var html = [];
         $.each(row, function (key, value) {
             // if we're displaying the accurate location we must match the id with the actual text value
-            if(key == 'cd_invent')
-                html.push('<p><b>Codice Inventario:</b> ' + cdinventFormatter(value, row, index) + '</p>');
+            if(key == 'inventario')
+                html.push('<p><b>Codice Inventario:</b> ' + cdinventFormatter(value) + '</p>');
             else if (key == 'ds_invent');
             else if (key == 'pg_bene')
-                html.push('<p><b>Numero inventario:</b> ' + pgFormatter(value, row, index) + '</p>');
+                html.push('<p><b>Numero inventario:</b> ' + numeroInventarioFormatter(value, row, index) + '</p>');
             else if (key == 'pg_bene_sub');
             else if (key == 'ds_bene') 
                 html.push('<p><b>Descrizione:</b> ' + value + '</p>');
@@ -411,20 +436,17 @@
             else if (key == 'possessore')
                 html.push('<p><b>Possessore:</b> ' + value + '</p>');
             else if (key == 'nuovo_possessore')
-                html.push('<p><b>Nuovo possessore:</b> ' + value + '</p>');
-            else if (key == 'ubicazione_precisa') 
-            {
-                if (value != "None")
-                    html.push('<p><b>Locale:</b> ' + AccurateLocationsArray[value] + '</p>');
-                else
-                    html.push('<p><b>Locale:</b> <b class="text-left text-danger">Non specificato</b></p>');
-            }
+                html.push('<p><b>Nuovo possessore:</b> ' + nuovoPossessoreFormatter(value, row, index) + '</p>');
+            else if (key == 'note')
+                html.push('<p><b>Note:</b> ' + noteFormatter(value, row, index) + '</p>');
+            else if (key == 'ubicazione_precisa')
+                html.push('<p><b>Note:</b> ' + accurateLocationsFormatter(value) + '</p>');
             // we need to show the render the immagine based on the filepath
             else if(key == 'immagine')
                 if ( value != "")
                     html.push('<p><b>' + key + ':</b></p><p><img style="max-width:100px;max-height:100px" src="/inventario/media/' + value + '"></p>');
                 else
-                    html.push('<p><b>' + key + ': </b><b class="text-left text-danger">Non disponibile</b></p>');
+                    html.push('<p><b>' + key + ': </b><a class="text-left text-danger">non disponibile</a></p>');
             // we hide the state 
             else if (key == 'state'){}
             else
@@ -459,27 +481,43 @@
 
     function editRicinv(id) {
         url = '{% url "inventario.views.ricognizioneInventarialeEditView" %}' + "?id=" + id;
+        urlNoLabel = '{% url "inventario.views.ricognizioneInventarialeEditNoLabelView" %}' + "?id=" + id;
+        
+        $('#tabLabel-form').trigger("reset");
+        $('#tabNoLabel-form').trigger("reset");
+
         $.ajax({ 
             type: 'GET', 
             url: url, 
-            dataType: 'html',
+            dataType: 'json',
             success: function (data) { 
-                $('#editRicInvModal').html(data);
+                $.each(data.results, function(index, element) {
+                  $('.edit_ds_bene').val(element[0]);
+                  $('.edit_possessore').val(element[1]);
+                  if (element[2] != null && element[2] != "") $('.edit_nuovo_possessore').val(element[2]);
+                  if (element[3] != null && element[3] != "") $('.edit_inserito_da').val(element[3]);
+                  if (element[4] != null && element[4] != "") $('.edit_inventario').val(element[4]);
+                  if (element[5] != null && element[5] != -1) $('.edit_pg_bene').val(element[5]); else $('.edit_pg_bene').val(""); 
+                  if (element[6] != null && element[6] != -1) $('.edit_pg_bene_sub').val(element[6]); else $('.edit_pg_bene_sub').val(""); 
+                  $('.edit_ds_spazio').val(element[7]);
+                  if (element[8] != null && element[8] != "") $('.edit_ubicazione_precisa').val(element[8]);
+                  if (element[9] != null && element[9] != "") $('.edit_note').val(element[9]);
+                
+                  if (element[5] != null && element[5] != -1)
+                     $('#tabLabel').find('a').trigger('click');
+                  else
+                     $('#tabNoLabel').find('a').trigger('click');
+                });
 
-                //// append the id to the form action
-                //action = $('#ricinv_edit_form_id').attr('action');
-                //action = action + "?id=" + id;
-                //$('#ricinv_edit_form_id').attr('action', action);
-//
-                //// bind the click event of the button
-                //var form = document.getElementById("ricinv_edit_form_id");
-//
-                //document.getElementById("edit_submit_btn_id").addEventListener("click", function () {
-                //  form.submit();
-                //});
+                $('#createRicInvModalLabel').html("Ricognizione Inventariale - Modifica")
+                $('#tabLabel-form').attr('action', url);
+                $('#tabNoLabel-form').attr('action', urlNoLabel);
+                $('#save-button').text('Modifica');
 
-                // shows the form
-                $('#editRicInvModal').modal();
+                $('#createRicInvModal').modal({
+                    backdrop: 'static',
+                    keyboard: false
+                });
             }
         });
     }
@@ -521,8 +559,24 @@
     function numeroInventarioFormatter(value, row) {
         // return "<a href='/inventario/show/" + row.id + "'>" + value + "</a>";
         response = "<a class=\"text-left text-danger\">non disponibile</a>";
-        if (row.pg_bene != "None" && row.pg_bene_sub != "None")
-          response = row.pg_bene + " - " + row.pg_bene_sub;;
+        if (row.pg_bene != "-1" && row.pg_bene_sub != "-1")
+          response = row.pg_bene + " - " + row.pg_bene_sub;
+        return response
+    }
+
+    function nuovoPossessoreFormatter(value, row) {
+        // return "<a href='/inventario/show/" + row.id + "'>" + value + "</a>";
+        response = "<a class=\"text-left text-danger\">non disponibile</a>";
+        if (row.nuovo_possessore != null && row.nuovo_possessore != "")
+          response = row.nuovo_possessore;
+        return response
+    }
+
+    function noteFormatter(value, row) {
+        // return "<a href='/inventario/show/" + row.id + "'>" + value + "</a>";
+        response = "<a class=\"text-left text-danger\">non disponibile</a>";
+        if (row.note != null && row.note != "")
+          response = row.note;
         return response
     }
 
@@ -534,14 +588,16 @@
     function cdinventFormatter(value, row) {
         // return "<a href='/inventario/show/" + row.id + "'>" + value + "</a>";
         response = "<a class=\"text-left text-danger\">non disponibile</a>";
-        if (row.cd_invent != null && row.ds_invent != null)
-          response = row.cd_invent + " - " + row.ds_invent;
+        if (value != null && value != "None")
+          response = value;
         return response
     }
 
-    function pgFormatter(value, row) {
-        // return "<a href='/inventario/show/" + row.id + "'>" + value + "</a>";
-        return row.pg_bene + "-" + row.pg_bene_sub;
+    function accurateLocationsFormatter(value) {
+      response = "<a class=\"text-left text-danger\">non disponibile</a>";
+      if (value != null && value != "None")
+        response = AccurateLocationsArray[value];
+      return response
     }
 
     $(function () {
@@ -634,6 +690,12 @@
         else $("#newAccLocationDiv").hide();
     }
 
+    // mostra/nasconde l'input per aggiungere un nuovo codice inventariale
+    function showNewInvCodeDiv () {
+        if ($("#newInvCodeDiv").is(":visible")==false) $("#newInvCodeDiv").show();
+        else $("#newInvCodeDiv").hide();
+    }
+
     // chiamata ajax per salvare la nuova posizione nel DB ricarica la pagina al success per aggiornare la lista delle posizioni
     function addLocation () {
         // alert($("#newAccLocationText").val());
@@ -651,6 +713,31 @@
                 alert('Error occured');
             }
         });
+    }
+
+    // chiamata ajax per salvare il nuovo codice nel DB ricarica la pagina al success per aggiornare la lista dei codici
+    function addInvCode () {
+        newInvCodeCd = $("#newInvCodeCd").val(); // codice
+        newInvCodeDs = $("#newInvCodeDs").val(); // descrizione
+        if (newInvCodeCd.length > 0 && newInvCodeDs.length > 0) {
+          $.ajax({
+              type: "POST",
+              url: '{% url "inventario.views.addCodiceInventario" %}',
+              data: ({ newInvCodeCd : newInvCodeCd, 
+                newInvCodeDs : newInvCodeDs,
+                csrfmiddlewaretoken:'{{csrf_token}}' }),
+              success: function(result) {
+                  location.reload();
+              },
+              error: function(jqXHR, textStatus, errorThrown) {
+                  alert('ERRORE' + " " + errorThrown);
+              }
+          });          
+        }
+        else
+        {
+          alert("Inserisci un codice ed una descrizione validi");
+        }
     }
 
 </script>
@@ -688,6 +775,19 @@ $( document ).ready(function() {
     $("#id_pg_bene_sub").val("");
 
     $("#createRicInvModalBtn").click(function() {
+
+      $('#createRicInvModalLabel').html("Ricognizione Inventariale - Crea")
+      $('#tabLabel-form').trigger("reset");
+      $('#id_pg_bene').val("");
+      $('#id_pg_bene_sub').val("");
+
+      $('#tabNoLabel-form').trigger("reset");
+      $('#tabLabel-form').attr('action', '{% url "inventario.views.ricognizioneInventarialeCreateView" %}');
+      $('#tabNoLabel-form').attr('action', '{% url "inventario.views.ricognizioneInventarialeCreateNoLabelView" %}');
+      $('#save-button').text('Crea');
+      
+      $('#tabLabel').find('a').trigger('click');
+
       $('#createRicInvModal').modal({
           backdrop: 'static',
           keyboard: false
@@ -754,7 +854,7 @@ $( document ).ready(function() {
                           ds_bene : element[0],
                           nome : element[1],
                           cognome : element[2],
-                          cd_invent : element[3],
+                          inventario : element[3],
                           ds_invent : element[4],
                           pg_bene : element[5],
                           pg_bene_sub : element[6],
@@ -778,7 +878,7 @@ $( document ).ready(function() {
         // fill the form with the received data
         $('#id_ds_bene').val(bene.item.ds_bene);
         $('#id_possessore').val((bene.item.nome + ' ' + bene.item.cognome).trim());
-        $('#id_cd_invent').val(bene.item.cd_invent);
+        $('#id_inventario').val(bene.item.inventario);
         $('#id_pg_bene').val(bene.item.pg_bene);
         $('#id_pg_bene_sub').val(bene.item.pg_bene_sub);
         $('#id_ds_spazio').val(bene.item.ds_spazio);

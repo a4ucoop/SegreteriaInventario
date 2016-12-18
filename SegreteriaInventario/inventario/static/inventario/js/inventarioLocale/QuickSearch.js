@@ -43,6 +43,10 @@ function ricognizioneInventarialeAccurateLocationSearch(keyword) {
   $('#table').bootstrapTable('refresh', {url: searchUrl});
 }
 function ricognizioneInventarialeClearFilters() {
+    if($('form[name="advancedRicognizioneInventarialeSearchForm"]').length != 0) 
+      $('form[name="advancedRicognizioneInventarialeSearchForm"]')[0].reset();
+    if ($('form[name="advancedSearchForm"]').length != 0)
+      $('form[name="advancedSearchForm"]')[0].reset();
     searchUrl = "/inventario/table/getRicognizioniData";
     $('#table').bootstrapTable('refresh', {url: searchUrl});
 }

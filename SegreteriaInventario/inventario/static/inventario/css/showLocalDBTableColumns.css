@@ -17,6 +17,11 @@
     word-wrap: break-word !important;
 }
 
+.inventario {
+    min-width:500px !important;
+    word-wrap: break-word !important;
+}
+
 .ds_bene {
     min-width:500px !important;
     word-wrap: break-word !important;

@@ -29,6 +29,7 @@ function advancedSearchRicInv(argument) {
     var min_pg_bene = document.forms["advancedRicognizioneInventarialeSearchForm"]["min_pg_bene"].value;
     var max_pg_bene = document.forms["advancedRicognizioneInventarialeSearchForm"]["max_pg_bene"].value;
     var ds_bene = document.forms["advancedRicognizioneInventarialeSearchForm"]["ds_bene"].value;
+    var possessore = document.forms["advancedRicognizioneInventarialeSearchForm"]["possessore"].value;
     var categorie_inventariali_selezionate = [];
     $("input:checkbox[name=categorie_inventariali]:checked").each(function(){
         categorie_inventariali_selezionate.push($(this).val());
@@ -52,6 +53,7 @@ function advancedSearchRicInv(argument) {
     if(max_pg_bene != null && max_pg_bene != "")
       query += "max_pg_bene=" + max_pg_bene + "&";
     if(ds_bene != null && ds_bene != "") query += "ds_bene=" + ds_bene + "&";
+    if(possessore != null && possessore != "") query += "possessore=" + possessore + "&";
     if(categorie_inventariali_selezionate != null && categorie_inventariali_selezionate.length > 0){
       for (var i = 0; i < categorie_inventariali_selezionate.length; i++) {
         query += "categ=" + categorie_inventariali_selezionate[i] + "&";

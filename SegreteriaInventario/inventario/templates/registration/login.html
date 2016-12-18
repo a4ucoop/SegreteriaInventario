@@ -39,7 +39,9 @@
 <body>
 
 <div class="container">
+
 <form class="form-signin" action="{{ app_path }}" method="post" id="login-form">{% csrf_token %}
+  <h1>Inventario Unicam</h1>
   <div class="form-signin-inner">
   {% block title %}<h2>{% trans 'Log in' %}</h2>{% endblock %}
   {% if form.errors and not form.non_field_errors %}
@@ -82,7 +84,7 @@
   <div class="form-actions clearfix">
     <div class="col-xs-6"><input type="submit" value="{% trans 'Log in' %}" class="btn btn-lg btn-primary btn-block" /></div>
 <!--     <div class="col-xs-6"><input type="submit" value="{% trans 'Sign Up' %}" class="btn btn-lg btn-success btn-block" /></div> -->
-    <div class="col-xs-6"><a href="{% url 'registration_register' %}" class="btn btn-lg btn-success btn-block" role="button">{% trans 'Sign Up' %}</a></div>
+    <div class="col-xs-6"><a href="{% url 'registration_register' %}" class="btn btn-lg btn-success btn-block" role="button">Registrati</a></div>
   </div>
   </div>
 </form>

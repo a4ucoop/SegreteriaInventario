@@ -8,6 +8,13 @@ class UbicazionePrecisa(models.Model):
 	def __str__(self):		# __unicode__ on Python 2
 		return self.ubicazione
 
+class Inventario(models.Model):
+    cd_invent = models.CharField(max_length=8, primary_key=True)
+    ds_invent = models.CharField(max_length=256)
+
+    def __str__(self):      # __unicode__ on Python 2
+        return u' '.join((self.cd_invent," - ", self.ds_invent)).encode('utf-8').strip()
+
 class Bene(models.Model):
     id_bene = models.IntegerField(default=None)
     cd_invent = models.CharField(max_length=8)
@@ -32,16 +39,14 @@ class Bene(models.Model):
     immagine = models.FileField(upload_to='pictures/%Y/%m/%d', null=True)
 
 class RicognizioneInventariale(models.Model):
-    descrizione_bene = models.CharField(max_length=256, default='', blank=True, null=True)
-    possessore = models.CharField(max_length=100, blank=True, null=True)
+    ds_bene = models.CharField(max_length=400, default="")
+    possessore = models.CharField(max_length=100, default=None)
     nuovo_possessore = models.CharField(max_length=100,default=None, blank=True, null=True)
     inserito_da = models.ForeignKey(User, default=None, related_name='ricinv_inseritori', blank=True, null=True)
-    cd_invent = models.CharField(max_length=8, blank=True, null=True)
-    ds_invent = models.CharField(max_length=256,default=None, blank=True, null=True)
+    inventario = models.ForeignKey(Inventario, default=None, blank=True, null=True, on_delete=models.SET_NULL)
     pg_bene = models.IntegerField(default=-1, blank=True, null=True)
     pg_bene_sub = models.IntegerField(default=-1, blank=True, null=True)
-    ds_bene = models.CharField(max_length=400, default="", blank=True, null=True)
-    ds_spazio = models.CharField(max_length=2000, blank=True, null=True)
+    ds_spazio = models.CharField(max_length=2000, default=None)
     ubicazione_precisa = models.ForeignKey(UbicazionePrecisa,blank=True, null=True, on_delete=models.SET_NULL)
     note = models.CharField(max_length=400, blank=True, null=True)
     immagine = models.FileField(upload_to='pictures/%Y/%m/%d', blank=True, null=True)

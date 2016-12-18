@@ -3,11 +3,15 @@
     <div class="modal-content">
       <div class="modal-header">
         <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-        <h4 class="modal-title" id="createRicInvModalLabel">Ricognizione Inventariale</h4>
+        <h4 class="modal-title" id="createRicInvModalLabel">
+            {% block modal-title %}
+            Ricognizione Inventariale
+            {% endblock %}
+        </h4>
       </div>
       <div class="modal-body">
         <div class="tabbable">
-            <ul class="nav nav-tabs" data-tabs="tabs">
+            <ul id="ricinv_form_tabs" class="nav nav-tabs" data-tabs="tabs">
                 <li id="tabLabel" class="active mytabs">
                     <a href="#One" data-toggle="tab">Con Etichetta</a>
                 </li>
@@ -17,11 +21,13 @@
             </ul>
             <div class="tab-content">
                 <div class="tab-pane active" id="One">
-                    <form name="ricinv_form" id="tabLabel-form" method="POST" action="{% url "inventario.views.ricognizioneInventarialeCreateView" %}" enctype="multipart/form-data"> 
+                    {% block form-header %}
+                    <form name="ricinv_form" id="tabLabel-form" method="POST" action="{% url "inventario.views.ricognizioneInventarialeCreateView" %}" enctype="multipart/form-data">
+                    {% endblock %} 
                         {% csrf_token %}
                         <!-- descrizione bene -->
                         <p>{{ form.ds_bene.errors }}</p>
-                        <div class="col-xs-12"><p>{{ form.ds_bene.label_tag }}<a class="text-left text-danger"><b>*</b></a>{{ form.ds_bene.help_text }}{% render_field form.ds_bene class+="form-control required"%}</p></div>
+                        <div class="col-xs-12"><p>{{ form.ds_bene.label_tag }}<a class="text-left text-danger"><b>*</b></a>{{ form.ds_bene.help_text }}{% render_field form.ds_bene class+="form-control edit_ds_bene required"%}</p></div>
 
                         <!-- possessore -->
                         <p>{{ form.possessore.errors }}</p>
@@ -29,7 +35,7 @@
                                  <p>{{ form.possessore.label_tag }}<a class="text-left text-danger"><b>*</b></a>
                                     {{ form.possessore.help_text }}
                                      <div class="input-group">
-                                        {% render_field form.possessore class+="form-control autocomplete_possessore required" %}
+                                        {% render_field form.possessore class+="form-control autocomplete_possessore edit_possessore required" %}
                                      <span class="input-group-btn">
                                           <button id="id_btn_nuovo_possessore" class="btn btn-default" type="button" title="Nuovo Possessore">
                                               <span class="glyphicon glyphicon-user"></span>&nbsp;
@@ -41,15 +47,15 @@
 
                         <!-- nuovo nuovo_possessore -->
                         <p>{{ form.nuovo_possessore.errors }}</p>
-                        <div class="col-xs-12" id="div_id_nuovo_possessore"><p>{{ form.nuovo_possessore.label_tag }} {{ form.nuovo_possessore.help_text }}{% render_field form.nuovo_possessore class+="form-control autocomplete_possessore" %}</p></div>
+                        <div class="col-xs-12" id="div_id_nuovo_possessore"><p>{{ form.nuovo_possessore.label_tag }} {{ form.nuovo_possessore.help_text }}{% render_field form.nuovo_possessore class+="form-control autocomplete_possessore edit_nuovo_possessore" %}</p></div>
 
                         <!-- inseritore -->
                         <p>{{ form.inserito_da.errors }}</p>
-                        <div class="col-xs-12"><p>{{ form.inserito_da.label_tag }}{{ form.inserito_da.help_text }}{% render_field form.inserito_da class+="form-control" %}</p></div>
+                        <div class="col-xs-12"><p>{{ form.inserito_da.label_tag }}{{ form.inserito_da.help_text }}{% render_field form.inserito_da class+="form-control edit_inserito_da" %}</p></div>
 
-                        <!-- cd_invent -->
-                        <p>{{ form.cd_invent.errors }}</p>
-                        <div class="col-xs-12"><p>{{ form.cd_invent.label_tag }}<a class="text-left text-danger"><b>*</b></a>{{ form.cd_invent.help_text }}{% render_field form.cd_invent class+="form-control required" %}</p></div>
+                        <!-- inventario -->
+                        <p>{{ form.inventario.errors }}</p>
+                        <div class="col-xs-12"><p>{{ form.inventario.label_tag }}<a class="text-left text-danger"><b>*</b></a>{{ form.inventario.help_text }}{% render_field form.inventario class+="form-control required edit_inventario" %}</p></div>
 
                         <!-- numero inventario e bene collegato -->
                         <div class="col-xs-12"><p>
@@ -57,25 +63,25 @@
                             <p>{{ form.pg_bene_sub.errors }}</p>
                             <p>{{ form.pg_bene.help_text }}</p>
                             <p>{{ form.pg_bene_sub.help_text }}</p>
-                            <label for="id_cd_invent">Numero inventario e bene collegato:</label><a class="text-left text-danger"><b>*</b></a>
+                            <label for="id_pg_bene">Numero inventario e bene collegato:</label><a class="text-left text-danger"><b>*</b></a>
                             <div class="input-group">
-                                {% render_field form.pg_bene class+="form-control col-xs-9 required" placeholder+="numero inventario" %}
+                                {% render_field form.pg_bene class+="form-control col-xs-9 edit_pg_bene required" placeholder+="numero inventario" %}
                                 <span class="input-group-addon">-</span>
-                                {% render_field form.pg_bene_sub class+="form-control col-xs-3 required" placeholder+="bene collegato" %}
+                                {% render_field form.pg_bene_sub class+="form-control col-xs-3 edit_pg_bene_sub required" placeholder+="bene collegato" %}
                             </div>
                         </p></div>
 
                         <!-- ds_spazio -->
                         <p>{{ form.ds_spazio.errors }}</p>
-                        <div class="col-xs-12"><p>{{ form.ds_spazio.label_tag }}<a class="text-left text-danger"><b>*</b></a>{{ form.ds_spazio.help_text }}{% render_field form.ds_spazio class+="form-control required" %}</p></div>
+                        <div class="col-xs-12"><p>{{ form.ds_spazio.label_tag }}<a class="text-left text-danger"><b>*</b></a>{{ form.ds_spazio.help_text }}{% render_field form.ds_spazio class+="form-control edit_ds_spazio required" %}</p></div>
                         <!-- ubicazione_precisa -->
                         <p>{{ form.ubicazione_precisa.errors }}</p>
-                        <div class="col-xs-12"><p>{{ form.ubicazione_precisa.label_tag }}{{ form.ubicazione_precisa.help_text }}{% render_field form.ubicazione_precisa class+="form-control" %}</p></div>
+                        <div class="col-xs-12"><p>{{ form.ubicazione_precisa.label_tag }}{{ form.ubicazione_precisa.help_text }}{% render_field form.ubicazione_precisa class+="form-control edit_ubicazione_precisa" %}</p></div>
                         <!-- note -->
                         <div class="col-xs-12" >
                           <p>
                               <p>{{ form.note.errors }}</p>
-                              <p>{{ form.note.label_tag }} {{ form.note.help_text }} {% render_field form.note class+="form-control" %}</p>
+                              <p>{{ form.note.label_tag }} {{ form.note.help_text }} {% render_field form.note class+="form-control edit_note" %}</p>
                           </p>
                         </div>
                         <!-- immagine -->
@@ -97,28 +103,28 @@
                         {% csrf_token %}
                         <!-- descrizione bene -->
                         <p>{{ form.ds_bene.errors }}</p>
-                        <div class="col-xs-12"><p>{{ form.ds_bene.label_tag }}<a class="text-left text-danger"><b>*</b></a>{{ form.ds_bene.help_text }}{% render_field form.ds_bene class+="form-control required"%}</p></div>
+                        <div class="col-xs-12"><p>{{ form.ds_bene.label_tag }}<a class="text-left text-danger"><b>*</b></a>{{ form.ds_bene.help_text }}{% render_field form.ds_bene class+="form-control edit_ds_bene required"%}</p></div>
 
                         <!-- possessore -->
                         <p>{{ form.possessore.errors }}</p>
                         <div class="col-xs-12">
                                  <p>{{ form.possessore.label_tag }}<a class="text-left text-danger"><b>*</b></a>
                                     {{ form.possessore.help_text }}
-                                    {% render_field form.possessore class+="form-control autocomplete_possessore required" %}
+                                    {% render_field form.possessore class+="form-control autocomplete_possessore edit_possessore required" %}
                                 </p>
                         </div>
 
                         <!-- ds_spazio -->
                         <p>{{ form.ds_spazio.errors }}</p>
-                        <div class="col-xs-12"><p>{{ form.ds_spazio.label_tag }}<a class="text-left text-danger"><b>*</b></a>{{ form.ds_spazio.help_text }}{% render_field form.ds_spazio class+="form-control required" %}</p></div>
+                        <div class="col-xs-12"><p>{{ form.ds_spazio.label_tag }}<a class="text-left text-danger"><b>*</b></a>{{ form.ds_spazio.help_text }}{% render_field form.ds_spazio class+="form-control edit_ds_spazio required" %}</p></div>
                         <!-- ubicazione_precisa -->
                         <p>{{ form.ubicazione_precisa.errors }}</p>
-                        <div class="col-xs-12"><p>{{ form.ubicazione_precisa.label_tag }}{{ form.ubicazione_precisa.help_text }}{% render_field form.ubicazione_precisa class+="form-control" %}</p></div>
+                        <div class="col-xs-12"><p>{{ form.ubicazione_precisa.label_tag }}{{ form.ubicazione_precisa.help_text }}{% render_field form.ubicazione_precisa class+="form-control edit_ubicazione_precisa" %}</p></div>
                         <!-- note -->
                         <div class="col-xs-12" >
                           <p>
                               <p>{{ form.note.errors }}</p>
-                              <p>{{ form.note.label_tag }} {{ form.note.help_text }} {% render_field form.note class+="form-control" %}</p>
+                              <p>{{ form.note.label_tag }} {{ form.note.help_text }} {% render_field form.note class+="form-control edit_note" %}</p>
                           </p>
                         </div>
                         <!-- immagine -->
