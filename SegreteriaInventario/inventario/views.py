@@ -921,7 +921,9 @@ def ricognizioneInventarialeCreateView(request):
                 possessore = possessore,
                 nuovo_possessore = nuovo_possessore,
                 inserito_da = inserito_da,
-                note = note
+                note = note,
+                nome=inserito_da.first_name.lower(),
+                cognome=inserito_da.last_name.lower()
             )
         else:
             print(form.errors)
@@ -955,7 +957,9 @@ def ricognizioneInventarialeCreateNoLabelView(request):
                 immagine = immagine,
                 possessore = possessore,
                 inserito_da = request.user,
-                note = note
+                note = note,
+                nome=request.user.first_name.lower(),
+                cognome=request.user.last_name.lower()
             )
         else:
             print(form.errors)
@@ -978,6 +982,7 @@ def ricognizioneInventarialeEditView(request):
         id = int(request.GET.get('id')) if (request.GET.get('id') is not None) else None
 
         f = RicognizioneInventarialeForm(request.POST, request.FILES)
+        inserito_da = f.cleaned_data['inserito_da'] if (f.cleaned_data['inserito_da'] is not None) else request.user
 
         if (id is not None): 
             ric_inv = RicognizioneInventariale.objects.get(id=id)
@@ -993,8 +998,10 @@ def ricognizioneInventarialeEditView(request):
                     ric_inv.immagine = f.cleaned_data['immagine']
                 ric_inv.possessore = f.cleaned_data['possessore']
                 ric_inv.nuovo_possessore = f.cleaned_data['nuovo_possessore']
-                ric_inv.inserito_da = f.cleaned_data['inserito_da'] if (f.cleaned_data['inserito_da'] is not None) else request.user
+                ric_inv.inserito_da = inserito_da
                 ric_inv.note = f.cleaned_data['note']
+                ric_inv.nome=inserito_da.first_name.lower(),
+                ric_inv.cognome=inserito_da.last_name.lower()
                 
                 ric_inv.save()
 
@@ -1077,6 +1084,17 @@ def showRicognizioniInventariali(request):
 @login_required
 def getRicognizioniData(request):
     
+    user = request.user
+    #id_ab = None
+
+    #try:
+    if (not user.is_authenticated):
+        html = '{ "total": 0, "rows": [] }'
+        return HttpResponse(html)
+    
+    user_first_name = user.first_name 
+    user_last_name = user.last_name
+
     # get string parameters from the url
     requestOrder = request.GET.get('order', None)
     sort = request.GET.get('sort', None)
@@ -1135,11 +1153,23 @@ def getRicognizioniData(request):
 
     else:
 
+        #getting and counting the objects
+        if(user_first_name and user_last_name and not user.is_superuser):
+            # retrieve the objects
+            rows = RicognizioneInventariale.objects.using('default').filter(nome=user_first_name.lower(),cognome=user_last_name.lower()).order_by(order)[offset:offset + limit]
+        else:
+            # retrieve the objects
+            rows = RicognizioneInventariale.objects.using('default').all().order_by(order)[offset:offset + limit]
+        
         # counts the number of objects
-        total = RicognizioneInventariale.objects.using('default').all().count()
+        total = rows.count()
+
+
+        # counts the number of objects
+        #total = RicognizioneInventariale.objects.using('default').all().count()
 
         # retrieve the objects
-        rows = RicognizioneInventariale.objects.using('default').all().order_by(order)[offset:offset + limit]
+        #rows = RicognizioneInventariale.objects.using('default').all().order_by(order)[offset:offset + limit]
     
     # we construct the JSON response, we use json.dumps() to excape undesired characters
     html = '{ "total": ' + json.dumps(str(total)) + ', "rows": [ '
@@ -1212,8 +1242,17 @@ def advancedRicognizioneInventarialeSearch(request):
         else:
             # default is order by id asc
             order = '-id'
+
+        user_first_name = user.first_name
+        user_last_name = user.last_name
+        # counts the number of objects
+        if(user_first_name and user_last_name and not user.is_superuser):
+            rows = RicognizioneInventariale.objects.using('default').filter(
+                inserito_da__fist_name=user_first_name.lower(),inserito_da__last_name=user_last_name.lower())
+        else:
+            rows = RicognizioneInventariale.objects.using('default').all()
         
-        rows = RicognizioneInventariale.objects.using('default').all()
+        #rows = RicognizioneInventariale.objects.using('default').all()
         # filter id range
         #WAS: if (min_id is not None and max_id is not None):
         rows = rows.filter(id__range=(min_id, max_id))

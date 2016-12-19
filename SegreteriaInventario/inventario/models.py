@@ -50,6 +50,8 @@ class RicognizioneInventariale(models.Model):
     ubicazione_precisa = models.ForeignKey(UbicazionePrecisa,blank=True, null=True, on_delete=models.SET_NULL)
     note = models.CharField(max_length=400, blank=True, null=True)
     immagine = models.FileField(upload_to='pictures/%Y/%m/%d', blank=True, null=True)
+    nome = models.CharField(max_length=128,default=None, null = True)
+    cognome = models.CharField(max_length=128,default=None, null = True)
 
 class Esse3User(models.Model):
     name = models.CharField(max_length=50)
