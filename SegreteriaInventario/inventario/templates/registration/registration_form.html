@@ -16,6 +16,7 @@
 
     <!-- Bootstrap core CSS -->
     <link href="{% static 'css/bootstrap/bootstrap/bootstrap.min.css' %}" rel="stylesheet">
+    <link rel="stylesheet" href="https://ajax.googleapis.com/ajax/libs/jqueryui/1.11.3/themes/smoothness/jquery-ui.css">
     <!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
     <link href="{% static 'registration/css/ie10-viewport-bug-workaround.css' %}" rel="stylesheet">
     <!-- Custom styles for this template -->
@@ -100,5 +101,56 @@
 
     <!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
     <script src="{% static 'registration/js/ie10-viewport-bug-workaround.js' %}"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.11.3/jquery-ui.min.js"></script>
+
+    <script type="text/javascript">
+    $( '#inputFirstName' ).autocomplete({
+      // gets the data source from the server
+      source: function( request, response ) {
+        var url = '/inventario/ricinv/getPossessori';
+        $.ajax({ 
+            type: 'GET', 
+            url: url, 
+            dataType: 'json',
+            data:{term : request.term},
+            success: function (data) { 
+                var utenti = [];
+                var i = 0;
+                // parse the JSON into an Object Array
+                $.each(data.results, function(index, element) {
+                        var utente = {
+                          nome : element.NOME,
+                          cognome : element.COGNOME,
+                        };
+                        utenti[i] = utente;
+                        i++;
+                });
+                // matches every item of the array with the search term
+                var matcher = new RegExp($.ui.autocomplete.escapeRegex(request.term), "i");
+                response($.grep(utenti, function(value) {
+                    // for each object returns only pg_bene
+                    return (matcher.test(value.nome) || matcher.test(value.cognome));
+                }));
+            }
+        });
+      },
+    // triggered when an item of the list is selected
+    select: function(event, utente) {
+        // fill the form with the received data
+        $('#inputFirstName').val(utente.item.nome);
+        $('#inputLastName').val(utente.item.cognome);
+        return false;
+    }
+    })
+    // custom render of the items, we only need ID and description
+    .data('uiAutocomplete')._renderItem = function(ul, item) {
+    return $('<li></li>')
+        .data('item.autocomplete', item)
+        .append('<a>' + item.nome + ' ' + item.cognome + '</a>')
+        .appendTo(ul);
+    };
+    </script>
   </body>
 </html>
+

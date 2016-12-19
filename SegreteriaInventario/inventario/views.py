@@ -1146,6 +1146,7 @@ def getRicognizioniData(request):
     for row in rows:
         # we get the id of the ubicazione_precisa because we need to display it instead of the text value (that will be matched with the list in the view)
         ubicazione_precisa = row.ubicazione_precisa.id if (row.ubicazione_precisa is not None) else None
+        inserito_da = row.inserito_da.first_name + " " + row.inserito_da.last_name if row.inserito_da.first_name and row.inserito_da.last_name else row.inserito_da.username
         html = html + '{ \
         "id": ' + json.dumps(row.id) + ', \
         "inventario": ' + json.dumps(str(row.inventario)) + ', \
@@ -1155,7 +1156,7 @@ def getRicognizioniData(request):
         "ds_spazio": ' + json.dumps(row.ds_spazio) + ', \
         "possessore": ' + json.dumps(row.possessore) + ', \
         "nuovo_possessore": ' + json.dumps(row.nuovo_possessore) + ', \
-        "inserito_da": ' + json.dumps(str(row.inserito_da)) + ', \
+        "inserito_da": ' + json.dumps(inserito_da)+ ', \
         "ubicazione_precisa": ' + json.dumps(str(row.ubicazione_precisa_id)) + ', \
         "note": ' + json.dumps(row.note) + ', \
         "immagine": ' + json.dumps(str(row.immagine)) + \
@@ -1239,6 +1240,7 @@ def advancedRicognizioneInventarialeSearch(request):
         for row in rows:
             # we get the id of the ubicazione_precisa because we need to display it instead of the text value (that will be matched with the list in the view)
             ubicazione_precisa = row.ubicazione_precisa.id if (row.ubicazione_precisa is not None) else None
+            inserito_da = row.inserito_da.first_name + " " + row.inserito_da.last_name if row.inserito_da.first_name and row.inserito_da.last_name else row.inserito_da.username
             html = html + '{ \
             "id": ' + json.dumps(str(row.id)) + ', \
             "inventario": ' + json.dumps(str(row.inventario)) + ', \
@@ -1246,6 +1248,7 @@ def advancedRicognizioneInventarialeSearch(request):
             "pg_bene_sub": ' + json.dumps(str(row.pg_bene_sub)) + ', \
             "ds_bene": ' + json.dumps(row.ds_bene) + ', \
             "possessore" : ' + json.dumps(row.possessore) + ', \
+            "inserito_da" : ' + json.dumps(inserito_da) + ', \
             "ds_spazio": ' + json.dumps(row.ds_spazio) + ', \
             "ubicazione_precisa": ' + json.dumps(str(row.ubicazione_precisa_id)) + ', \
             "immagine": ' + json.dumps(str(row.immagine)) + \
@@ -1259,7 +1262,6 @@ def advancedRicognizioneInventarialeSearch(request):
         # Redirect to the document list after POST
         return redirect ('ricinv')
 
-@login_required
 def getPossessori(request):
     term = request.GET.get('term', "")
     cursor = connections['cineca'].cursor()         # Cursor connessione Cineca
