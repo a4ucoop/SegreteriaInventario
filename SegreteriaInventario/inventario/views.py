@@ -982,11 +982,11 @@ def ricognizioneInventarialeEditView(request):
         id = int(request.GET.get('id')) if (request.GET.get('id') is not None) else None
 
         f = RicognizioneInventarialeForm(request.POST, request.FILES)
-        inserito_da = f.cleaned_data['inserito_da'] if (f.cleaned_data['inserito_da'] is not None) else request.user
 
         if (id is not None): 
             ric_inv = RicognizioneInventariale.objects.get(id=id)
             if(f.is_valid()):
+                inserito_da = f.cleaned_data['inserito_da'] if (f.cleaned_data['inserito_da'] is not None) else request.user
                 ric_inv = RicognizioneInventariale.objects.get(id=id)
                 ric_inv.inventario = f.cleaned_data['inventario']
                 ric_inv.pg_bene = f.cleaned_data['pg_bene']
@@ -1000,8 +1000,8 @@ def ricognizioneInventarialeEditView(request):
                 ric_inv.nuovo_possessore = f.cleaned_data['nuovo_possessore']
                 ric_inv.inserito_da = inserito_da
                 ric_inv.note = f.cleaned_data['note']
-                ric_inv.nome=inserito_da.first_name.lower(),
-                ric_inv.cognome=inserito_da.last_name.lower()
+                #ric_inv.nome= inserito_da.first_name.lower(),
+                #ric_inv.cognome= inserito_da.last_name.lower()
                 
                 ric_inv.save()
 
@@ -1202,6 +1202,7 @@ def getRicognizioniData(request):
 def advancedRicognizioneInventarialeSearch(request):
     if request.method == 'GET':
 
+        user = request.user
         ricinv = RicognizioneInventariale.objects.using('default')
 
         min_id = int(request.GET.get('min_id')) if (request.GET.get('min_id') is not None) else ricinv.order_by("id").first().id
@@ -1248,7 +1249,7 @@ def advancedRicognizioneInventarialeSearch(request):
         # counts the number of objects
         if(user_first_name and user_last_name and not user.is_superuser):
             rows = RicognizioneInventariale.objects.using('default').filter(
-                inserito_da__fist_name=user_first_name.lower(),inserito_da__last_name=user_last_name.lower())
+                inserito_da__first_name=user_first_name.lower(),inserito_da__last_name=user_last_name.lower())
         else:
             rows = RicognizioneInventariale.objects.using('default').all()
         
