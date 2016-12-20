@@ -45,7 +45,7 @@
                   <a href="#" id="btn-1" data-toggle="collapse" data-target="#submenu1" aria-expanded="false">Ubicazioni</a>
                   <ul class="nav collapse" id="submenu1" role="menu" aria-labelledby="btn-1">
                   {% for l in locations %}
-                      <li ><a style="line-height:10px" href="#" title="{{l}}" onClick="locationSearch('{{l}}', this)">{{l}}</a></li>
+                      <li ><a style="line-height:10px" href="#" title="{{l}}" onClick="locationSearch('{{l|escapejs}}', this)">{{l}}</a></li>
                   {%endfor%}
                   </ul>    
               </li>
@@ -54,7 +54,7 @@
                 <a href="#" id="btn-2" data-toggle="collapse" data-target="#submenu2" aria-expanded="false">Ubicazioni Precise</a>
                 <ul class="nav collapse" id="submenu2" role="menu" aria-labelledby="btn-2">
                 {% for al in accurateLocations %}
-                    <li ><a style="line-height:10px" href="#" title="{{al}}" onClick="accurateLocationSearch('{{al}}', this)">{{al}}</a></li>
+                    <li ><a style="line-height:10px" href="#" title="{{al}}" onClick="accurateLocationSearch('{{al|escapejs}}', this)">{{al}}</a></li>
                 {%endfor%}
                 </ul>    
             </li>
@@ -64,7 +64,7 @@
                 <a href="#" id="btn-3" data-toggle="collapse" data-target="#submenu3" aria-expanded="false">Possessori</a>
                 <ul class="nav collapse" id="submenu3" role="menu" aria-labelledby="btn-3">
                 {% for al in possessori %}
-                    <li ><a style="line-height:10px" href="#" title="{{al.0}} {{ al.1}}" onClick="possessoriSearch('{{al.0}}','{{al.1}}', this)">{{al.0}} {{ al.1}}</a></li>
+                    <li ><a style="line-height:10px" href="#" title="{{al.0}} {{ al.1}}" onClick="possessoriSearch('{{al.0|escapejs}}','{{al.1|escapejs}}', this)">{{al.0}} {{ al.1}}</a></li>
                 {%endfor%}
                 </ul>    
             </li>
