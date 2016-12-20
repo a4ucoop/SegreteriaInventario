@@ -515,28 +515,28 @@ def getData(request):
     if search is not None:
 
         # counts the number of objects that match the query
-        total = Bene.objects.using('default').filter(\
-            Q(id_bene__icontains= search) | \
-            Q(cd_invent__icontains= search) | \
-            Q(ds_invent__icontains= search) | \
-            Q(pg_bene__icontains= search) | \
-            Q(pg_bene_sub__icontains= search) | \
-            Q(ds_bene__icontains= search) | \
-            Q(dt_registrazione_buono__icontains= search) | \
-            Q(cd_categ_gruppo__icontains= search) | \
-            Q(ds_categ_gruppo__icontains= search) | \
-            Q(ds_spazio__icontains= search) | \
-            Q(ubicazione_precisa__ubicazione__icontains= search) | \
-            Q(dt_ini_ammortamento__icontains= search) | \
-            Q(valore_convenzionale__icontains= search) | \
-            Q(nome_tipo_dg__icontains= search) | \
-            Q(num_doc_rif__icontains= search) | \
-            Q(num_registrazione__icontains= search) | \
-            Q(dt_registrazione_dg__icontains= search) | \
-            Q(denominazione__icontains= search) |\
-            Q(nome__icontains= search) | \
-            Q(cognome__icontains= search) \
-            ).count()
+        #total = Bene.objects.using('default').filter(\
+        #    Q(id_bene__icontains= search) | \
+        #    Q(cd_invent__icontains= search) | \
+        #    Q(ds_invent__icontains= search) | \
+        #    Q(pg_bene__icontains= search) | \
+        #    Q(pg_bene_sub__icontains= search) | \
+        #    Q(ds_bene__icontains= search) | \
+        #    Q(dt_registrazione_buono__icontains= search) | \
+        #    Q(cd_categ_gruppo__icontains= search) | \
+        #    Q(ds_categ_gruppo__icontains= search) | \
+        #    Q(ds_spazio__icontains= search) | \
+        #    Q(ubicazione_precisa__ubicazione__icontains= search) | \
+        #    Q(dt_ini_ammortamento__icontains= search) | \
+        #    Q(valore_convenzionale__icontains= search) | \
+        #    Q(nome_tipo_dg__icontains= search) | \
+        #    Q(num_doc_rif__icontains= search) | \
+        #    Q(num_registrazione__icontains= search) | \
+        #    Q(dt_registrazione_dg__icontains= search) | \
+        #    Q(denominazione__icontains= search) |\
+        #    Q(nome__icontains= search) | \
+        #    Q(cognome__icontains= search) \
+        #    ).count()
 
         # retrieve the objects that match the query
         rows = Bene.objects.using('default').filter(\
@@ -561,6 +561,13 @@ def getData(request):
             Q(nome__icontains= search) | \
             Q(cognome__icontains= search) \
             )
+
+
+        if(user_first_name and user_last_name and not user.is_superuser):
+            rows = rows.filter(nome=user_first_name.lower(),cognome=user_last_name.lower())
+        
+        total = rows.count()
+
         if order == 'possessore':
             rows = rows.order_by(*sorts('nome','cognome'))[offset:offset + limit]
         elif order == '-possessore':
@@ -1120,20 +1127,20 @@ def getRicognizioniData(request):
     if search is not None:
 
         # counts the number of objects that match the query
-        total = RicognizioneInventariale.objects.using('default').filter(\
-            Q(id__icontains= search) | \
-            Q(inventario__cd_invent__icontains= search) | \
-            Q(inventario__ds_invent__icontains= search) | \
-            Q(pg_bene__icontains= search) | \
-            Q(pg_bene_sub__icontains= search) | \
-            Q(ds_bene__icontains= search) | \
-            Q(ds_spazio__icontains= search) | \
-            Q(possessore__icontains= search) | \
-            Q(nuovo_possessore__icontains= search) | \
-            Q(inserito_da__username__icontains= search) | \
-            Q(note__icontains= search) | \
-            Q(ubicazione_precisa__ubicazione__icontains= search)  \
-            ).count()
+        #total = RicognizioneInventariale.objects.using('default').filter(\
+        #    Q(id__icontains= search) | \
+        #    Q(inventario__cd_invent__icontains= search) | \
+        #    Q(inventario__ds_invent__icontains= search) | \
+        #    Q(pg_bene__icontains= search) | \
+        #    Q(pg_bene_sub__icontains= search) | \
+        #    Q(ds_bene__icontains= search) | \
+        #    Q(ds_spazio__icontains= search) | \
+        #    Q(possessore__icontains= search) | \
+        #    Q(nuovo_possessore__icontains= search) | \
+        #    Q(inserito_da__username__icontains= search) | \
+        #    Q(note__icontains= search) | \
+        #    Q(ubicazione_precisa__ubicazione__icontains= search)  \
+        #    ).count()
 
         # retrieve the objects that match the query
         rows = RicognizioneInventariale.objects.using('default').filter(\
@@ -1149,7 +1156,15 @@ def getRicognizioniData(request):
             Q(inserito_da__username__icontains= search) | \
             Q(note__icontains= search) | \
             Q(ubicazione_precisa__ubicazione__icontains= search)  \
-            ).order_by(order)[offset:offset + limit]
+            )
+
+        #getting and counting the objects
+        if(user_first_name and user_last_name and not user.is_superuser):
+            rows = rows.filter(nome=user_first_name.lower(),cognome=user_last_name.lower())
+        rows = rows.order_by(order)[offset:offset + limit]
+
+        # counts the number of objects
+        total = rows.count()
 
     else:
 
