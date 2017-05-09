@@ -26,9 +26,14 @@ import json
 from django.core import serializers
 from django.http import JsonResponse
 
+from django.contrib.auth import authenticate, login
+
+import logging
+
 @login_required
 def index(request):
 	# return showLocalDB(request)
+
     return render (request,'inventario/index.html')
 
 def ricinv(request):
@@ -36,7 +41,21 @@ def ricinv(request):
 
 @never_cache
 def login(request, *args, **kw):
-    return django_auth_login(request, *args, **kw)
+    logger = logging.getLogger('django_auth_ldap')
+    logger.addHandler(logging.StreamHandler())
+    logger.setLevel(logging.DEBUG)
+    if request.method == 'POST':
+        user = authenticate(username=request.POST.get('username'), password=request.POST.get('password'))
+        if(user):
+            try:
+                user.first_name = user.username.split('.')[0]
+                user.last_name = user.username.split('.')[1]
+                user.save()
+            except IndexError:
+                pass
+        return django_auth_login(request, *args, **kw)
+    if request.method == 'GET':
+        return django_auth_login(request, *args, **kw)
 
 # prende il cursore che ha eseguito la query, estrae i risultati sotto
 # forma di dizionario che ha come chiave il nome del campo

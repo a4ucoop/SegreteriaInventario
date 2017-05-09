@@ -13,6 +13,8 @@ https://docs.djangoproject.com/en/1.8/ref/settings/
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 import os
 import sys
+import ldap
+from django_auth_ldap.config import LDAPSearch
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
@@ -132,3 +134,17 @@ ACCOUNT_ACTIVATION_DAYS = 7
 #EMAIL_BACKEND = 'django.core.mail.backends.filebased.EmailBackend'
 #EMAIL_FILE_PATH = '/tmp/app-messages' # change this to a proper location
 
+AUTHENTICATION_BACKENDS = (
+    'django_auth_ldap.backend.LDAPBackend',
+    'django.contrib.auth.backends.ModelBackend',
+)
+
+#AUTH_LDAP_SERVER_URI = "ldap://ldap.forumsys.com"
+#
+#
+#AUTH_LDAP_BIND_DN = "cn=read-only-admin,dc=example,dc=com"
+#AUTH_LDAP_BIND_PASSWORD = "password"
+#AUTH_LDAP_USER_SEARCH = LDAPSearch("dc=example,dc=com",
+#    ldap.SCOPE_SUBTREE, "(uid=%(user)s)")
+#    ldap.SCOPE_SUBTREE, "(sAMAccountName=%(user)s)")
+##AUTH_LDAP_USER_DN_TEMPLATE = "uid=%(user)s,ou=scientists,dc=example,dc=com"
